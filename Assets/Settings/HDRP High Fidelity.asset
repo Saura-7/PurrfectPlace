@@ -209,7 +209,6 @@ MonoBehaviour:
   - {fileID: 0}
   m_PrefilterUseLegacyLightmaps: 0
   m_PrefilterUseLightmapBicubicSampling: 0
-  m_ShouldUseConservativeEnclosingSphere: 0
   m_RenderPipelineSettings:
     supportShadowMask: 0
     supportSSR: 0
@@ -284,7 +283,7 @@ MonoBehaviour:
     supportProbeVolumeScenarios: 0
     supportProbeVolumeScenarioBlending: 1
     probeVolumeBlendingMemoryBudget: 128
-    supportRayTracing: 1
+    supportRayTracing: 0
     supportVFXRayTracing: 0
     supportedRayTracingMode: 3
     lightLoopSettings:
