@@ -4,10 +4,10 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField]CharacterController controller;
-    [SerializeField] float walkSpeed = 12f;
-    [SerializeField] float gravity = -9.81f;
-    [SerializeField] float jumpHeight = 1.5f;
+    CharacterController controller;
+    float walkSpeed = 10f;
+    float gravity = -24.5f;
+    float jumpHeight = 1.5f;
 
     InputSystem_Actions inputSystemActions;
     InputAction moveAction;
