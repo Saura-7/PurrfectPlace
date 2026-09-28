@@ -145,6 +145,42 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Interact2"",
+                    ""type"": ""Button"",
+                    ""id"": ""3ab99c4e-7844-48c4-a370-6aaed4663b7a"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Interact3"",
+                    ""type"": ""Button"",
+                    ""id"": ""7dd5bdda-34a6-4e98-aa01-76391060d144"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Interact4"",
+                    ""type"": ""Button"",
+                    ""id"": ""740135d4-b653-48c9-81b5-25d64e7fabe9"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Interact5"",
+                    ""type"": ""Button"",
+                    ""id"": ""8bd40582-2ef1-4e53-8b0b-d05051d21a7a"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -376,6 +412,138 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""XR"",
                     ""action"": ""Interact1"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""dee3b2dd-4506-48c7-8abe-55be1b0b9f0e"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Interact2"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f537f36d-e3dc-4027-a579-5e87ac07f17f"",
+                    ""path"": ""<Gamepad>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Interact2"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""853b58e8-b85d-43e2-be80-61670ef72cec"",
+                    ""path"": ""<XRController>/trigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""XR"",
+                    ""action"": ""Interact2"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""226eb17b-fcb4-4dac-9cdb-143d35bcc7fb"",
+                    ""path"": ""<Keyboard>/c"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Interact3"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""94486aee-a5e0-445f-b97b-7ea8faff6ef9"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Interact3"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""90bbda77-474a-44fe-b5fa-d96db9f01c63"",
+                    ""path"": ""<XRController>/trigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""XR"",
+                    ""action"": ""Interact3"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""04c8cf6a-9b54-4476-8fcb-f512b391101f"",
+                    ""path"": ""<Keyboard>/x"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Interact4"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9c60ca57-8065-463c-a8a1-d20a78032324"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Interact4"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c4307470-86fe-4c1e-b863-1ce153dffd32"",
+                    ""path"": ""<XRController>/trigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""XR"",
+                    ""action"": ""Interact4"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a725e980-a773-457a-8d59-37e203b90f61"",
+                    ""path"": ""<Keyboard>/z"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Interact5"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8b80dab9-baf3-4c5e-aac1-d2512b722028"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Interact5"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fcc1c15f-2614-42d7-baa0-d22d96e257a9"",
+                    ""path"": ""<XRController>/trigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""XR"",
+                    ""action"": ""Interact5"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1024,6 +1192,10 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
         m_Player_Interact1 = m_Player.FindAction("Interact1", throwIfNotFound: true);
+        m_Player_Interact2 = m_Player.FindAction("Interact2", throwIfNotFound: true);
+        m_Player_Interact3 = m_Player.FindAction("Interact3", throwIfNotFound: true);
+        m_Player_Interact4 = m_Player.FindAction("Interact4", throwIfNotFound: true);
+        m_Player_Interact5 = m_Player.FindAction("Interact5", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1123,6 +1295,10 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Sprint;
     private readonly InputAction m_Player_Interact1;
+    private readonly InputAction m_Player_Interact2;
+    private readonly InputAction m_Player_Interact3;
+    private readonly InputAction m_Player_Interact4;
+    private readonly InputAction m_Player_Interact5;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1158,6 +1334,22 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Interact1".
         /// </summary>
         public InputAction @Interact1 => m_Wrapper.m_Player_Interact1;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/Interact2".
+        /// </summary>
+        public InputAction @Interact2 => m_Wrapper.m_Player_Interact2;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/Interact3".
+        /// </summary>
+        public InputAction @Interact3 => m_Wrapper.m_Player_Interact3;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/Interact4".
+        /// </summary>
+        public InputAction @Interact4 => m_Wrapper.m_Player_Interact4;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/Interact5".
+        /// </summary>
+        public InputAction @Interact5 => m_Wrapper.m_Player_Interact5;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1202,6 +1394,18 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Interact1.started += instance.OnInteract1;
             @Interact1.performed += instance.OnInteract1;
             @Interact1.canceled += instance.OnInteract1;
+            @Interact2.started += instance.OnInteract2;
+            @Interact2.performed += instance.OnInteract2;
+            @Interact2.canceled += instance.OnInteract2;
+            @Interact3.started += instance.OnInteract3;
+            @Interact3.performed += instance.OnInteract3;
+            @Interact3.canceled += instance.OnInteract3;
+            @Interact4.started += instance.OnInteract4;
+            @Interact4.performed += instance.OnInteract4;
+            @Interact4.canceled += instance.OnInteract4;
+            @Interact5.started += instance.OnInteract5;
+            @Interact5.performed += instance.OnInteract5;
+            @Interact5.canceled += instance.OnInteract5;
         }
 
         /// <summary>
@@ -1231,6 +1435,18 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Interact1.started -= instance.OnInteract1;
             @Interact1.performed -= instance.OnInteract1;
             @Interact1.canceled -= instance.OnInteract1;
+            @Interact2.started -= instance.OnInteract2;
+            @Interact2.performed -= instance.OnInteract2;
+            @Interact2.canceled -= instance.OnInteract2;
+            @Interact3.started -= instance.OnInteract3;
+            @Interact3.performed -= instance.OnInteract3;
+            @Interact3.canceled -= instance.OnInteract3;
+            @Interact4.started -= instance.OnInteract4;
+            @Interact4.performed -= instance.OnInteract4;
+            @Interact4.canceled -= instance.OnInteract4;
+            @Interact5.started -= instance.OnInteract5;
+            @Interact5.performed -= instance.OnInteract5;
+            @Interact5.canceled -= instance.OnInteract5;
         }
 
         /// <summary>
@@ -1573,6 +1789,34 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnInteract1(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Interact2" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnInteract2(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Interact3" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnInteract3(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Interact4" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnInteract4(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Interact5" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnInteract5(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.
