@@ -1,13 +1,10 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
+using Unity.Cinemachine;
 
 public class PlayerLook : MonoBehaviour
 {
-    [SerializeField] public float mouseSens = 150f;
     [SerializeField] Transform playerBody;
-    float xRotation;
-    InputSystem_Actions inputActions;
-    InputAction lookAction;
+
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked; // Lock the cursor to the center of the screen
@@ -15,26 +12,22 @@ public class PlayerLook : MonoBehaviour
 
     void OnEnable()
     {
-        inputActions = new InputSystem_Actions();
-        inputActions.Enable();
-        lookAction = inputActions.Player.Look;
-    }
-
-    void Update()
-    {
-        Vector2 lookVector = lookAction.ReadValue<Vector2>();
-        float lookX = lookVector.x * mouseSens * Time.deltaTime;
-        float lookY = lookVector.y * mouseSens * Time.deltaTime;
-
-        xRotation -= lookY;
-        xRotation = Mathf.Clamp(xRotation, -90f, 90f);
-
-        playerBody.Rotate(Vector3.up * lookX);//To rotate the parent object which is the player.
-        transform.localRotation = Quaternion.Euler(xRotation, 90f, 0f);
+        CinemachineCore.CameraUpdatedEvent.AddListener(UpdatePlayerBodyRotation);
     }
 
     void OnDisable()
     {
-        inputActions.Disable();
+        CinemachineCore.CameraUpdatedEvent.RemoveListener(UpdatePlayerBodyRotation);
+    }
+
+    void UpdatePlayerBodyRotation(CinemachineBrain brain)
+    {
+        if (playerBody == null || brain == null || brain.OutputCamera == null || brain.OutputCamera.transform != transform) return;
+
+        Vector3 cameraForward = transform.forward;
+        cameraForward.y = 0f;
+        if (cameraForward.sqrMagnitude < 0.0001f) return;
+
+        playerBody.rotation = Quaternion.LookRotation(cameraForward, Vector3.up);
     }
 }

@@ -9,40 +9,59 @@ public class ReceptionDesk : MonoBehaviour
     public float maxInteractionDistance = 10f;
 
     private InputSystem_Actions inputActions;
+    private InputAction CompleteDealAction;
 
     private void OnEnable()
     {
         inputActions = new InputSystem_Actions();
-
-        // Bind to 'Interact' action (E on Keyboard / Button North on Gamepad)
-        inputActions.Player.Interact.started += OnInteractPressed;
-
+        CompleteDealAction = inputActions.Player.CompleteDeal;
         inputActions.Player.Enable();
     }
 
     private void OnDisable()
     {
-        if (inputActions != null)
+        if (inputActions != null) inputActions.Player.Disable();
+    }
+
+    private void Update()
+    {
+        if (CompleteDealAction.WasPressedThisFrame())
         {
-            inputActions.Player.Interact.started -= OnInteractPressed;
-            inputActions.Player.Disable();
+            OnInteractPressed();
         }
     }
 
-    private void OnInteractPressed(InputAction.CallbackContext context)
+    private void LateUpdate()
+    {
+        // 1. Draw the ray in LateUpdate so it perfectly syncs with Cinemachine
+        if (Camera.main != null)
+        {
+            // Viewport 0.5f, 0.5f is the absolute dead-center of the screen
+            Ray debugRay = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+            
+            Debug.DrawRay(debugRay.origin, debugRay.direction * maxInteractionDistance, Color.blue);
+        }
+    }
+
+    private void OnInteractPressed()
     {
         if (Camera.main == null) return;
 
-        // 1. Unified Center-Screen Raycast (Works for Mouse & Gamepad)
-        Vector3 centerScreen = new Vector3(Screen.width / 2f, Screen.height / 2f, 0f);
-        Ray ray = Camera.main.ScreenPointToRay(centerScreen);
+        // 2. Use the exact same Viewport center for the actual interaction
+        Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
 
         if (Physics.Raycast(ray, out RaycastHit hit, maxInteractionDistance))
         {
-            // 2. Check if the player is aiming directly at this Reception Desk
-            if (hit.collider.gameObject == gameObject || hit.collider.GetComponent<ReceptionDesk>() != null)
+            Debug.Log($"Raycast hit: {hit.collider.gameObject.name}");
+            
+            // 3. Check if the player is actually looking at THIS reception desk (or its child meshes)
+            if (hit.collider.gameObject == gameObject || hit.collider.GetComponentInParent<ReceptionDesk>() != null)
             {
                 ProcessTransaction();
+            }
+            else
+            {
+                Debug.Log("You must look directly at the Reception Desk to complete a deal.");
             }
         }
     }
