@@ -17,83 +17,76 @@ public class CareSubsystem : MonoBehaviour
     void OnEnable()
     {
         inputActions = new InputSystem_Actions();
-        RightShoulder = inputActions.Player.Interact3;
-        LeftShoulder = inputActions.Player.Interact4;
+        RightShoulder = inputActions.Player.FeedCat;
+        LeftShoulder = inputActions.Player.CleanCat;
         // interact1Action = inputActions.Player.Interact1;
         inputActions.Enable();
     }
 
-    private void Update()
+ private void Update()
+{
+    // 1. DRAW THE RAYCAST EVERY FRAME (Continuous Visualization)
+    if (Camera.main != null)
     {
-        // 0 = Left Click (Feed), 1 = Right Click (Clean)
-        if (LeftShoulder.WasPressedThisFrame())
-        {
-            TryCareForCat(isFeeding: true);
-        }
-        else if (RightShoulder.WasPressedThisFrame()) 
-        {
-            TryCareForCat(isFeeding: false);
-        }
+        // CRITICAL: This must be Camera.main.transform, not just "transform"
+        Vector3 rayOrigin = Camera.main.transform.position;
+        Vector3 rayDirection = Camera.main.transform.forward;
+        
+        // Draws a permanent blue laser in the Scene view exactly where the camera is looking
+        Debug.DrawRay(rayOrigin, rayDirection * maxInteractionDistance, Color.blue);
     }
 
-    private void TryCareForCat(bool isFeeding)
+    // 2. CHECK FOR INPUTS
+    if (LeftShoulder.WasPressedThisFrame())
     {
-        if (Camera.main == null) return;
+        TryCareForCat(isFeeding: false); 
+    }
+    else if (RightShoulder.WasPressedThisFrame()) 
+    {
+        TryCareForCat(isFeeding: true); 
+    }
+}
 
-        // 1. Calculate the ray from the center of the camera
-        Vector3 centerScreen = new Vector3(Screen.width / 2f, Screen.height / 2f, 0f);
-        Ray ray = Camera.main.ScreenPointToRay(centerScreen);
+private void TryCareForCat(bool isFeeding)
+{
+    if (Camera.main == null) return;
 
-        Color debugColor = Color.red; // Default color when aiming at nothing
+    // 3. CREATE THE SAME RAY FOR THE ACTUAL INTERACTION
+    Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
 
-        // 2. If the ray hits a physical object in the scene...
-        if (Physics.Raycast(ray, out RaycastHit hit, maxInteractionDistance))
+    if (Physics.Raycast(ray, out RaycastHit hit, maxInteractionDistance))
+    {
+        Debug.Log($"Raycast hit: {hit.collider.name}");
+
+        BaseCat clickedCat = hit.collider.GetComponent<BaseCat>();
+
+        if (clickedCat != null)
         {
-            // 3. Check if the object we hit is actually a Cat
-            BaseCat clickedCat = hit.collider.GetComponent<BaseCat>();
+            // Economy and Care Logic
+            int currentMoney = CoreEconomySystem.Instance.GetGP(systemName);
 
-            if (clickedCat != null)
+            if (currentMoney >= careCost)
             {
-                // 4. Check if the cat is already maxed out on this stat
-                if (isFeeding && clickedCat.feedingLevel >= 6)
-                {
-                    Debug.Log("Cat is already completely full!");
-                    return; // Stop running code
-                }
-                if (!isFeeding && clickedCat.cleanlinessLevel >= 6)
-                {
-                    Debug.Log("Cat is already perfectly clean!");
-                    return; // Stop running code
-                }
+                CoreEconomySystem.Instance.ModifyGP(-careCost, systemName);
 
-                // 5. ECONOMY CHECK: Do we have $10?
-                int currentMoney = CoreEconomySystem.Instance.GetGP(systemName);
+                if (isFeeding) { clickedCat.UpgradeFeeding(); }
+                else { clickedCat.UpgradeCleanliness(); }
 
-                if (currentMoney >= careCost)
-                {
-                    // 6. PROCESS TRANSACTION: Deduct money using the Audit Trail
-                    CoreEconomySystem.Instance.ModifyGP(-careCost, systemName);
-
-                    // 7. COMMAND THE PUPPET: Upgrade the stat and play animation
-                    if (isFeeding)
-                    {
-                        clickedCat.UpgradeFeeding();
-                        Debug.Log($"Fed {clickedCat.name}! Feeding Level is now {clickedCat.feedingLevel}.");
-                    }
-                    else
-                    {
-                        clickedCat.UpgradeCleanliness();
-                        Debug.Log($"Cleaned {clickedCat.name}! Cleanliness Level is now {clickedCat.cleanlinessLevel}.");
-                    }
-
-                    // Tell the cat to react visually
-                    clickedCat.PlayInteractAnimation();
-                }
-                else
-                {
-                    Debug.LogWarning("Not enough GP to care for the cat!");
-                }
+                clickedCat.PlayInteractAnimation();
+            }
+            else
+            {
+                Debug.LogWarning("Not enough GP!");
             }
         }
+        else
+        {
+            Debug.LogWarning("Raycast hit an object, but it is not a Cat.");
+        }
     }
+    else
+    {
+        Debug.Log("Raycast hit nothing.");
+    }
+}
 }

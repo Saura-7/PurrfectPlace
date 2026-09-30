@@ -5,14 +5,14 @@ public class DebugEconomyTester : MonoBehaviour
 {
     private readonly string systemName = "DebugTester";
     private InputSystem_Actions inputActions;
-    private InputAction interactAction;
-    private InputAction interact1Action;
+    private InputAction GetGPAction;
+    private InputAction GetReputationAction;
 
     void OnEnable()
     {
         inputActions = new InputSystem_Actions();
-        interactAction = inputActions.Player.Interact;
-        interact1Action = inputActions.Player.Interact1;
+        GetGPAction = inputActions.Player.MoneyIncrease;
+        GetReputationAction = inputActions.Player.RepIncrease;
         inputActions.Enable();
     }
 
@@ -28,12 +28,12 @@ public class DebugEconomyTester : MonoBehaviour
             return;
         }
 
-        if (interactAction.WasPressedThisFrame())
+        if (GetGPAction.WasPressedThisFrame())
         {
             CoreEconomySystem.Instance.ModifyGP(15, systemName);
         }
 
-        if (interact1Action.WasPressedThisFrame())
+        if (GetReputationAction.WasPressedThisFrame())
         {
             CoreEconomySystem.Instance.ModifyReputation(5, systemName);
         }

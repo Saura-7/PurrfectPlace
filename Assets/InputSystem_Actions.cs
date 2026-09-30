@@ -111,7 +111,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""Interact"",
+                    ""name"": ""MoneyIncrease"",
                     ""type"": ""Button"",
                     ""id"": ""852140f2-7766-474d-8707-702459ba45f3"",
                     ""expectedControlType"": """",
@@ -138,7 +138,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Interact1"",
+                    ""name"": ""RepIncrease"",
                     ""type"": ""Button"",
                     ""id"": ""d3075d99-624a-4ea3-a6de-5f8ac0633eda"",
                     ""expectedControlType"": """",
@@ -147,7 +147,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Interact2"",
+                    ""name"": ""SpawnCat"",
                     ""type"": ""Button"",
                     ""id"": ""3ab99c4e-7844-48c4-a370-6aaed4663b7a"",
                     ""expectedControlType"": """",
@@ -156,7 +156,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Interact3"",
+                    ""name"": ""FeedCat"",
                     ""type"": ""Button"",
                     ""id"": ""7dd5bdda-34a6-4e98-aa01-76391060d144"",
                     ""expectedControlType"": """",
@@ -165,7 +165,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Interact4"",
+                    ""name"": ""CleanCat"",
                     ""type"": ""Button"",
                     ""id"": ""740135d4-b653-48c9-81b5-25d64e7fabe9"",
                     ""expectedControlType"": """",
@@ -174,7 +174,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Interact5"",
+                    ""name"": ""CompleteDeal"",
                     ""type"": ""Button"",
                     ""id"": ""8bd40582-2ef1-4e53-8b0b-d05051d21a7a"",
                     ""expectedControlType"": """",
@@ -389,7 +389,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Interact1"",
+                    ""action"": ""RepIncrease"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -400,7 +400,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
-                    ""action"": ""Interact1"",
+                    ""action"": ""RepIncrease"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -411,7 +411,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""XR"",
-                    ""action"": ""Interact1"",
+                    ""action"": ""RepIncrease"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -422,7 +422,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Interact2"",
+                    ""action"": ""SpawnCat"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -433,7 +433,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
-                    ""action"": ""Interact2"",
+                    ""action"": ""SpawnCat"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -444,7 +444,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""XR"",
-                    ""action"": ""Interact2"",
+                    ""action"": ""SpawnCat"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -455,18 +455,18 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Interact3"",
+                    ""action"": ""FeedCat"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
                     ""id"": ""94486aee-a5e0-445f-b97b-7ea8faff6ef9"",
-                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""path"": ""<Gamepad>/dpad/up"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
-                    ""action"": ""Interact3"",
+                    ""action"": ""FeedCat"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -477,7 +477,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""XR"",
-                    ""action"": ""Interact3"",
+                    ""action"": ""FeedCat"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -488,18 +488,18 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Interact4"",
+                    ""action"": ""CleanCat"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
                     ""id"": ""9c60ca57-8065-463c-a8a1-d20a78032324"",
-                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""path"": ""<Gamepad>/dpad/down"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
-                    ""action"": ""Interact4"",
+                    ""action"": ""CleanCat"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -510,7 +510,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""XR"",
-                    ""action"": ""Interact4"",
+                    ""action"": ""CleanCat"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -521,7 +521,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Interact5"",
+                    ""action"": ""CompleteDeal"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -532,7 +532,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
-                    ""action"": ""Interact5"",
+                    ""action"": ""CompleteDeal"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -543,7 +543,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""XR"",
-                    ""action"": ""Interact5"",
+                    ""action"": ""CompleteDeal"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -587,7 +587,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Interact"",
+                    ""action"": ""MoneyIncrease"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -598,7 +598,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
-                    ""action"": ""Interact"",
+                    ""action"": ""MoneyIncrease"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1188,14 +1188,14 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
         m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
-        m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
+        m_Player_MoneyIncrease = m_Player.FindAction("MoneyIncrease", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
-        m_Player_Interact1 = m_Player.FindAction("Interact1", throwIfNotFound: true);
-        m_Player_Interact2 = m_Player.FindAction("Interact2", throwIfNotFound: true);
-        m_Player_Interact3 = m_Player.FindAction("Interact3", throwIfNotFound: true);
-        m_Player_Interact4 = m_Player.FindAction("Interact4", throwIfNotFound: true);
-        m_Player_Interact5 = m_Player.FindAction("Interact5", throwIfNotFound: true);
+        m_Player_RepIncrease = m_Player.FindAction("RepIncrease", throwIfNotFound: true);
+        m_Player_SpawnCat = m_Player.FindAction("SpawnCat", throwIfNotFound: true);
+        m_Player_FeedCat = m_Player.FindAction("FeedCat", throwIfNotFound: true);
+        m_Player_CleanCat = m_Player.FindAction("CleanCat", throwIfNotFound: true);
+        m_Player_CompleteDeal = m_Player.FindAction("CompleteDeal", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1291,14 +1291,14 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private List<IPlayerActions> m_PlayerActionsCallbackInterfaces = new List<IPlayerActions>();
     private readonly InputAction m_Player_Move;
     private readonly InputAction m_Player_Look;
-    private readonly InputAction m_Player_Interact;
+    private readonly InputAction m_Player_MoneyIncrease;
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Sprint;
-    private readonly InputAction m_Player_Interact1;
-    private readonly InputAction m_Player_Interact2;
-    private readonly InputAction m_Player_Interact3;
-    private readonly InputAction m_Player_Interact4;
-    private readonly InputAction m_Player_Interact5;
+    private readonly InputAction m_Player_RepIncrease;
+    private readonly InputAction m_Player_SpawnCat;
+    private readonly InputAction m_Player_FeedCat;
+    private readonly InputAction m_Player_CleanCat;
+    private readonly InputAction m_Player_CompleteDeal;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1319,9 +1319,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Look => m_Wrapper.m_Player_Look;
         /// <summary>
-        /// Provides access to the underlying input action "Player/Interact".
+        /// Provides access to the underlying input action "Player/MoneyIncrease".
         /// </summary>
-        public InputAction @Interact => m_Wrapper.m_Player_Interact;
+        public InputAction @MoneyIncrease => m_Wrapper.m_Player_MoneyIncrease;
         /// <summary>
         /// Provides access to the underlying input action "Player/Jump".
         /// </summary>
@@ -1331,25 +1331,25 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
         /// <summary>
-        /// Provides access to the underlying input action "Player/Interact1".
+        /// Provides access to the underlying input action "Player/RepIncrease".
         /// </summary>
-        public InputAction @Interact1 => m_Wrapper.m_Player_Interact1;
+        public InputAction @RepIncrease => m_Wrapper.m_Player_RepIncrease;
         /// <summary>
-        /// Provides access to the underlying input action "Player/Interact2".
+        /// Provides access to the underlying input action "Player/SpawnCat".
         /// </summary>
-        public InputAction @Interact2 => m_Wrapper.m_Player_Interact2;
+        public InputAction @SpawnCat => m_Wrapper.m_Player_SpawnCat;
         /// <summary>
-        /// Provides access to the underlying input action "Player/Interact3".
+        /// Provides access to the underlying input action "Player/FeedCat".
         /// </summary>
-        public InputAction @Interact3 => m_Wrapper.m_Player_Interact3;
+        public InputAction @FeedCat => m_Wrapper.m_Player_FeedCat;
         /// <summary>
-        /// Provides access to the underlying input action "Player/Interact4".
+        /// Provides access to the underlying input action "Player/CleanCat".
         /// </summary>
-        public InputAction @Interact4 => m_Wrapper.m_Player_Interact4;
+        public InputAction @CleanCat => m_Wrapper.m_Player_CleanCat;
         /// <summary>
-        /// Provides access to the underlying input action "Player/Interact5".
+        /// Provides access to the underlying input action "Player/CompleteDeal".
         /// </summary>
-        public InputAction @Interact5 => m_Wrapper.m_Player_Interact5;
+        public InputAction @CompleteDeal => m_Wrapper.m_Player_CompleteDeal;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1382,30 +1382,30 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Look.started += instance.OnLook;
             @Look.performed += instance.OnLook;
             @Look.canceled += instance.OnLook;
-            @Interact.started += instance.OnInteract;
-            @Interact.performed += instance.OnInteract;
-            @Interact.canceled += instance.OnInteract;
+            @MoneyIncrease.started += instance.OnMoneyIncrease;
+            @MoneyIncrease.performed += instance.OnMoneyIncrease;
+            @MoneyIncrease.canceled += instance.OnMoneyIncrease;
             @Jump.started += instance.OnJump;
             @Jump.performed += instance.OnJump;
             @Jump.canceled += instance.OnJump;
             @Sprint.started += instance.OnSprint;
             @Sprint.performed += instance.OnSprint;
             @Sprint.canceled += instance.OnSprint;
-            @Interact1.started += instance.OnInteract1;
-            @Interact1.performed += instance.OnInteract1;
-            @Interact1.canceled += instance.OnInteract1;
-            @Interact2.started += instance.OnInteract2;
-            @Interact2.performed += instance.OnInteract2;
-            @Interact2.canceled += instance.OnInteract2;
-            @Interact3.started += instance.OnInteract3;
-            @Interact3.performed += instance.OnInteract3;
-            @Interact3.canceled += instance.OnInteract3;
-            @Interact4.started += instance.OnInteract4;
-            @Interact4.performed += instance.OnInteract4;
-            @Interact4.canceled += instance.OnInteract4;
-            @Interact5.started += instance.OnInteract5;
-            @Interact5.performed += instance.OnInteract5;
-            @Interact5.canceled += instance.OnInteract5;
+            @RepIncrease.started += instance.OnRepIncrease;
+            @RepIncrease.performed += instance.OnRepIncrease;
+            @RepIncrease.canceled += instance.OnRepIncrease;
+            @SpawnCat.started += instance.OnSpawnCat;
+            @SpawnCat.performed += instance.OnSpawnCat;
+            @SpawnCat.canceled += instance.OnSpawnCat;
+            @FeedCat.started += instance.OnFeedCat;
+            @FeedCat.performed += instance.OnFeedCat;
+            @FeedCat.canceled += instance.OnFeedCat;
+            @CleanCat.started += instance.OnCleanCat;
+            @CleanCat.performed += instance.OnCleanCat;
+            @CleanCat.canceled += instance.OnCleanCat;
+            @CompleteDeal.started += instance.OnCompleteDeal;
+            @CompleteDeal.performed += instance.OnCompleteDeal;
+            @CompleteDeal.canceled += instance.OnCompleteDeal;
         }
 
         /// <summary>
@@ -1423,30 +1423,30 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Look.started -= instance.OnLook;
             @Look.performed -= instance.OnLook;
             @Look.canceled -= instance.OnLook;
-            @Interact.started -= instance.OnInteract;
-            @Interact.performed -= instance.OnInteract;
-            @Interact.canceled -= instance.OnInteract;
+            @MoneyIncrease.started -= instance.OnMoneyIncrease;
+            @MoneyIncrease.performed -= instance.OnMoneyIncrease;
+            @MoneyIncrease.canceled -= instance.OnMoneyIncrease;
             @Jump.started -= instance.OnJump;
             @Jump.performed -= instance.OnJump;
             @Jump.canceled -= instance.OnJump;
             @Sprint.started -= instance.OnSprint;
             @Sprint.performed -= instance.OnSprint;
             @Sprint.canceled -= instance.OnSprint;
-            @Interact1.started -= instance.OnInteract1;
-            @Interact1.performed -= instance.OnInteract1;
-            @Interact1.canceled -= instance.OnInteract1;
-            @Interact2.started -= instance.OnInteract2;
-            @Interact2.performed -= instance.OnInteract2;
-            @Interact2.canceled -= instance.OnInteract2;
-            @Interact3.started -= instance.OnInteract3;
-            @Interact3.performed -= instance.OnInteract3;
-            @Interact3.canceled -= instance.OnInteract3;
-            @Interact4.started -= instance.OnInteract4;
-            @Interact4.performed -= instance.OnInteract4;
-            @Interact4.canceled -= instance.OnInteract4;
-            @Interact5.started -= instance.OnInteract5;
-            @Interact5.performed -= instance.OnInteract5;
-            @Interact5.canceled -= instance.OnInteract5;
+            @RepIncrease.started -= instance.OnRepIncrease;
+            @RepIncrease.performed -= instance.OnRepIncrease;
+            @RepIncrease.canceled -= instance.OnRepIncrease;
+            @SpawnCat.started -= instance.OnSpawnCat;
+            @SpawnCat.performed -= instance.OnSpawnCat;
+            @SpawnCat.canceled -= instance.OnSpawnCat;
+            @FeedCat.started -= instance.OnFeedCat;
+            @FeedCat.performed -= instance.OnFeedCat;
+            @FeedCat.canceled -= instance.OnFeedCat;
+            @CleanCat.started -= instance.OnCleanCat;
+            @CleanCat.performed -= instance.OnCleanCat;
+            @CleanCat.canceled -= instance.OnCleanCat;
+            @CompleteDeal.started -= instance.OnCompleteDeal;
+            @CompleteDeal.performed -= instance.OnCompleteDeal;
+            @CompleteDeal.canceled -= instance.OnCompleteDeal;
         }
 
         /// <summary>
@@ -1762,12 +1762,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnLook(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Interact" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "MoneyIncrease" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnInteract(InputAction.CallbackContext context);
+        void OnMoneyIncrease(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "Jump" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
@@ -1783,40 +1783,40 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnSprint(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Interact1" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "RepIncrease" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnInteract1(InputAction.CallbackContext context);
+        void OnRepIncrease(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Interact2" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "SpawnCat" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnInteract2(InputAction.CallbackContext context);
+        void OnSpawnCat(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Interact3" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "FeedCat" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnInteract3(InputAction.CallbackContext context);
+        void OnFeedCat(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Interact4" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "CleanCat" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnInteract4(InputAction.CallbackContext context);
+        void OnCleanCat(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Interact5" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "CompleteDeal" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnInteract5(InputAction.CallbackContext context);
+        void OnCompleteDeal(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

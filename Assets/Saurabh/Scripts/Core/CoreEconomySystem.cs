@@ -9,7 +9,7 @@ public class CoreEconomySystem : MonoBehaviour
     // 2. STATE VARIABLES (Strictly Private)
     [SerializeField] private int currentGP = 0;
     [SerializeField] private int reputation = 0;
-    [SerializeField] private int currentDay = 1;
+    // [SerializeField] private int currentDay = 1;
 
     // Event for the UI to listen to
     public event Action OnEconomyUpdated;
@@ -28,7 +28,7 @@ public class CoreEconomySystem : MonoBehaviour
     private void LogAudit(string subsystemName, string action, int value, string variableName, int newValue)
     {
         // Formats as: [AUDIT] GroomingSystem | ADD | Value: -5 | Target: GP | New Total: 45
-        Debug.Log($"<b><color=#00FF00>[AUDIT]</color></b> {subsystemName} | {action} | Value: {value} | Target: {variableName} | New Total: {newValue}");
+        // Debug.Log($"<b><color=#00FF00>[AUDIT]</color></b> {subsystemName} | {action} | Value: {value} | Target: {variableName} | New Total: {newValue}");
     }
 
     // ==========================================

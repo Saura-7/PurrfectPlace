@@ -25,7 +25,7 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Interact",
+                    "name": "MoneyIncrease",
                     "type": "Button",
                     "id": "852140f2-7766-474d-8707-702459ba45f3",
                     "expectedControlType": "",
@@ -52,7 +52,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Interact1",
+                    "name": "RepIncrease",
                     "type": "Button",
                     "id": "d3075d99-624a-4ea3-a6de-5f8ac0633eda",
                     "expectedControlType": "",
@@ -61,7 +61,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Interact2",
+                    "name": "SpawnCat",
                     "type": "Button",
                     "id": "3ab99c4e-7844-48c4-a370-6aaed4663b7a",
                     "expectedControlType": "",
@@ -70,7 +70,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Interact3",
+                    "name": "FeedCat",
                     "type": "Button",
                     "id": "7dd5bdda-34a6-4e98-aa01-76391060d144",
                     "expectedControlType": "",
@@ -79,7 +79,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Interact4",
+                    "name": "CleanCat",
                     "type": "Button",
                     "id": "740135d4-b653-48c9-81b5-25d64e7fabe9",
                     "expectedControlType": "",
@@ -88,7 +88,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Interact5",
+                    "name": "CompleteDeal",
                     "type": "Button",
                     "id": "8bd40582-2ef1-4e53-8b0b-d05051d21a7a",
                     "expectedControlType": "",
@@ -303,7 +303,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "Interact1",
+                    "action": "RepIncrease",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -314,7 +314,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
-                    "action": "Interact1",
+                    "action": "RepIncrease",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -325,7 +325,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "XR",
-                    "action": "Interact1",
+                    "action": "RepIncrease",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -336,7 +336,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "Interact2",
+                    "action": "SpawnCat",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -347,7 +347,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
-                    "action": "Interact2",
+                    "action": "SpawnCat",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -358,7 +358,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "XR",
-                    "action": "Interact2",
+                    "action": "SpawnCat",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -369,18 +369,18 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "Interact3",
+                    "action": "FeedCat",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
                     "id": "94486aee-a5e0-445f-b97b-7ea8faff6ef9",
-                    "path": "<Gamepad>/rightShoulder",
+                    "path": "<Gamepad>/dpad/up",
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
-                    "action": "Interact3",
+                    "action": "FeedCat",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -391,7 +391,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "XR",
-                    "action": "Interact3",
+                    "action": "FeedCat",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -402,18 +402,18 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "Interact4",
+                    "action": "CleanCat",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
                     "id": "9c60ca57-8065-463c-a8a1-d20a78032324",
-                    "path": "<Gamepad>/leftShoulder",
+                    "path": "<Gamepad>/dpad/down",
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
-                    "action": "Interact4",
+                    "action": "CleanCat",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -424,7 +424,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "XR",
-                    "action": "Interact4",
+                    "action": "CleanCat",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -435,7 +435,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "Interact5",
+                    "action": "CompleteDeal",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -446,7 +446,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
-                    "action": "Interact5",
+                    "action": "CompleteDeal",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -457,7 +457,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "XR",
-                    "action": "Interact5",
+                    "action": "CompleteDeal",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -501,7 +501,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "Interact",
+                    "action": "MoneyIncrease",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -512,7 +512,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
-                    "action": "Interact",
+                    "action": "MoneyIncrease",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
