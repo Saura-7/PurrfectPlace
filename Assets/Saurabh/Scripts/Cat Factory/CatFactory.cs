@@ -72,4 +72,20 @@ public class CatFactory : MonoBehaviour
                 break;
         }
     }
+
+        // Add this method to your existing CatFactory.cs
+    public BaseCat GenerateGiverCat(Transform handPoint)
+    {
+        // Instantiate your Cat_Prototype
+        GameObject newCatObj = Instantiate(catPrefab, handPoint.position, handPoint.rotation, handPoint);
+        BaseCat newCat = newCatObj.GetComponent<BaseCat>();
+
+        // Randomize core stats between 0 and 6
+        newCat.feedingLevel = Random.Range(0, 7);
+        newCat.cleanlinessLevel = Random.Range(0, 7);
+
+        // Optional: Visually reflect stats (e.g., if clean is 0, add dirt particles)
+        
+        return newCat;
+    }
 }

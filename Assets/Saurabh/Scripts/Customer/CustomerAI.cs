@@ -1,124 +1,165 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class CustomerAI : MonoBehaviour
 {
-    // Added 'WaitingForCat' as the default state
-    public enum CustomerState { WaitingForCat, WalkingToCat, WalkingToRegister, WaitingAtRegister, Leaving }
-    
-    [Header("State")]
-    public CustomerState currentState = CustomerState.WaitingForCat;
+    public enum CustomerType { Taker, Giver }
+    public enum CustomerState { Entering, LookingForCat, WalkingToRegister, WaitingAtRegister, Leaving }
+
+    public CustomerType myType;
+    public CustomerState currentState;
 
     [Header("References")]
-    public Transform receptionDesk;
-    public Transform exitDoor;
+    public Transform handHoldPoint; 
+    public BaseCat heldCat;
+    
     private NavMeshAgent agent;
-    private BaseCat targetCat;
+    private Transform receptionDesk;
+    private Transform exitDoor;
+    private Transform targetCage; // Used by Takers to find a cat
 
-    private void Start()
+    private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
-        currentState = CustomerState.WaitingForCat;
+        receptionDesk = GameObject.Find("ReceptionDeskTarget").transform;
+        exitDoor = GameObject.Find("ExitDoorTarget").transform;
+    }
+
+    public void InitializeCustomer(CustomerType type)
+    {
+        myType = type;
+        
+        if (myType == CustomerType.Giver)
+        {
+            heldCat = CatFactory.Instance.GenerateGiverCat(handHoldPoint);
+            ChangeState(CustomerState.WalkingToRegister);
+        }
+        else
+        {
+            ChangeState(CustomerState.Entering);
+        }
     }
 
     private void Update()
     {
+        // 1. TAKER LOGIC: Walking to a cage to grab a cat
+        if (currentState == CustomerState.LookingForCat)
+        {
+            if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
+            {
+                GrabCatFromCage();
+            }
+        }
+        // 2. Walking to the register (Both Types)
+        else if (currentState == CustomerState.WalkingToRegister)
+        {
+            if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
+            {
+                ChangeState(CustomerState.WaitingAtRegister);
+            }
+        }
+        // 3. Leaving the store (Both Types)
+        else if (currentState == CustomerState.Leaving)
+        {
+            if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
+            {
+                Destroy(gameObject); 
+            }
+        }
+    }
+
+    public void ChangeState(CustomerState newState)
+    {
+        currentState = newState;
         switch (currentState)
         {
-            case CustomerState.WaitingForCat:
-                // Keep looking every frame until a cat is spawned by debug input
-                FindRandomCat();
+            case CustomerState.Entering:
+                // Takers immediately transition to looking for a cat
+                ChangeState(CustomerState.LookingForCat);
                 break;
-
-            case CustomerState.WalkingToCat:
-                // Guard clause: if the cat was destroyed or lost, go back to waiting
-                if (targetCat == null)
-                {
-                    currentState = CustomerState.WaitingForCat;
-                    return;
-                }
-
-                // If we reached the cat
-                if (!agent.pathPending && agent.remainingDistance < 0.5f)
-                {
-                    PickUpCat();
-                }
+                
+            case CustomerState.LookingForCat:
+                FindTargetCatToBuy();
                 break;
-
+                
             case CustomerState.WalkingToRegister:
-                if (!agent.pathPending && agent.remainingDistance < 0.5f)
-                {
-                    currentState = CustomerState.WaitingAtRegister;
-                }
+                agent.SetDestination(receptionDesk.position);
                 break;
-
-            case CustomerState.WaitingAtRegister:
-                // Customer waits for player to click the reception desk
-                break;
-
+                
             case CustomerState.Leaving:
-                if (!agent.pathPending && agent.remainingDistance < 0.5f)
-                {
-                    Destroy(gameObject); // Despawn out the door
-                }
+                agent.SetDestination(exitDoor.position);
                 break;
         }
     }
 
-    private void FindRandomCat()
+    private void FindTargetCatToBuy()
     {
-        BaseCat[] allCats = FindObjectsByType<BaseCat>(FindObjectsSortMode.None);
+        // Find all cats currently in the scene
+        BaseCat[] availableCats = FindObjectsByType<BaseCat>(FindObjectsSortMode.None);
         
-        // Filter for cats that exist AND are available (not claimed by another customer)
-        List<BaseCat> availableCats = new List<BaseCat>();
-        foreach (BaseCat cat in allCats)
+        foreach (BaseCat cat in availableCats)
         {
-            if (cat.isAvailable)
+            // Ensure the cat isn't already being held by another customer
+            if (cat.transform.parent != handHoldPoint && cat.transform.parent != null)
             {
-                availableCats.Add(cat);
+                targetCage = cat.transform.parent; // Assuming the cat is a child of the cage
+                agent.SetDestination(targetCage.position);
+                return; // Found a target, exit loop
             }
         }
 
-        // Only proceed if at least one available cat exists
-        if (availableCats.Count > 0)
-        {
-            targetCat = availableCats[Random.Range(0, availableCats.Count)];
-            targetCat.isAvailable = false; // Reserve this cat
-            
-            currentState = CustomerState.WalkingToCat;
-            agent.SetDestination(targetCat.transform.position);
-        }
+        // If no cats are available in the store, the Taker leaves disappointed
+        Debug.Log("No cats available to buy. Taker is leaving.");
+        ChangeState(CustomerState.Leaving);
     }
 
-    private void PickUpCat()
+    private void GrabCatFromCage()
     {
-        // Guard clause to prevent NullReferenceException
-        if (targetCat == null) return;
-
-        // Parent the cat to the customer so it moves with them
-        targetCat.transform.SetParent(this.transform);
-        targetCat.transform.localPosition = new Vector3(0, 1, 1); // Position in front of customer
-
-        currentState = CustomerState.WalkingToRegister;
-        
-        if (receptionDesk != null)
+        if (targetCage != null)
         {
-            agent.SetDestination(receptionDesk.position);
+            BaseCat catInCage = targetCage.GetComponentInChildren<BaseCat>();
+            if (catInCage != null)
+            {
+                // Pick up the cat
+                heldCat = catInCage;
+                heldCat.transform.SetParent(handHoldPoint);
+                heldCat.transform.localPosition = Vector3.zero;
+                heldCat.transform.localRotation = Quaternion.identity;
+
+                // Free the cage in the Manager so Givers can use it
+                if (CageManager.Instance != null)
+                {
+                    CageManager.Instance.FreeCage(targetCage);
+                }
+
+                ChangeState(CustomerState.WalkingToRegister);
+                return;
+            }
         }
+        
+        // Failsafe: if the cat disappeared before we got there, leave.
+        ChangeState(CustomerState.Leaving);
     }
 
-    public BaseCat CompleteTransactionAndLeave()
+    public BaseCat CompleteTakerTransactionAndLeave()
     {
-        BaseCat soldCat = targetCat;
-        targetCat = null;
-        
-        currentState = CustomerState.Leaving;
-        if (exitDoor != null)
-        {
-            agent.SetDestination(exitDoor.position);
-        }
-        
+        BaseCat soldCat = heldCat;
+        heldCat = null;
+        ChangeState(CustomerState.Leaving);
         return soldCat;
+    }
+
+    public void RejectOfferAndLeave()
+    {
+        ChangeState(CustomerState.Leaving);
+    }
+
+    public BaseCat AcceptOfferAndLeave()
+    {
+        BaseCat boughtCat = heldCat;
+        boughtCat.transform.SetParent(null); 
+        heldCat = null;
+        ChangeState(CustomerState.Leaving);
+        return boughtCat;
     }
 }
