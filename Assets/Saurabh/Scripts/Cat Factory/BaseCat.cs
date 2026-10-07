@@ -70,8 +70,8 @@ public class BaseCat : MonoBehaviour
 
     public int CalculateFinalPrice()
     {
-        // Base price is 50. Each stat point (max 12 total) adds 20 to the value.
-        Debug.Log($"[BaseCat] Final price calculated for {name}: 50 + ({feedingLevel} * 20) + ({cleanlinessLevel} * 20)");
-        return 50 + (feedingLevel * 20) + (cleanlinessLevel * 20);
+        // Base price is 50. Each stat point (max 12 total) adds 10 to the value.
+        Debug.Log($"[BaseCat] Final price calculated for {name}: 50 + ({feedingLevel} * 10) + ({cleanlinessLevel} * 10)");
+        return 50 + (feedingLevel * 10) + (cleanlinessLevel * 10);
     }
 }

@@ -42,22 +42,21 @@ public class ReceptionDesk : MonoBehaviour
     {
         if (Camera.main == null) return;
 
-        // Firing Raycast from center crosshair
         Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
 
         if (Physics.Raycast(ray, out RaycastHit hit, maxInteractionDistance))
         {
-            // 1. Check if we hit a World Space UI Button (Accept/Reject)
             WorldSpaceUIButton uiButton = hit.collider.GetComponent<WorldSpaceUIButton>();
             if (uiButton != null)
             {
+                Debug.Log($"[SOA {systemName}] Raycast hit World Space UI Button: {uiButton.gameObject.name}");
                 uiButton.PressButton();
                 return;
             }
 
-            // 2. Check if we hit the Reception Desk directly
             if (hit.collider.gameObject == gameObject || hit.collider.GetComponentInParent<ReceptionDesk>() != null)
             {
+                Debug.Log($"[SOA {systemName}] Raycast hit Reception Desk directly.");
                 ProcessTransaction();
             }
         }
@@ -65,72 +64,97 @@ public class ReceptionDesk : MonoBehaviour
 
     private void ProcessTransaction()
     {
-        currentInteractingCustomer = FindWaitingCustomer();
+        currentInteractingCustomer = CustomerQueueManager.Instance.GetCurrentCustomerAtDesk();
 
-        if (currentInteractingCustomer != null)
+        if (currentInteractingCustomer != null && currentInteractingCustomer.heldCat != null)
         {
+            BaseCat cat = currentInteractingCustomer.heldCat;
+
             if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Taker)
             {
-                BaseCat soldCat = currentInteractingCustomer.CompleteTakerTransactionAndLeave();
-                int payout = soldCat.CalculateFinalPrice();
-                CoreEconomySystem.Instance.ModifyGP(payout, systemName);
-                Destroy(soldCat.gameObject);
+                currentDealPrice = cat.CalculateFinalPrice();
+                dealText.text = $"SELL CAT?\nFeed: {cat.feedingLevel}/6\nClean: {cat.cleanlinessLevel}/6\nPayout: +{currentDealPrice} GP";
+                dealUIPanel.SetActive(true);
+
+                Debug.Log($"[SOA {systemName}] Generated Taker sale offer for cat '{cat.name}'. Payout: {currentDealPrice} GP.");
             }
             else if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Giver)
             {
-                PresentGiverDeal(currentInteractingCustomer);
+                int statPenalty = (12 - (cat.feedingLevel + cat.cleanlinessLevel)) * 2; // Each missing stat point reduces price by 2 GP
+                currentDealPrice = Mathf.Max(30, 80 - statPenalty);
+
+                dealText.text = $"BUY CAT?\nFeed: {cat.feedingLevel}/6\nClean: {cat.cleanlinessLevel}/6\nCost: -{currentDealPrice} GP";
+                dealUIPanel.SetActive(true);
+
+                Debug.Log($"[SOA {systemName}] Generated Giver purchase offer for cat '{cat.name}'. Cost: {currentDealPrice} GP.");
             }
-        }
-    }
-
-    private void PresentGiverDeal(CustomerAI giver)
-    {
-        BaseCat offeredCat = giver.heldCat;
-        int statPenalty = (12 - (offeredCat.feedingLevel + offeredCat.cleanlinessLevel)) * 5; 
-        currentDealPrice = Mathf.Max(10, 50 - statPenalty);
-
-        dealText.text = $"Buy this cat?\nFeed: {offeredCat.feedingLevel}/6\nClean: {offeredCat.cleanlinessLevel}/6\nPrice: {currentDealPrice} GP";
-        dealUIPanel.SetActive(true);
-    }
-
-    public void AcceptGiverDeal()
-    {
-        if (currentInteractingCustomer == null) return;
-
-        int playerMoney = CoreEconomySystem.Instance.GetGP(systemName);
-        Transform emptyCage = CageManager.Instance.GetAvailableCage();
-
-        if (playerMoney >= currentDealPrice && emptyCage != null)
-        {
-            CoreEconomySystem.Instance.ModifyGP(-currentDealPrice, systemName);
-            BaseCat boughtCat = currentInteractingCustomer.AcceptOfferAndLeave();
-            CageManager.Instance.OccupyCage(emptyCage, boughtCat);
         }
         else
         {
-            currentInteractingCustomer.RejectOfferAndLeave();
+            Debug.LogWarning($"[SOA {systemName}] Interaction attempt failed: No valid customer standing at front of register line.");
         }
-
-        dealUIPanel.SetActive(false);
-        currentInteractingCustomer = null;
     }
 
-    public void RejectGiverDeal()
+    public void AcceptDeal()
     {
         if (currentInteractingCustomer == null) return;
 
+        if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Taker)
+        {
+            CoreEconomySystem.Instance.ModifyGP(currentDealPrice, systemName);
+            currentInteractingCustomer.CompleteTakerTransactionAndLeave();
+            
+            Debug.Log($"[SOA {systemName}] ACCEPTED deal: Sold cat for +{currentDealPrice} GP.");
+        }
+        else if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Giver)
+        {
+            int playerMoney = CoreEconomySystem.Instance.GetGP(systemName);
+            Transform emptyCage = CageManager.Instance.GetAvailableCage();
+
+            if (playerMoney >= currentDealPrice && emptyCage != null)
+            {
+                CoreEconomySystem.Instance.ModifyGP(-currentDealPrice, systemName);
+                BaseCat boughtCat = currentInteractingCustomer.AcceptGiverOfferAndLeave();
+                CageManager.Instance.OccupyCage(emptyCage, boughtCat);
+
+                Debug.Log($"[SOA {systemName}] ACCEPTED deal: Bought cat for -{currentDealPrice} GP and assigned to cage '{emptyCage.name}'.");
+            }
+            else
+            {
+                Debug.LogWarning($"[SOA {systemName}] ACCEPT failed: Player GP ({playerMoney}) < Cost ({currentDealPrice}) or no empty cage available. Auto-rejecting deal.");
+                RejectDeal();
+                return;
+            }
+        }
+
         dealUIPanel.SetActive(false);
-        currentInteractingCustomer.RejectOfferAndLeave();
+        CustomerQueueManager.Instance.AdvanceQueue();
         currentInteractingCustomer = null;
     }
 
-    private CustomerAI FindWaitingCustomer()
+    public void RejectDeal()
     {
-        CustomerAI[] customers = FindObjectsByType<CustomerAI>(FindObjectsSortMode.None);
-        foreach (var customer in customers)
+        if (currentInteractingCustomer == null) return;
+
+        if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Taker)
         {
-            if (customer.currentState == CustomerAI.CustomerState.WaitingAtRegister) return customer;
+            BaseCat returnedCat = currentInteractingCustomer.RejectTakerTransactionAndLeave();
+            Transform emptyCage = CageManager.Instance.GetAvailableCage();
+
+            if (returnedCat != null && emptyCage != null)
+            {
+                CageManager.Instance.OccupyCage(emptyCage, returnedCat);
+                Debug.Log($"[SOA {systemName}] REJECTED Taker deal. Cat '{returnedCat.name}' placed back in cage '{emptyCage.name}'.");
+            }
         }
-        return null;
+        else if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Giver)
+        {
+            currentInteractingCustomer.RejectGiverOfferAndLeave();
+            Debug.Log($"[SOA {systemName}] REJECTED Giver deal. Customer departing with cat.");
+        }
+
+        dealUIPanel.SetActive(false);
+        CustomerQueueManager.Instance.AdvanceQueue();
+        currentInteractingCustomer = null;
     }
 }
