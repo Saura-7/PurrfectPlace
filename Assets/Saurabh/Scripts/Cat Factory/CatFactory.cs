@@ -80,9 +80,9 @@ public class CatFactory : MonoBehaviour
         GameObject newCatObj = Instantiate(catPrefab, handPoint.position, handPoint.rotation, handPoint);
         BaseCat newCat = newCatObj.GetComponent<BaseCat>();
 
-        // Randomize core stats between 0 and 6
-        newCat.feedingLevel = Random.Range(0, 7);
-        newCat.cleanlinessLevel = Random.Range(0, 7);
+        // Randomize core stats between 0 and 2
+        newCat.feedingLevel = Random.Range(0, 2); // Giver cats are less likely to be well-fed
+        newCat.cleanlinessLevel = Random.Range(0, 2); // Giver cats are less likely to be clean
 
         // Optional: Visually reflect stats (e.g., if clean is 0, add dirt particles)
         

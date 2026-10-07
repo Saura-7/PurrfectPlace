@@ -4,10 +4,12 @@ using System.Collections.Generic;
 public class CageManager : MonoBehaviour
 {
     public static CageManager Instance { get; private set; }
+    private readonly string systemName = "CageManager";
 
     [Header("Store Cages")]
-    public List<Transform> allCages; // Drag all your cage spawn points here in the Inspector
-    private List<Transform> occupiedCages = new List<Transform>();
+    public List<Transform> allCages; 
+
+    private Dictionary<Transform, BaseCat> occupiedCages = new Dictionary<Transform, BaseCat>();
 
     private void Awake()
     {
@@ -24,23 +26,43 @@ public class CageManager : MonoBehaviour
     {
         foreach (Transform cage in allCages)
         {
-            if (!occupiedCages.Contains(cage)) return cage;
+            if (!occupiedCages.ContainsKey(cage)) return cage;
         }
         return null;
     }
 
     public void OccupyCage(Transform cage, BaseCat cat)
     {
-        if (!occupiedCages.Contains(cage))
+        if (!occupiedCages.ContainsKey(cage))
         {
-            occupiedCages.Add(cage);
-            cat.transform.position = cage.position;
-            cat.transform.rotation = cage.rotation;
+            occupiedCages.Add(cage, cat);
+            
+            cat.transform.SetParent(cage);
+            cat.transform.localPosition = Vector3.zero;
+            cat.transform.localRotation = Quaternion.identity;
+
+            Debug.Log($"[SOA {systemName}] Cage '{cage.name}' occupied by cat '{cat.name}'. Occupied: {occupiedCages.Count}/{allCages.Count}");
         }
     }
 
     public void FreeCage(Transform cage)
     {
-        if (occupiedCages.Contains(cage)) occupiedCages.Remove(cage);
+        if (occupiedCages.ContainsKey(cage))
+        {
+            occupiedCages.Remove(cage);
+            Debug.Log($"[SOA {systemName}] Cage '{cage.name}' freed. Occupied: {occupiedCages.Count}/{allCages.Count}");
+        }
+    }
+
+    public KeyValuePair<Transform, BaseCat>? GetOccupiedCageWithCat()
+    {
+        foreach (var pair in occupiedCages)
+        {
+            if (pair.Value != null)
+            {
+                return pair;
+            }
+        }
+        return null;
     }
 }

@@ -20,6 +20,12 @@ public class CustomerSpawner : MonoBehaviour
     {
         while (true)
         {
+            if (CustomerQueueManager.Instance.IsQueueFull())
+            {
+                yield return null; // Skip spawning until queue opens up
+                continue;
+            }
+
             yield return new WaitForSeconds(Random.Range(minSpawnTime, maxSpawnTime));
 
             // 1. Audit store conditions
