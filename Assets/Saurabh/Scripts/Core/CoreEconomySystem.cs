@@ -11,6 +11,9 @@ public class CoreEconomySystem : MonoBehaviour
     [SerializeField] private int reputation = 0;
     [SerializeField] private int currentDay = 1;
 
+    private readonly string transactionColor = "#00FF00"; // Green for economy
+    private readonly string reputationColor = "#FF0000"; // Red for reputation
+
     // Event for the UI to listen to
     public event Action OnEconomyUpdated;
 
@@ -48,8 +51,7 @@ public class CoreEconomySystem : MonoBehaviour
         currentGP += amount;
         
         string actionType = amount >= 0 ? "ADD" : "SUBTRACT";
-        LogAudit(subsystemName, actionType, amount, "GP", currentGP);
-        
+        SOALogger.LogAudit(subsystemName, actionType, amount, "GP", currentGP);
         OnEconomyUpdated?.Invoke(); // Tell the UI to refresh
     }
 
@@ -57,7 +59,7 @@ public class CoreEconomySystem : MonoBehaviour
     public void OverwriteGP(int exactValue, string subsystemName)
     {
         currentGP = exactValue;
-        LogAudit(subsystemName, "OVERWRITE", exactValue, "GP", currentGP);
+        SOALogger.LogAudit(subsystemName, "OVERWRITE", exactValue, "GP", currentGP);
         OnEconomyUpdated?.Invoke();
     }
 
@@ -68,8 +70,7 @@ public class CoreEconomySystem : MonoBehaviour
     {
         reputation += amount;
         string actionType = amount >= 0 ? "ADD" : "SUBTRACT";
-        LogAudit(subsystemName, actionType, amount, "Reputation", reputation);
-        
+        SOALogger.LogAudit(subsystemName, actionType, amount, "Reputation", reputation);
         OnEconomyUpdated?.Invoke();
     }
 }
