@@ -81,7 +81,7 @@ public class ReceptionDesk : MonoBehaviour
             else if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Giver)
             {
                 int statPenalty = (12 - (cat.feedingLevel + cat.cleanlinessLevel)) * 2; // Each missing stat point reduces price by 2 GP
-                currentDealPrice = Mathf.Max(30, 80 - statPenalty);
+                currentDealPrice = Mathf.Max(30, 50 - statPenalty);
 
                 dealText.text = $"BUY CAT?\nFeed: {cat.feedingLevel}/6\nClean: {cat.cleanlinessLevel}/6\nCost: -{currentDealPrice} GP";
                 dealUIPanel.SetActive(true);

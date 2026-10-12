@@ -25,11 +25,11 @@ public class CoreEconomySystem : MonoBehaviour
     }
 
     // 3. THE AUDIT TRAIL LOGIC
-    private void LogAudit(string subsystemName, string action, int value, string variableName, int newValue)
-    {
-        // Formats as: [AUDIT] GroomingSystem | ADD | Value: -5 | Target: GP | New Total: 45
-        // Debug.Log($"<b><color=#00FF00>[AUDIT]</color></b> {subsystemName} | {action} | Value: {value} | Target: {variableName} | New Total: {newValue}");
-    }
+    // private void LogAudit(string subsystemName, string action, int value, string variableName, int newValue)
+    // {
+    //     // Formats as: [AUDIT] GroomingSystem | ADD | Value: -5 | Target: GP | New Total: 45
+    //     // Debug.Log($"<b><color=#00FF00>[AUDIT]</color></b> {subsystemName} | {action} | Value: {value} | Target: {variableName} | New Total: {newValue}");
+    // }
 
     // ==========================================
     // 4. GETTERS & SETTERS
@@ -48,7 +48,7 @@ public class CoreEconomySystem : MonoBehaviour
         currentGP += amount;
         
         string actionType = amount >= 0 ? "ADD" : "SUBTRACT";
-        LogAudit(subsystemName, actionType, amount, "GP", currentGP);
+        SOALogger.LogAudit(subsystemName, actionType, amount, "GP", currentGP);
         
         OnEconomyUpdated?.Invoke(); // Tell the UI to refresh
     }
@@ -57,7 +57,7 @@ public class CoreEconomySystem : MonoBehaviour
     public void OverwriteGP(int exactValue, string subsystemName)
     {
         currentGP = exactValue;
-        LogAudit(subsystemName, "OVERWRITE", exactValue, "GP", currentGP);
+        SOALogger.LogAudit(subsystemName, "OVERWRITE", exactValue, "GP", currentGP);
         OnEconomyUpdated?.Invoke();
     }
 
@@ -68,7 +68,7 @@ public class CoreEconomySystem : MonoBehaviour
     {
         reputation += amount;
         string actionType = amount >= 0 ? "ADD" : "SUBTRACT";
-        LogAudit(subsystemName, actionType, amount, "Reputation", reputation);
+        SOALogger.LogAudit(subsystemName, actionType, amount, "Reputation", reputation);
         
         OnEconomyUpdated?.Invoke();
     }

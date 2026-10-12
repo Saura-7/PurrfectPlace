@@ -14,8 +14,14 @@ public class BaseCat : MonoBehaviour
 
     [Header("MVP Gameplay Stats")]
     public bool isAvailable = true; // True if waiting on a shelf. False if a customer claimed it.
-    [Range(0, 6)] public int feedingLevel = 0;
-    [Range(0, 6)] public int cleanlinessLevel = 0;
+
+    public const int MaxLevel = 6;
+
+    [Range(0, MaxLevel)] public int feedingLevel = 0;
+    [Range(0, MaxLevel)] public int cleanlinessLevel = 0;
+
+    public bool CanUpgradeFeeding => feedingLevel < MaxLevel;
+    public bool CanUpgradeCleanliness => cleanlinessLevel < MaxLevel;
 
     // Getters for subsystems to read the DNA
     public CatBehavior Behavior => currentBehavior;
@@ -58,13 +64,13 @@ public class BaseCat : MonoBehaviour
 
     public void UpgradeFeeding()
     {
-        if (feedingLevel < 6) feedingLevel++;
+        if (feedingLevel < MaxLevel) feedingLevel++;
         Debug.Log($"[BaseCat] Feeding level upgraded to {feedingLevel} for {name}");
     }
 
     public void UpgradeCleanliness()
     {
-        if (cleanlinessLevel < 6) cleanlinessLevel++;
+        if (cleanlinessLevel < MaxLevel) cleanlinessLevel++;
         Debug.Log($"[BaseCat] Cleanliness level upgraded to {cleanlinessLevel} for {name}");
     }
 

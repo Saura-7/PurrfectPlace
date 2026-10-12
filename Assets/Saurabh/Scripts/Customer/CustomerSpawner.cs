@@ -27,6 +27,7 @@ public class CustomerSpawner : MonoBehaviour
             }
 
             yield return new WaitForSeconds(Random.Range(minSpawnTime, maxSpawnTime));
+            if (CustomerQueueManager.Instance.IsQueueFull()) continue;
 
             // 1. Audit store conditions
             bool hasSpace = CageManager.Instance.HasEmptyCage();

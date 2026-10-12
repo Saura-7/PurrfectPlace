@@ -10,6 +10,8 @@ public class CageManager : MonoBehaviour
     public List<Transform> allCages; 
 
     private Dictionary<Transform, BaseCat> occupiedCages = new Dictionary<Transform, BaseCat>();
+    // NEW: HashSet to track cages already claimed by an incoming Taker
+    private HashSet<Transform> reservedCages = new HashSet<Transform>();
 
     private void Awake()
     {
@@ -41,7 +43,8 @@ public class CageManager : MonoBehaviour
             cat.transform.localPosition = Vector3.zero;
             cat.transform.localRotation = Quaternion.identity;
 
-            Debug.Log($"[SOA {systemName}] Cage '{cage.name}' occupied by cat '{cat.name}'. Occupied: {occupiedCages.Count}/{allCages.Count}");
+            // Debug.Log($"[SOA {systemName}] Cage '{cage.name}' occupied by cat '{cat.name}'. Occupied: {occupiedCages.Count}/{allCages.Count}");
+            SOALogger.LogState("CageManager", SOALogger.Colors.Cage, "OCCUPY", $"Cage '{cage.name}' assigned to cat '{cat.name}'. Total Occupied: {occupiedCages.Count}/{allCages.Count}");
         }
     }
 
@@ -50,19 +53,42 @@ public class CageManager : MonoBehaviour
         if (occupiedCages.ContainsKey(cage))
         {
             occupiedCages.Remove(cage);
-            Debug.Log($"[SOA {systemName}] Cage '{cage.name}' freed. Occupied: {occupiedCages.Count}/{allCages.Count}");
+            reservedCages.Remove(cage); // Clear reservation when cage is freed
+            
+            // Debug.Log($"[SOA {systemName}] Cage '{cage.name}' freed. Occupied: {occupiedCages.Count}/{allCages.Count}");
+            SOALogger.LogState("CageManager", SOALogger.Colors.Cage, "FREE", $"Cage '{cage.name}' freed. Total Occupied: {occupiedCages.Count}/{allCages.Count}");
         }
+    
     }
 
-    public KeyValuePair<Transform, BaseCat>? GetOccupiedCageWithCat()
+    // UPDATED: Finds an occupied cage that is NOT already reserved by another Taker
+    public KeyValuePair<Transform, BaseCat>? ReserveUnclaimedCatCage()
     {
         foreach (var pair in occupiedCages)
         {
-            if (pair.Value != null)
+            Transform cage = pair.Key;
+            BaseCat cat = pair.Value;
+
+            // Check that the cage has a cat AND is not reserved by another Taker
+            if (cat != null && !reservedCages.Contains(cage))
             {
+                reservedCages.Add(cage); // Instantly reserve this cage for the caller
+                // Debug.Log($"[SOA {systemName}] Cage '{cage.name}' reserved for incoming Taker.");
+                SOALogger.LogState("CageManager", SOALogger.Colors.Cage, "RESERVE", $"Cage '{cage.name}' reserved for incoming Taker.");
                 return pair;
             }
         }
-        return null;
+        return null; // No unreserved cats available
+    }
+
+    // NEW: Unreserves a cage if a Taker leaves or cancels their walk to the cage
+    public void UnreserveCage(Transform cage)
+    {
+        if (cage != null && reservedCages.Contains(cage))
+        {
+            reservedCages.Remove(cage);
+            // Debug.Log($"[SOA {systemName}] Reservation released for cage '{cage.name}'.");
+            SOALogger.LogState("CageManager", SOALogger.Colors.Cage, "UNRESERVE", $"Reservation released for cage '{cage.name}'.");
+        }
     }
 }
