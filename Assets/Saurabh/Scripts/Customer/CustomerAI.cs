@@ -213,4 +213,13 @@ public class CustomerAI : MonoBehaviour
         ChangeState(CustomerState.Leaving);
         return boughtCat;
     }
+
+    private void OnDestroy()
+    {
+        // If this customer disappears while still walking to a reserved cage, release it
+        if (heldCat == null && currentState == CustomerState.LookingForCat && CageManager.Instance != null)
+        {
+            CageManager.Instance.UnreserveCage(targetCage);
+        }
+    }
 }

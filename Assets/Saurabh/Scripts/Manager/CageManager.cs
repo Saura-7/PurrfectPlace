@@ -50,10 +50,10 @@ public class CageManager : MonoBehaviour
 
     public void FreeCage(Transform cage)
     {
+        reservedCages.Remove(cage); // always clear it; safe even if it isn't in the set
         if (occupiedCages.ContainsKey(cage))
         {
             occupiedCages.Remove(cage);
-            reservedCages.Remove(cage); // Clear reservation when cage is freed
             
             // Debug.Log($"[SOA {systemName}] Cage '{cage.name}' freed. Occupied: {occupiedCages.Count}/{allCages.Count}");
             SOALogger.LogState("CageManager", SOALogger.Colors.Cage, "FREE", $"Cage '{cage.name}' freed. Total Occupied: {occupiedCages.Count}/{allCages.Count}");
