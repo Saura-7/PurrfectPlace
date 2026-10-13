@@ -51,42 +51,45 @@ private void TryCareForCat(bool isFeeding)
 {
     if (Camera.main == null) return;
 
-    // 3. CREATE THE SAME RAY FOR THE ACTUAL INTERACTION
     Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
 
     if (Physics.Raycast(ray, out RaycastHit hit, maxInteractionDistance))
     {
-        Debug.Log($"Raycast hit: {hit.collider.name}");
-
         BaseCat clickedCat = hit.collider.GetComponent<BaseCat>();
 
-        if (clickedCat != null)
-        {
-            // Economy and Care Logic
-            int currentMoney = CoreEconomySystem.Instance.GetGP(systemName);
-
-            if (currentMoney >= careCost)
-            {
-                CoreEconomySystem.Instance.ModifyGP(-careCost, systemName);
-
-                if (isFeeding) { clickedCat.UpgradeFeeding(); }
-                else { clickedCat.UpgradeCleanliness(); }
-
-                clickedCat.PlayInteractAnimation();
-            }
-            else
-            {
-                Debug.LogWarning("Not enough GP!");
-            }
-        }
-        else
+        if (clickedCat == null)
         {
             Debug.LogWarning("Raycast hit an object, but it is not a Cat.");
+            return;
         }
+
+        // NEW: stop before spending any money if this stat is already maxed
+        bool canUpgrade = isFeeding ? clickedCat.CanUpgradeFeeding : clickedCat.CanUpgradeCleanliness;
+        if (!canUpgrade)
+        {
+            Debug.Log($"{clickedCat.name} is already at max level for this stat. No GP spent.");
+            return;
+        }
+
+        int currentMoney = CoreEconomySystem.Instance.GetGP(systemName);
+
+        if (currentMoney < careCost)
+        {
+            Debug.LogWarning("Not enough GP!");
+            return;
+        }
+
+        CoreEconomySystem.Instance.ModifyGP(-careCost, systemName);
+
+        if (isFeeding) clickedCat.UpgradeFeeding();
+        else clickedCat.UpgradeCleanliness();
+
+        clickedCat.PlayInteractAnimation();
     }
     else
     {
         Debug.Log("Raycast hit nothing.");
     }
 }
+
 }

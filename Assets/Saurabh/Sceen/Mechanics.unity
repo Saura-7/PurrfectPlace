@@ -1564,7 +1564,7 @@ MonoBehaviour:
   spawnPoint: {fileID: 736099951}
   minSpawnTime: 5
   maxSpawnTime: 10
-  minimumBuyPriceThreshold: 20
+  minimumBuyPriceThreshold: 50
 --- !u!1 &683376256
 GameObject:
   m_ObjectHideFlags: 0
@@ -7001,7 +7001,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecbc9be992f52bd4c81e8a8dca667249, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CoreEconomySystem
-  currentGP: 0
+  currentGP: 500
   reputation: 0
 --- !u!4 &1990669226
 Transform:

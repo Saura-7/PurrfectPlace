@@ -3,7 +3,8 @@ using UnityEngine;
 public class BaseCat : MonoBehaviour
 {
     [Header("3D Components")]
-    public MeshRenderer catMeshRenderer; // Using MeshRenderer for the prototype cube
+    // public MeshRenderer catMeshRenderer; // Using MeshRenderer for the prototype cube
+    public Renderer[] bodyRenderers; // Every part that should receive the pattern material
     public Animator catAnimator;
     public AudioSource catAudio;
 
@@ -14,8 +15,14 @@ public class BaseCat : MonoBehaviour
 
     [Header("MVP Gameplay Stats")]
     public bool isAvailable = true; // True if waiting on a shelf. False if a customer claimed it.
-    [Range(0, 6)] public int feedingLevel = 0;
-    [Range(0, 6)] public int cleanlinessLevel = 0;
+
+    public const int MaxLevel = 6;
+
+    [Range(0, MaxLevel)] public int feedingLevel = 0;
+    [Range(0, MaxLevel)] public int cleanlinessLevel = 0;
+
+    public bool CanUpgradeFeeding => feedingLevel < MaxLevel;
+    public bool CanUpgradeCleanliness => cleanlinessLevel < MaxLevel;
 
     // Getters for subsystems to read the DNA
     public CatBehavior Behavior => currentBehavior;
@@ -38,9 +45,21 @@ public class BaseCat : MonoBehaviour
         cleanlinessLevel = 0;
 
         // 2. Apply Visuals & Audio
-        if (catMeshRenderer != null && material != null) catMeshRenderer.material = material;
+        if (material != null)
+        {
+            foreach (Renderer part in bodyRenderers)
+            {
+                if (part != null) part.sharedMaterial = material;
+            }
+        }
         if (catAudio != null && voiceClip != null) catAudio.clip = voiceClip;
         if (catAnimator != null) catAnimator.SetInteger("BehaviorType", (int)currentBehavior);
+    }
+
+    [ContextMenu("Fill Body Renderers")]
+    private void FillBodyRenderers()
+    {
+        bodyRenderers = GetComponentsInChildren<Renderer>();
     }
 
     /// <summary>
@@ -58,13 +77,13 @@ public class BaseCat : MonoBehaviour
 
     public void UpgradeFeeding()
     {
-        if (feedingLevel < 6) feedingLevel++;
+        if (feedingLevel < MaxLevel) feedingLevel++;
         Debug.Log($"[BaseCat] Feeding level upgraded to {feedingLevel} for {name}");
     }
 
     public void UpgradeCleanliness()
     {
-        if (cleanlinessLevel < 6) cleanlinessLevel++;
+        if (cleanlinessLevel < MaxLevel) cleanlinessLevel++;
         Debug.Log($"[BaseCat] Cleanliness level upgraded to {cleanlinessLevel} for {name}");
     }
 

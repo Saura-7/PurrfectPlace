@@ -20,6 +20,8 @@ public class CustomerAI : MonoBehaviour
     private Transform targetCage; 
     private bool isAtFrontOfLine = false;
 
+    public Transform HomeCage => targetCage;
+
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -34,12 +36,25 @@ public class CustomerAI : MonoBehaviour
         
         if (myType == CustomerType.Giver)
         {
+            if (CustomerQueueManager.Instance.IsQueueFull())
+            {
+                Debug.LogWarning($"[SOA {systemName}] Queue full. Giver leaving without entering.");
+                ChangeState(CustomerState.Leaving);
+                return;
+            }
+
             heldCat = CatFactory.Instance.GenerateGiverCat(handHoldPoint);
             Debug.Log($"[SOA {systemName}] Giver initialized with cat '{heldCat.name}'. Joining queue.");
             CustomerQueueManager.Instance.JoinQueue(this);
         }
         else
         {
+            if (CustomerQueueManager.Instance.IsQueueFull())
+            {
+                Debug.LogWarning($"[SOA {systemName}] Queue full. Taker leaving without a cat.");
+                ChangeState(CustomerState.Leaving);
+                return;
+            }
             Debug.Log($"[SOA {systemName}] Taker initialized. Setting state to Entering.");
             ChangeState(CustomerState.Entering);
         }
@@ -77,8 +92,15 @@ public class CustomerAI : MonoBehaviour
 
     public void ChangeState(CustomerState newState)
     {
+        // If we change states before reaching the cage (e.g. leaving early), release reservation
+        if (currentState == CustomerState.LookingForCat && newState == CustomerState.Leaving && heldCat == null)
+        {
+            CageManager.Instance.UnreserveCage(targetCage);
+        }
+
         currentState = newState;
-        Debug.Log($"[SOA {systemName}] {gameObject.name} state changed to: {currentState}");
+        // Debug.Log($"[SOA {systemName}] {gameObject.name} state changed to: {currentState}");
+        SOALogger.LogState("CustomerAI", SOALogger.Colors.Customer, "STATE_CHANGE", $"{gameObject.name} state changed to {currentState}");
 
         switch (currentState)
         {
@@ -101,28 +123,36 @@ public class CustomerAI : MonoBehaviour
         currentState = CustomerState.WalkingToRegister;
         isAtFrontOfLine = isAtRegister;
         agent.SetDestination(spotPosition);
-        Debug.Log($"[SOA {systemName}] {gameObject.name} moving to queue spot: {spotPosition}. At register: {isAtRegister}");
+        // Debug.Log($"[SOA {systemName}] {gameObject.name} moving to queue spot: {spotPosition}. At register: {isAtRegister}");
     }
 
     private void FindTargetCatToBuy()
-    {
-        var occupiedPair = CageManager.Instance.GetOccupiedCageWithCat();
+{
+    // Ask CageManager for an occupied cage that no other Taker has claimed yet
+    var reservedPair = CageManager.Instance.ReserveUnclaimedCatCage();
 
-        if (occupiedPair.HasValue)
-        {
-            targetCage = occupiedPair.Value.Key;
-            agent.SetDestination(targetCage.position);
-            Debug.Log($"[SOA {systemName}] Taker targeting cat in cage '{targetCage.name}'.");
-        }
-        else
-        {
-            Debug.Log($"[SOA {systemName}] No occupied cages found. Taker leaving store.");
-            ChangeState(CustomerState.Leaving);
-        }
+    if (reservedPair.HasValue)
+    {
+        targetCage = reservedPair.Value.Key;
+        agent.SetDestination(targetCage.position);
+        // Debug.Log($"[SOA {systemName}] Taker reserved and targeted cat in cage '{targetCage.name}'.");
     }
+    else
+    {
+        // Debug.Log($"[SOA {systemName}] No unreserved cats available. Taker leaving store.");
+        ChangeState(CustomerState.Leaving);
+    }
+}
 
     private void GrabCatFromCage()
     {
+        if (CustomerQueueManager.Instance.IsQueueFull())
+        {
+            Debug.LogWarning($"[SOA {systemName}] Queue full. Taker leaving without a cat.");
+            ChangeState(CustomerState.Leaving);
+            return;
+        }
+
         if (targetCage != null)
         {
             BaseCat catInCage = targetCage.GetComponentInChildren<BaseCat>();
@@ -133,22 +163,23 @@ public class CustomerAI : MonoBehaviour
                 heldCat.transform.localPosition = Vector3.zero;
                 heldCat.transform.localRotation = Quaternion.identity;
 
-                Debug.Log($"[SOA {systemName}] Taker picked up cat '{heldCat.name}' from cage '{targetCage.name}'.");
+                // Debug.Log($"[SOA {systemName}] Taker picked up cat '{heldCat.name}' from cage '{targetCage.name}'.");
 
-                CageManager.Instance.FreeCage(targetCage);
+                // CageManager.Instance.FreeCage(targetCage);
                 CustomerQueueManager.Instance.JoinQueue(this);
                 return;
             }
         }
         
-        Debug.LogWarning($"[SOA {systemName}] Taker reached cage but no cat was present. Leaving store.");
+        // Debug.LogWarning($"[SOA {systemName}] Taker reached cage but no cat was present. Leaving store.");
+        SOALogger.LogState("CustomerAI", SOALogger.Colors.Customer, "WARNING", $"Taker reached cage but no cat was present. Leaving store.");
         ChangeState(CustomerState.Leaving);
     }
 
     public BaseCat CompleteTakerTransactionAndLeave()
     {
         BaseCat soldCat = heldCat;
-        Debug.Log($"[SOA {systemName}] Taker transaction complete. Leaving with cat '{soldCat?.name}'.");
+        // Debug.Log($"[SOA {systemName}] Taker transaction complete. Leaving with cat '{soldCat?.name}'.");
         ChangeState(CustomerState.Leaving);
         return soldCat;
     }
@@ -161,14 +192,14 @@ public class CustomerAI : MonoBehaviour
             returnedCat.transform.SetParent(null);
         }
         heldCat = null;
-        Debug.Log($"[SOA {systemName}] Taker transaction rejected. Leaving empty-handed.");
+        // Debug.Log($"[SOA {systemName}] Taker transaction rejected. Leaving empty-handed.");
         ChangeState(CustomerState.Leaving);
         return returnedCat;
     }
 
     public void RejectGiverOfferAndLeave()
     {
-        Debug.Log($"[SOA {systemName}] Giver deal rejected. Leaving store with cat.");
+        // Debug.Log($"[SOA {systemName}] Giver deal rejected. Leaving store with cat.");
         ChangeState(CustomerState.Leaving);
     }
 
@@ -180,8 +211,17 @@ public class CustomerAI : MonoBehaviour
             boughtCat.transform.SetParent(null);
         }
         heldCat = null;
-        Debug.Log($"[SOA {systemName}] Giver deal accepted. Handing over cat '{boughtCat?.name}' and leaving.");
+        // Debug.Log($"[SOA {systemName}] Giver deal accepted. Handing over cat '{boughtCat?.name}' and leaving.");
         ChangeState(CustomerState.Leaving);
         return boughtCat;
+    }
+
+    private void OnDestroy()
+    {
+        // If this customer disappears while still walking to a reserved cage, release it
+        if (heldCat == null && currentState == CustomerState.LookingForCat && CageManager.Instance != null)
+        {
+            CageManager.Instance.UnreserveCage(targetCage);
+        }
     }
 }

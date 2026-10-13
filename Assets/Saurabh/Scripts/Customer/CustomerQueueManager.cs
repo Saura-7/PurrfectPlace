@@ -26,12 +26,14 @@ public class CustomerQueueManager : MonoBehaviour
     {
         if (IsQueueFull())
         {
-            Debug.LogWarning($"[SOA {systemName}] Queue is full ({line.Count}/{queueSpots.Count}). Customer '{customer.name}' cannot join.");
-            return false;
+            
+            // Debug.LogWarning($"[SOA {systemName}] Queue is full ({line.Count}/{queueSpots.Count}). Customer '{customer.name}' cannot join.");
+            SOALogger.LogWarning("QueueManager", SOALogger.Colors.Queue, $"Queue full ({line.Count}/{queueSpots.Count}). Rejecting '{customer.name}'.");return false;
         }
 
         line.Add(customer);
-        Debug.Log($"[SOA {systemName}] Customer '{customer.name}' ({customer.myType}) joined queue at spot {line.Count - 1}.");
+        // Debug.Log($"[SOA {systemName}] Customer '{customer.name}' ({customer.myType}) joined queue at spot {line.Count - 1}.");
+        SOALogger.LogState("QueueManager", SOALogger.Colors.Queue, "JOIN", $"Customer '{customer.name}' ({customer.myType}) joined queue at spot {line.Count - 1}.");
         UpdateLinePositions();
         return true;
     }
@@ -55,7 +57,8 @@ public class CustomerQueueManager : MonoBehaviour
         {
             CustomerAI finishedCustomer = line[0];
             line.RemoveAt(0);
-            Debug.Log($"[SOA {systemName}] Customer '{finishedCustomer.name}' removed from queue front. Remaining in line: {line.Count}.");
+            // Debug.Log($"[SOA {systemName}] Customer '{finishedCustomer.name}' removed from queue front. Remaining in line: {line.Count}.");
+            SOALogger.LogState("QueueManager", SOALogger.Colors.Queue, "ADVANCE", $"Customer '{finishedCustomer.name}' removed from queue front. Remaining in line: {line.Count}.");
             UpdateLinePositions();
         }
     }
@@ -68,7 +71,8 @@ public class CustomerQueueManager : MonoBehaviour
             bool isFrontOfLine = (i == 0);
             
             line[i].MoveToQueueSpot(targetSpot, isFrontOfLine);
-            Debug.Log($"[SOA {systemName}] Updated position for customer '{line[i].name}' -> Queue Spot {i} ({targetSpot}).");
+            // Debug.Log($"[SOA {systemName}] Updated position for customer '{line[i].name}' -> Queue Spot {i} ({targetSpot}).");
+            SOALogger.LogState("QueueManager", SOALogger.Colors.Queue, "UPDATE", $"Customer '{line[i].name}' moved to queue spot {i} ({targetSpot}).");
         }
     }
 }

@@ -23,28 +23,8 @@ public class CatFactory : MonoBehaviour
     /// </summary>
     public BaseCat GenerateRandomCat(Vector3 spawnPosition)
     {
-        // 1. Roll the dice for the DNA (Enums)
-        CatBehavior randomBehavior = GetRandomEnum<CatBehavior>();
-        CatBody randomBody = GetRandomEnum<CatBody>();
-        CatPattern randomPattern = GetRandomEnum<CatPattern>();
-
-        // 2. Spawn the blank prototype cube
         GameObject newCatObj = Instantiate(catPrefab, spawnPosition, Quaternion.identity);
-        BaseCat catScript = newCatObj.GetComponent<BaseCat>();
-
-        // 3. Select the Material based on the Pattern enum
-        Material selectedMat = patternMaterials[(int)randomPattern];
-
-        // 4. Initialize the data inside the cat
-        catScript.InitializeCat(randomBehavior, randomBody, randomPattern, selectedMat, null);
-
-        // 5. PROTOTYPE ONLY: Change the physical shape of the cube based on Body Type
-        ApplyPrototypeScale(newCatObj.transform, randomBody);
-
-        // 6. Rename the object in the Hierarchy for easy debugging
-        newCatObj.name = $"Cat [{randomPattern} | {randomBody} | {randomBehavior}]";
-
-        return catScript;
+        return SetupCat(newCatObj);
     }
 
     // --- Helper Methods ---
@@ -58,34 +38,56 @@ public class CatFactory : MonoBehaviour
 
     // A temporary method to visualize the body types without 3D models
     private void ApplyPrototypeScale(Transform catTransform, CatBody bodyType)
+{
+    Vector3 baseScale = catTransform.localScale; // keep the model's own scale (118.55)
+
+    switch (bodyType)
     {
-        switch (bodyType)
-        {
-            case CatBody.Normal:
-                catTransform.localScale = new Vector3(1f, 1f, 1f); // Standard Cube
-                break;
-            case CatBody.Chonky:
-                catTransform.localScale = new Vector3(1.5f, 1f, 1.5f); // Wide Cube
-                break;
-            case CatBody.Skinny:
-                catTransform.localScale = new Vector3(0.5f, 1f, 0.5f); // Thin Cube
-                break;
-        }
+        case CatBody.Normal:
+            break; // leave it as it is
+        case CatBody.Chonky:
+            catTransform.localScale = new Vector3(baseScale.x * 1.5f, baseScale.y * 1.5f, baseScale.z * 1.5f);
+            break;
+        case CatBody.Skinny:
+            catTransform.localScale = new Vector3(baseScale.x * 0.5f, baseScale.y * 0.5f, baseScale.z * 0.5f);
+            break;
     }
+}
 
         // Add this method to your existing CatFactory.cs
     public BaseCat GenerateGiverCat(Transform handPoint)
     {
-        // Instantiate your Cat_Prototype
         GameObject newCatObj = Instantiate(catPrefab, handPoint.position, handPoint.rotation, handPoint);
-        BaseCat newCat = newCatObj.GetComponent<BaseCat>();
+        BaseCat newCat = SetupCat(newCatObj);
 
-        // Randomize core stats between 0 and 2
-        newCat.feedingLevel = Random.Range(0, 2); // Giver cats are less likely to be well-fed
-        newCat.cleanlinessLevel = Random.Range(0, 2); // Giver cats are less likely to be clean
+        // IMPORTANT: set the stats AFTER SetupCat, because InitializeCat resets them to 0
+        newCat.feedingLevel = Random.Range(0, 3);      // 0, 1 or 2 (the max value is excluded)
+        newCat.cleanlinessLevel = Random.Range(0, 3);  // 0, 1 or 2
 
-        // Optional: Visually reflect stats (e.g., if clean is 0, add dirt particles)
-        
         return newCat;
+    }
+
+    // Shared setup used by every way of creating a cat
+    private BaseCat SetupCat(GameObject catObj)
+    {
+        // 1. Roll the dice for the DNA (Enums)
+        CatBehavior randomBehavior = GetRandomEnum<CatBehavior>();
+        CatBody randomBody = GetRandomEnum<CatBody>();
+        CatPattern randomPattern = GetRandomEnum<CatPattern>();
+
+        // 2. Pick the material from the Pattern enum
+        BaseCat catScript = catObj.GetComponent<BaseCat>();
+        Material selectedMat = patternMaterials[(int)randomPattern];
+
+        // 3. Initialize the data inside the cat
+        catScript.InitializeCat(randomBehavior, randomBody, randomPattern, selectedMat, null);
+
+        // 4. PROTOTYPE ONLY: change the shape of the cube based on body type
+        ApplyPrototypeScale(catObj.transform, randomBody);
+
+        // 5. Rename for easy debugging in the Hierarchy
+        catObj.name = $"Cat [{randomPattern} | {randomBody} | {randomBehavior}]";
+
+        return catScript;
     }
 }

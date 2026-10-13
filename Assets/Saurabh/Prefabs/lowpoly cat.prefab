@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 69614568119837917}
   - component: {fileID: 4384230874719272137}
   m_Layer: 0
-  m_Name: polySurface5
+  m_Name: catNoseDetails
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -282,7 +282,7 @@ GameObject:
   - component: {fileID: 2887297226904412357}
   - component: {fileID: 2412585121212252904}
   m_Layer: 0
-  m_Name: polySurface4
+  m_Name: catNose
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -372,7 +372,7 @@ GameObject:
   - component: {fileID: 7949505393192892361}
   - component: {fileID: 189400328775902538}
   m_Layer: 0
-  m_Name: polySurface3
+  m_Name: catEyeBrows
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -462,7 +462,7 @@ GameObject:
   - component: {fileID: 8837434254107851936}
   - component: {fileID: 4723305116078332953}
   m_Layer: 0
-  m_Name: reduce4
+  m_Name: catWhisker2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -552,7 +552,7 @@ GameObject:
   - component: {fileID: 4590566073917314344}
   - component: {fileID: 4337164612905135406}
   m_Layer: 0
-  m_Name: eye2
+  m_Name: catEyeBalls
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -785,8 +785,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.01, y: 0.006626018, z: 0.0074695107}
-  m_Center: {x: 0, y: -0.0008434953, z: 0.0012652441}
+  m_Size: {x: 0.0049390285, y: 0.006626018, z: 0.0074695107}
+  m_Center: {x: 5.027621e-10, y: -0.0008434953, z: 0.0012652441}
 --- !u!23 &1716496084014379010
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -848,7 +848,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 576730e76defc284589c0dc4f7ccc865, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BaseCat
-  catMeshRenderer: {fileID: 1716496084014379010}
+  bodyRenderers:
+  - {fileID: 8645977402561441596}
+  - {fileID: 5252550944918469211}
+  - {fileID: 2018383054019021002}
   catAnimator: {fileID: 0}
   catAudio: {fileID: 0}
   currentBehavior: 0
@@ -869,7 +872,7 @@ GameObject:
   - component: {fileID: 7878936773309817226}
   - component: {fileID: 9053579308857436650}
   m_Layer: 0
-  m_Name: reduce2
+  m_Name: catWhisker1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -959,7 +962,7 @@ GameObject:
   - component: {fileID: 8004641355759848127}
   - component: {fileID: 5252550944918469211}
   m_Layer: 0
-  m_Name: polySurface1
+  m_Name: catHead
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1049,7 +1052,7 @@ GameObject:
   - component: {fileID: 1898128665270402535}
   - component: {fileID: 7284182298267512191}
   m_Layer: 0
-  m_Name: eyeb1
+  m_Name: catEyeLashes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
