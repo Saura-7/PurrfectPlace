@@ -3,7 +3,8 @@ using UnityEngine;
 public class BaseCat : MonoBehaviour
 {
     [Header("3D Components")]
-    public MeshRenderer catMeshRenderer; // Using MeshRenderer for the prototype cube
+    // public MeshRenderer catMeshRenderer; // Using MeshRenderer for the prototype cube
+    public Renderer[] bodyRenderers; // Every part that should receive the pattern material
     public Animator catAnimator;
     public AudioSource catAudio;
 
@@ -44,9 +45,21 @@ public class BaseCat : MonoBehaviour
         cleanlinessLevel = 0;
 
         // 2. Apply Visuals & Audio
-        if (catMeshRenderer != null && material != null) catMeshRenderer.material = material;
+        if (material != null)
+        {
+            foreach (Renderer part in bodyRenderers)
+            {
+                if (part != null) part.sharedMaterial = material;
+            }
+        }
         if (catAudio != null && voiceClip != null) catAudio.clip = voiceClip;
         if (catAnimator != null) catAnimator.SetInteger("BehaviorType", (int)currentBehavior);
+    }
+
+    [ContextMenu("Fill Body Renderers")]
+    private void FillBodyRenderers()
+    {
+        bodyRenderers = GetComponentsInChildren<Renderer>();
     }
 
     /// <summary>
