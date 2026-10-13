@@ -20,6 +20,8 @@ public class CustomerAI : MonoBehaviour
     private Transform targetCage; 
     private bool isAtFrontOfLine = false;
 
+    public Transform HomeCage => targetCage;
+
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -163,7 +165,7 @@ public class CustomerAI : MonoBehaviour
 
                 // Debug.Log($"[SOA {systemName}] Taker picked up cat '{heldCat.name}' from cage '{targetCage.name}'.");
 
-                CageManager.Instance.FreeCage(targetCage);
+                // CageManager.Instance.FreeCage(targetCage);
                 CustomerQueueManager.Instance.JoinQueue(this);
                 return;
             }

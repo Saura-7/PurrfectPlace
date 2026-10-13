@@ -18,6 +18,10 @@ public class ReceptionDesk : MonoBehaviour
     private CustomerAI currentInteractingCustomer;
     private int currentDealPrice;
 
+    [Header("Reputation Settings")]
+    public int minReputationChange = 5;
+    public int maxReputationChange = 10;
+
     private void OnEnable()
     {
         inputActions = new InputSystem_Actions();
@@ -103,6 +107,7 @@ public class ReceptionDesk : MonoBehaviour
         {
             CoreEconomySystem.Instance.ModifyGP(currentDealPrice, systemName);
             currentInteractingCustomer.CompleteTakerTransactionAndLeave();
+            CageManager.Instance.FreeCage(currentInteractingCustomer.HomeCage); // the cat is sold, so the cage is free now
             
             Debug.Log($"[SOA {systemName}] ACCEPTED deal: Sold cat for +{currentDealPrice} GP.");
         }
@@ -127,6 +132,9 @@ public class ReceptionDesk : MonoBehaviour
             }
         }
 
+        int repGain = Random.Range(minReputationChange, maxReputationChange + 1);
+        CoreEconomySystem.Instance.ModifyReputation(repGain, systemName);   
+        
         dealUIPanel.SetActive(false);
         CustomerQueueManager.Instance.AdvanceQueue();
         currentInteractingCustomer = null;
@@ -139,12 +147,11 @@ public class ReceptionDesk : MonoBehaviour
         if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Taker)
         {
             BaseCat returnedCat = currentInteractingCustomer.RejectTakerTransactionAndLeave();
-            Transform emptyCage = CageManager.Instance.GetAvailableCage();
 
-            if (returnedCat != null && emptyCage != null)
+            if (returnedCat != null)
             {
-                CageManager.Instance.OccupyCage(emptyCage, returnedCat);
-                Debug.Log($"[SOA {systemName}] REJECTED Taker deal. Cat '{returnedCat.name}' placed back in cage '{emptyCage.name}'.");
+                CageManager.Instance.ReturnCatToCage(currentInteractingCustomer.HomeCage, returnedCat);
+                Debug.Log($"[SOA {systemName}] REJECTED Taker deal. Cat '{returnedCat.name}' placed back in cage '{currentInteractingCustomer.HomeCage.name}'.");
             }
         }
         else if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Giver)
@@ -153,6 +160,9 @@ public class ReceptionDesk : MonoBehaviour
             Debug.Log($"[SOA {systemName}] REJECTED Giver deal. Customer departing with cat.");
         }
 
+        int repLoss = Random.Range(minReputationChange, maxReputationChange + 1);
+        CoreEconomySystem.Instance.ModifyReputation(-repLoss, systemName);
+        
         dealUIPanel.SetActive(false);
         CustomerQueueManager.Instance.AdvanceQueue();
         currentInteractingCustomer = null;

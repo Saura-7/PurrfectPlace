@@ -91,4 +91,17 @@ public class CageManager : MonoBehaviour
             SOALogger.LogState("CageManager", SOALogger.Colors.Cage, "UNRESERVE", $"Reservation released for cage '{cage.name}'.");
         }
     }
+
+    // Puts a returned cat back into the cage it came from
+    public void ReturnCatToCage(Transform cage, BaseCat cat)
+    {
+        if (cage == null || cat == null || !occupiedCages.ContainsKey(cage)) return;
+
+        occupiedCages[cage] = cat;
+        reservedCages.Remove(cage); // the cat is back on the shelf and can be bought again
+
+        cat.transform.SetParent(cage);
+        cat.transform.localPosition = Vector3.zero;
+        cat.transform.localRotation = Quaternion.identity;
+    }
 }
