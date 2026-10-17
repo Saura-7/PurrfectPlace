@@ -10,6 +10,12 @@ public class DebugEconomyTester : MonoBehaviour
 
     void OnEnable()
     {
+
+        if(!Debug.isDebugBuild)
+        {
+            enabled = false;
+            return;
+        }   
         inputActions = new InputSystem_Actions();
         GetGPAction = inputActions.Player.MoneyIncrease;
         GetReputationAction = inputActions.Player.RepIncrease;
@@ -18,7 +24,7 @@ public class DebugEconomyTester : MonoBehaviour
 
     void OnDisable()
     {
-        inputActions.Disable();
+        if (inputActions != null) inputActions.Disable();
     }
 
     void Update()

@@ -10,10 +10,20 @@ public class DebugSpawner : MonoBehaviour
 
     void OnEnable()
     {
+        if(!Debug.isDebugBuild)
+        {
+            this.enabled = false;
+            return;
+        }
         inputActions = new InputSystem_Actions();
         SpawnCatAction = inputActions.Player.SpawnCat;
         // interact1Action = inputActions.Player.Interact1;
         inputActions.Enable();
+    }
+
+    void OnDisable()
+    {
+        if(inputActions != null) inputActions.Disable();
     }
 
     void Update()
