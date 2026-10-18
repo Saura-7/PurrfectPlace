@@ -53,14 +53,14 @@ public class ReceptionDesk : MonoBehaviour
             WorldSpaceUIButton uiButton = hit.collider.GetComponent<WorldSpaceUIButton>();
             if (uiButton != null)
             {
-                Debug.Log($"[SOA {systemName}] Raycast hit World Space UI Button: {uiButton.gameObject.name}");
+                // Debug.Log($"[SOA {systemName}] Raycast hit World Space UI Button: {uiButton.gameObject.name}");
                 uiButton.PressButton();
                 return;
             }
 
             if (hit.collider.gameObject == gameObject || hit.collider.GetComponentInParent<ReceptionDesk>() != null)
             {
-                Debug.Log($"[SOA {systemName}] Raycast hit Reception Desk directly.");
+                // Debug.Log($"[SOA {systemName}] Raycast hit Reception Desk directly.");
                 ProcessTransaction();
             }
         }
@@ -80,7 +80,7 @@ public class ReceptionDesk : MonoBehaviour
                 dealText.text = $"SELL CAT?\nFeed: {cat.feedingLevel}/6\nClean: {cat.cleanlinessLevel}/6\nPayout: +{currentDealPrice} GP";
                 dealUIPanel.SetActive(true);
 
-                Debug.Log($"[SOA {systemName}] Generated Taker sale offer for cat '{cat.name}'. Payout: {currentDealPrice} GP.");
+                // Debug.Log($"[SOA {systemName}] Generated Taker sale offer for cat '{cat.name}'. Payout: {currentDealPrice} GP.");
             }
             else if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Giver)
             {
@@ -90,7 +90,7 @@ public class ReceptionDesk : MonoBehaviour
                 dealText.text = $"BUY CAT?\nFeed: {cat.feedingLevel}/6\nClean: {cat.cleanlinessLevel}/6\nCost: -{currentDealPrice} GP";
                 dealUIPanel.SetActive(true);
 
-                Debug.Log($"[SOA {systemName}] Generated Giver purchase offer for cat '{cat.name}'. Cost: {currentDealPrice} GP.");
+                // Debug.Log($"[SOA {systemName}] Generated Giver purchase offer for cat '{cat.name}'. Cost: {currentDealPrice} GP.");
             }
         }
         else
@@ -109,7 +109,8 @@ public class ReceptionDesk : MonoBehaviour
             currentInteractingCustomer.CompleteTakerTransactionAndLeave();
             CageManager.Instance.FreeCage(currentInteractingCustomer.HomeCage); // the cat is sold, so the cage is free now
             
-            Debug.Log($"[SOA {systemName}] ACCEPTED deal: Sold cat for +{currentDealPrice} GP.");
+            // Debug.Log($"[SOA {systemName}] ACCEPTED deal: Sold cat for +{currentDealPrice} GP.");
+            MessageUI.Notify($"Deal accepted: +{currentDealPrice} GP");
         }
         else if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Giver)
         {
@@ -122,18 +123,21 @@ public class ReceptionDesk : MonoBehaviour
                 BaseCat boughtCat = currentInteractingCustomer.AcceptGiverOfferAndLeave();
                 CageManager.Instance.OccupyCage(emptyCage, boughtCat);
 
-                Debug.Log($"[SOA {systemName}] ACCEPTED deal: Bought cat for -{currentDealPrice} GP and assigned to cage '{emptyCage.name}'.");
+                // Debug.Log($"[SOA {systemName}] ACCEPTED deal: Bought cat for - {currentDealPrice} GP and assigned to cage '{emptyCage.name}'.");
+                MessageUI.Notify($"Deal accepted: -{currentDealPrice} GP"); 
             }
             else
             {
-                Debug.LogWarning($"[SOA {systemName}] ACCEPT failed: Player GP ({playerMoney}) < Cost ({currentDealPrice}) or no empty cage available. Auto-rejecting deal.");
+                // Debug.LogWarning($"[SOA {systemName}] ACCEPT failed: Player GP ({playerMoney}) < Cost ({currentDealPrice}) or no empty cage available. Auto-rejecting deal.");
+                MessageUI.Notify(emptyCage == null ? "No free cage!" : "Not enough GP!");
                 RejectDeal();
                 return;
             }
         }
 
         int repGain = Random.Range(minReputationChange, maxReputationChange + 1);
-        CoreEconomySystem.Instance.ModifyReputation(repGain, systemName);   
+        CoreEconomySystem.Instance.ModifyReputation(repGain, systemName);  
+        MessageUI.Notify($"+{repGain} reputation"); 
         
         dealUIPanel.SetActive(false);
         CustomerQueueManager.Instance.AdvanceQueue();
@@ -151,17 +155,18 @@ public class ReceptionDesk : MonoBehaviour
             if (returnedCat != null)
             {
                 CageManager.Instance.ReturnCatToCage(currentInteractingCustomer.HomeCage, returnedCat);
-                Debug.Log($"[SOA {systemName}] REJECTED Taker deal. Cat '{returnedCat.name}' placed back in cage '{currentInteractingCustomer.HomeCage.name}'.");
+                // Debug.Log($"[SOA {systemName}] REJECTED Taker deal. Cat '{returnedCat.name}' placed back in cage '{currentInteractingCustomer.HomeCage.name}'.");
             }
         }
         else if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Giver)
         {
             currentInteractingCustomer.RejectGiverOfferAndLeave();
-            Debug.Log($"[SOA {systemName}] REJECTED Giver deal. Customer departing with cat.");
+            // Debug.Log($"[SOA {systemName}] REJECTED Giver deal. Customer departing with cat.");
         }
 
         int repLoss = Random.Range(minReputationChange, maxReputationChange + 1);
         CoreEconomySystem.Instance.ModifyReputation(-repLoss, systemName);
+        MessageUI.Notify($"Deal rejected: -{repLoss} reputation");
         
         dealUIPanel.SetActive(false);
         CustomerQueueManager.Instance.AdvanceQueue();

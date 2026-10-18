@@ -44,7 +44,7 @@ public class CustomerAI : MonoBehaviour
             }
 
             heldCat = CatFactory.Instance.GenerateGiverCat(handHoldPoint);
-            Debug.Log($"[SOA {systemName}] Giver initialized with cat '{heldCat.name}'. Joining queue.");
+            // Debug.Log($"[SOA {systemName}] Giver initialized with cat '{heldCat.name}'. Joining queue.");
             CustomerQueueManager.Instance.JoinQueue(this);
         }
         else
@@ -55,7 +55,7 @@ public class CustomerAI : MonoBehaviour
                 ChangeState(CustomerState.Leaving);
                 return;
             }
-            Debug.Log($"[SOA {systemName}] Taker initialized. Setting state to Entering.");
+            // Debug.Log($"[SOA {systemName}] Taker initialized. Setting state to Entering.");
             ChangeState(CustomerState.Entering);
         }
     }
@@ -75,7 +75,7 @@ public class CustomerAI : MonoBehaviour
             {
                 if (isAtFrontOfLine)
                 {
-                    Debug.Log($"[SOA {systemName}] Customer reached register (Spot 0). Waiting for interaction.");
+                    // Debug.Log($"[SOA {systemName}] Customer reached register (Spot 0). Waiting for interaction.");
                     ChangeState(CustomerState.WaitingAtRegister);
                 }
             }
@@ -84,7 +84,7 @@ public class CustomerAI : MonoBehaviour
         {
             if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
             {
-                Debug.Log($"[SOA {systemName}] Customer reached exit door. Despawning GameObject.");
+                // Debug.Log($"[SOA {systemName}] Customer reached exit door. Despawning GameObject.");
                 Destroy(gameObject);
             }
         }

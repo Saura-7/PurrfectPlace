@@ -78,19 +78,21 @@ public class BaseCat : MonoBehaviour
     public void UpgradeFeeding()
     {
         if (feedingLevel < MaxLevel) feedingLevel++;
-        Debug.Log($"[BaseCat] Feeding level upgraded to {feedingLevel} for {name}");
+        // Debug.Log($"[BaseCat] Feeding level upgraded to {feedingLevel} for {name}");
+        MessageUI.Notify("Feeding level upgraded! to " + feedingLevel);
     }
 
     public void UpgradeCleanliness()
     {
         if (cleanlinessLevel < MaxLevel) cleanlinessLevel++;
-        Debug.Log($"[BaseCat] Cleanliness level upgraded to {cleanlinessLevel} for {name}");
+        // Debug.Log($"[BaseCat] Cleanliness level upgraded to {cleanlinessLevel} for {name}");
+        MessageUI.Notify("Cleanliness level upgraded! to " + cleanlinessLevel);
     }
 
     public int CalculateFinalPrice()
     {
         // Base price is 50. Each stat point (max 12 total) adds 10 to the value.
-        Debug.Log($"[BaseCat] Final price calculated for {name}: 50 + ({feedingLevel} * 10) + ({cleanlinessLevel} * 10)");
+        // Debug.Log($"[BaseCat] Final price calculated for {name}: 50 + ({feedingLevel} * 10) + ({cleanlinessLevel} * 10)");
         return 50 + (feedingLevel * 10) + (cleanlinessLevel * 10);
     }
 }

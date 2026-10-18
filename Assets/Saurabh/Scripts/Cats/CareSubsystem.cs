@@ -68,6 +68,7 @@ private void TryCareForCat(bool isFeeding)
         if (!canUpgrade)
         {
             Debug.Log($"{clickedCat.name} is already at max level for this stat. No GP spent.");
+            MessageUI.Notify("This stat is already at max level!");
             return;
         }
 
@@ -76,6 +77,7 @@ private void TryCareForCat(bool isFeeding)
         if (currentMoney < careCost)
         {
             Debug.LogWarning("Not enough GP!");
+            MessageUI.Notify("Not enough GP!");
             return;
         }
 
