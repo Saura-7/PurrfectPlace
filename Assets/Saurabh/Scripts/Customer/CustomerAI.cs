@@ -25,6 +25,7 @@ public class CustomerAI : MonoBehaviour
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
+        agent.avoidancePriority = Random.Range(40, 60);
         
         GameObject exitObj = GameObject.Find("ExitDoorTarget");
         if (exitObj != null) exitDoor = exitObj.transform;
@@ -113,6 +114,7 @@ public class CustomerAI : MonoBehaviour
                 break;
                 
             case CustomerState.Leaving:
+                agent.avoidancePriority = Random.Range(70, 90); // leaving customers give way to everyone else
                 if (exitDoor != null) agent.SetDestination(exitDoor.position);
                 break;
         }

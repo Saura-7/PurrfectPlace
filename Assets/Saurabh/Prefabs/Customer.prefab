@@ -42,7 +42,6 @@ GameObject:
   - component: {fileID: 2497254154345210421}
   - component: {fileID: 3211010472458708480}
   - component: {fileID: 8539969025587562682}
-  - component: {fileID: 5821318354622170060}
   - component: {fileID: 4423087439019032601}
   - component: {fileID: 5096721756509676375}
   m_Layer: 0
@@ -125,29 +124,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &5821318354622170060
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5318555209367129198}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!195 &4423087439019032601
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -157,7 +133,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 5318555209367129198}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5
+  m_Radius: 0.3
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50

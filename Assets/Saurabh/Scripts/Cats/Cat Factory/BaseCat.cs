@@ -23,6 +23,7 @@ public class BaseCat : MonoBehaviour
 
     public bool CanUpgradeFeeding => feedingLevel < MaxLevel;
     public bool CanUpgradeCleanliness => cleanlinessLevel < MaxLevel;
+    public bool IsHeldByCustomer => GetComponentInParent<CustomerAI>() != null; 
 
     // Getters for subsystems to read the DNA
     public CatBehavior Behavior => currentBehavior;

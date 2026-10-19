@@ -63,6 +63,12 @@ private void TryCareForCat(bool isFeeding)
             return;
         }
 
+        if (clickedCat.IsHeldByCustomer)
+        {
+            MessageUI.Notify("The customer is holding this cat.");
+            return;
+        }
+
         // NEW: stop before spending any money if this stat is already maxed
         bool canUpgrade = isFeeding ? clickedCat.CanUpgradeFeeding : clickedCat.CanUpgradeCleanliness;
         if (!canUpgrade)

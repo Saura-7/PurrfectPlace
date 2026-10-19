@@ -36,7 +36,7 @@ public class InteractionPromptUI : MonoBehaviour
 
         // 1. Looking at a cat
         BaseCat cat = hit.collider.GetComponent<BaseCat>();
-        if (cat != null && hit.distance <= catDistance)
+        if (cat != null && hit.distance <= catDistance && !cat.IsHeldByCustomer)
         {
             string feed = InputPrompts.Get(PromptAction.Feed);
             string clean = InputPrompts.Get(PromptAction.Clean);
