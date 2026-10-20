@@ -218,6 +218,30 @@ public class CustomerAI : MonoBehaviour
         return boughtCat;
     }
 
+    public void DismissForNewDay()
+    {
+        if (myType == CustomerType.Taker)
+        {
+            bool waitingWithCat = heldCat != null &&
+                (currentState == CustomerState.WalkingToRegister || currentState == CustomerState.WaitingAtRegister);
+
+            if (waitingWithCat)
+            {
+                // The cat was never sold, so it goes back to its own enclosure
+                BaseCat cat = heldCat;
+                heldCat = null;
+                CageManager.Instance.ReturnCatToCage(HomeCage, cat);
+            }
+            else if (currentState == CustomerState.LookingForCat)
+            {
+                // Still walking to the enclosure, so release the reservation
+                CageManager.Instance.UnreserveCage(targetCage);
+            }
+        }
+
+        Destroy(gameObject); 
+    }
+
     private void OnDestroy()
     {
         // If this customer disappears while still walking to a reserved cage, release it

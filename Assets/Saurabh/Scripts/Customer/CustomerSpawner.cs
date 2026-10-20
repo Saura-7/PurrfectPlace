@@ -5,6 +5,7 @@ public class CustomerSpawner : MonoBehaviour
 {
     public GameObject customerPrefab;
     public Transform spawnPoint;
+    private bool firstSpawnOfDay;
     
     [Header("Spawn Settings")]
     public float minSpawnTime = 10f;
@@ -13,7 +14,7 @@ public class CustomerSpawner : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(SpawnRoutine());
+        // StartCoroutine(SpawnRoutine());
     }
 
     private IEnumerator SpawnRoutine()
@@ -26,7 +27,10 @@ public class CustomerSpawner : MonoBehaviour
                 continue;
             }
 
-            yield return new WaitForSeconds(Random.Range(minSpawnTime, maxSpawnTime));
+            float wait = firstSpawnOfDay ? Random.Range(3f, 6f) : Random.Range(minSpawnTime, maxSpawnTime);
+            firstSpawnOfDay = false;
+            yield return new WaitForSeconds(wait);
+            
             if (CustomerQueueManager.Instance.IsQueueFull()) continue;
 
             // 1. Audit store conditions
@@ -48,5 +52,17 @@ public class CustomerSpawner : MonoBehaviour
             
             ai.InitializeCustomer(typeToSpawn);
         }
+    }
+
+    public void StopSpawning()
+    {
+        StopAllCoroutines();
+    }
+
+    public void StartSpawning()
+    {
+        firstSpawnOfDay = true;
+        StopAllCoroutines();
+        StartCoroutine(SpawnRoutine());
     }
 }

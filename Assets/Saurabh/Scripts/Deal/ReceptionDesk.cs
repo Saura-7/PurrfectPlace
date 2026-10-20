@@ -106,6 +106,7 @@ public class ReceptionDesk : MonoBehaviour
         if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Taker)
         {
             CoreEconomySystem.Instance.ModifyGP(currentDealPrice, systemName);
+            DayManager.RecordCatSold();
             currentInteractingCustomer.CompleteTakerTransactionAndLeave();
             CageManager.Instance.FreeCage(currentInteractingCustomer.HomeCage); // the cat is sold, so the cage is free now
             
@@ -120,6 +121,7 @@ public class ReceptionDesk : MonoBehaviour
             if (playerMoney >= currentDealPrice && emptyCage != null)
             {
                 CoreEconomySystem.Instance.ModifyGP(-currentDealPrice, systemName);
+                DayManager.RecordCatBought();
                 BaseCat boughtCat = currentInteractingCustomer.AcceptGiverOfferAndLeave();
                 CageManager.Instance.OccupyCage(emptyCage, boughtCat);
 
@@ -166,10 +168,17 @@ public class ReceptionDesk : MonoBehaviour
 
         int repLoss = Random.Range(minReputationChange, maxReputationChange + 1);
         CoreEconomySystem.Instance.ModifyReputation(-repLoss, systemName);
+        DayManager.RecordRejected();
         MessageUI.Notify($"Deal rejected: -{repLoss} reputation");
         
         dealUIPanel.SetActive(false);
         CustomerQueueManager.Instance.AdvanceQueue();
         currentInteractingCustomer = null;
+    }
+
+    public void CancelCurrentDeal()
+    {
+        currentInteractingCustomer = null;
+        if (dealUIPanel != null) dealUIPanel.SetActive(false);
     }
 }

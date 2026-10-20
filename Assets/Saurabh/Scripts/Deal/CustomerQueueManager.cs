@@ -75,4 +75,11 @@ public class CustomerQueueManager : MonoBehaviour
             SOALogger.LogState("QueueManager", SOALogger.Colors.Queue, "UPDATE", $"Customer '{line[i].name}' moved to queue spot {i} ({targetSpot}).");
         }
     }
+
+    public void ClearQueue()
+    {
+        line.Clear();
+        // Debug.Log($"[SOA {systemName}] Queue cleared. Current line count: {line.Count}.");
+        SOALogger.LogState("QueueManager", SOALogger.Colors.Queue, "CLEAR", $"Queue cleared. Current line count: {line.Count}.");
+    }
 }

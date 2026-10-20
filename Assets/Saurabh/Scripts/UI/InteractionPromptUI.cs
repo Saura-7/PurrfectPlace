@@ -45,6 +45,12 @@ public class InteractionPromptUI : MonoBehaviour
                    $"Clean [{clean}]  {cat.cleanlinessLevel}/{BaseCat.MaxLevel}";
         }
 
+        OpenSign sign = hit.collider.GetComponentInParent<OpenSign>();
+        if (sign != null && hit.distance <= deskDistance)
+        {
+            return sign.IsOpen ? "" : $"Open the shop [{InputPrompts.Get(PromptAction.CompleteDeal)}]";
+        }
+
         // 2. Looking at an Accept / Reject button
         if (hit.distance <= deskDistance && hit.collider.GetComponent<WorldSpaceUIButton>() != null)
         {
