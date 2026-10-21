@@ -2676,9 +2676,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CustomerSpawner
   customerPrefab: {fileID: 5318555209367129198, guid: ac54cfa82002b99459e951ea70ce49c4, type: 3}
   spawnPoint: {fileID: 736099951}
-  minSpawnTime: 1
-  maxSpawnTime: 5
-  minimumBuyPriceThreshold: 10
+  minSpawnTime: 5
+  maxSpawnTime: 10
+  minimumBuyPriceThreshold: 50
 --- !u!1 &683376256
 GameObject:
   m_ObjectHideFlags: 0
@@ -10109,8 +10109,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed73632b8a1955b47a96e3d69cb72662, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DayManager
-  dayLengthSeconds: 30
-  lastCallSeconds: 15
+  dayLengthSeconds: 300
+  lastCallSeconds: 60
   requireOpenSign: 1
   timerText: {fileID: 1037195334}
   rentText: {fileID: 1218717105}

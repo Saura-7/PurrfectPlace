@@ -24,6 +24,15 @@ public class InteractionPromptUI : MonoBehaviour
         }
     }
 
+    // Unity calls OnDisable automatically when this script is switched off (for example when the game freezes)
+    private void OnDisable()
+    {
+        lastText = "";
+
+        // Wipe the text so an old prompt doesn't stay on screen over the pause menu or summary
+        if (promptText != null) promptText.text = "";
+    }
+
     private string GetPromptText()
     {
         Camera cam = Camera.main;

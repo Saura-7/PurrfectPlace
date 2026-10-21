@@ -19,6 +19,9 @@ public class CustomerAI : MonoBehaviour
     private Transform exitDoor;
     private Transform targetCage; 
     private bool isAtFrontOfLine = false;
+    
+    // How greedy this Giver is: 0.7 = asks 30% less than the cat is worth, 1.3 = asks 30% more
+    public float AskFactor { get; private set; }
 
     public Transform HomeCage => targetCage;
 
@@ -29,6 +32,7 @@ public class CustomerAI : MonoBehaviour
         
         GameObject exitObj = GameObject.Find("ExitDoorTarget");
         if (exitObj != null) exitDoor = exitObj.transform;
+        AskFactor = Random.Range(0.6f, 1.2f);   
     }
 
     public void InitializeCustomer(CustomerType type)

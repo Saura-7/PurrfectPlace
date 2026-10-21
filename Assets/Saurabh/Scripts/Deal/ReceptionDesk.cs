@@ -84,13 +84,12 @@ public class ReceptionDesk : MonoBehaviour
             }
             else if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Giver)
             {
-                int statPenalty = (12 - (cat.feedingLevel + cat.cleanlinessLevel)) * 2; // Each missing stat point reduces price by 2 GP
-                currentDealPrice = Mathf.Max(30, 50 - statPenalty);
+                // What the cat is really worth, and what this Giver asks for it
+                int catValue = cat.CalculateFinalPrice();
+                currentDealPrice = Mathf.Max(10, Mathf.RoundToInt(catValue * currentInteractingCustomer.AskFactor));
 
-                dealText.text = $"BUY CAT?\nFeed: {cat.feedingLevel}/6\nClean: {cat.cleanlinessLevel}/6\nCost: -{currentDealPrice} GP";
+                dealText.text = $"BUY CAT?\nFeed: {cat.feedingLevel}/6\nClean: {cat.cleanlinessLevel}/6\nWorth about: {catValue} GP\nCost: -{currentDealPrice} GP";
                 dealUIPanel.SetActive(true);
-
-                // Debug.Log($"[SOA {systemName}] Generated Giver purchase offer for cat '{cat.name}'. Cost: {currentDealPrice} GP.");
             }
         }
         else
