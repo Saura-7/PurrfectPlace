@@ -50,6 +50,7 @@ public class InputPrompts : MonoBehaviour
             new PromptEntry { action = PromptAction.Feed,         keyboardText = "C", gamepadText = "LB" },
             new PromptEntry { action = PromptAction.Clean,        keyboardText = "X", gamepadText = "RB" },
             new PromptEntry { action = PromptAction.CompleteDeal, keyboardText = "Z", gamepadText = "RT" },
+            // new PromptEntry { action = PromptAction.OpenSign,     keyboardText = "Z", gamepadText = "RT" },
         };
     }
 

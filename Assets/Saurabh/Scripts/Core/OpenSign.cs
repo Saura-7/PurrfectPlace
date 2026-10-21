@@ -1,10 +1,11 @@
 using UnityEngine;
 
 /// <summary>
-/// The Open / Closed sign. The player looks at it and presses the deal key to open the shop.
-/// Customers only arrive after the sign is switched on, and the day timer only runs while it is open.
+/// The Open / Closed sign. It is only a button.
+/// When the player presses it, it tells DayManager, and DayManager decides what that means
+/// (open the shop during prep, close the shop at closing time).
 ///
-/// Setup: an empty object with a BoxCollider, this script, and a WorldSpaceUIButton (added automatically).
+/// Setup: an empty object with a BoxCollider and this script (WorldSpaceUIButton is added automatically).
 /// Put the visuals in two child objects WITHOUT colliders.
 /// When the artists deliver a final sign, swap the child models and keep this object.
 /// </summary>
@@ -36,21 +37,21 @@ public class OpenSign : MonoBehaviour
 
     private void OnPressed()
     {
-        if (IsOpen)
-        {
-            MessageUI.Notify("The shop is already open.");
-            return;
-        }
-
-        if (DayManager.Instance != null) DayManager.Instance.OpenShop();
+        if (DayManager.Instance != null) DayManager.Instance.OnSignPressed();
     }
 
-    // Called by DayManager. Does not start the day by itself.
+    // Called by DayManager to change how the sign looks
     public void SetOpen(bool open)
     {
         IsOpen = open;
 
         if (closedVisual != null) closedVisual.SetActive(!open);
         if (openVisual != null) openVisual.SetActive(open);
+    }
+
+    // The text shown when the player looks at the sign
+    public string GetPrompt(string key)
+    {
+        return DayManager.Instance != null ? DayManager.Instance.GetSignPrompt(key) : "";
     }
 }

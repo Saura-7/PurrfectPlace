@@ -2676,8 +2676,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CustomerSpawner
   customerPrefab: {fileID: 5318555209367129198, guid: ac54cfa82002b99459e951ea70ce49c4, type: 3}
   spawnPoint: {fileID: 736099951}
-  minSpawnTime: 5
-  maxSpawnTime: 10
+  minSpawnTime: 1
+  maxSpawnTime: 5
   minimumBuyPriceThreshold: 10
 --- !u!1 &683376256
 GameObject:
@@ -5029,7 +5029,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: New Text
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -5722,7 +5722,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: New Text
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -10074,6 +10074,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2055573662}
   - component: {fileID: 2055573663}
+  - component: {fileID: 2055573664}
   m_Layer: 0
   m_Name: DayManager
   m_TagString: Untagged
@@ -10109,16 +10110,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DayManager
   dayLengthSeconds: 30
+  lastCallSeconds: 15
   requireOpenSign: 1
-  firstRentDay: 2
-  baseRent: 40
-  lateFeePercent: 10
-  missedPaymentsToClose: 2
   timerText: {fileID: 1037195334}
   rentText: {fileID: 1218717105}
   endPanel: {fileID: 855771532}
   resultsText: {fileID: 1555189843}
   nextDayButton: {fileID: 1100895836}
+--- !u!114 &2055573664
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2055573661}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 502e3dd77b56015459caf1afcfd2f16a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  firstRentDay: 2
+  baseRent: 40
+  lateFeePercent: 10
+  missedPaymentsToClose: 2
 --- !u!4 &2058937962 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3694436082367100000, guid: d4e48794c0568d640b942cf649f57eb4, type: 3}

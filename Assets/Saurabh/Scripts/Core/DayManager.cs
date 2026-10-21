@@ -1,13 +1,18 @@
 using UnityEngine;
 using TMPro;
 
+// The four parts of a day. DayManager is always in exactly one of them.
+public enum DayPhase
+{
+    Prep,       // Shop closed. Timer frozen. The player can look after the cats.
+    Open,       // Customers arrive and the timer runs.
+    LastCall,   // The timer ran out. No new customers. Customers already inside finish up.
+    Summary     // The day is over. Rent is taken and the results are shown.
+}
+
 /// <summary>
-/// Runs the days and the rent.
-/// - Every day starts in a PREP phase: the shop is closed, the day timer is frozen, and the player can care for the cats.
-/// - The player opens the shop at the Open sign. Customers arrive and the timer runs.
-/// - At the end of the day everyone goes home, the game freezes, and a summary is shown.
-/// - Day 1 is free. From the first rent day, rent is taken at the end of every day.
-/// - Missing rent once brings a notice and a late fee. Missing it twice in a row closes the shop.
+/// Runs the day: which phase we are in, the timer, and the summary screen.
+/// The rent rules live in RentSystem, which sits on the same object.
 /// </summary>
 public class DayManager : MonoBehaviour
 {
@@ -15,15 +20,14 @@ public class DayManager : MonoBehaviour
 
     private readonly string systemName = "DayManager";
 
+    // ==========================================
+    // SETTINGS (change these in the Inspector)
+    // ==========================================
+
     [Header("Day Settings")]
     [SerializeField] private float dayLengthSeconds = 300f;   // 5 minutes of open shop
-    [SerializeField] private bool requireOpenSign = true;     // Untick to open the shop automatically (handy for testing)
-
-    [Header("Rent Settings")]
-    [SerializeField] private int firstRentDay = 2;            // Day 1 is free
-    [SerializeField] private int baseRent = 40;               // PLACEHOLDER. Set it from your own test results
-    [SerializeField, Range(0, 50)] private int lateFeePercent = 10;
-    [SerializeField] private int missedPaymentsToClose = 2;   // Misses in a row before the shop closes
+    [SerializeField] private float lastCallSeconds = 60f;     // After this long, the player may close even with customers inside
+    [SerializeField] private bool requireOpenSign = true;     // Untick to open and close the shop automatically (handy for testing)
 
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI timerText;
@@ -32,30 +36,34 @@ public class DayManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI resultsText;
     [SerializeField] private GameObject nextDayButton;
 
-    // Day state
+    // ==========================================
+    // WHAT THIS SCRIPT REMEMBERS
+    // ==========================================
+
+    // Other scripts can read these, but only DayManager changes them
+    public DayPhase Phase { get; private set; }
+    public int CustomersInside { get; private set; }
+    public bool LastCallExpired { get; private set; }
+
     private int day = 1;
     private float timeLeft;
     private int lastShownSeconds = -1;
-    private bool shopOpen;
-    private bool dayEnded;
     private bool rentWarned;
 
-    // Money state for the current day
+    private float lastCallElapsed;   // seconds since closing time began
+    private float countTimer;        // counts down to the next customer recount
+
     private int dayStartGP;
     private int dayStartReputation;
-
-    // Rent state
-    private int missedPayments;   // misses in a row
-    private int lateFeeOwed;      // added to the next rent after a miss
-    private int extraRent;        // added by store expansions later
 
     // Simple stats for the summary (reset every day)
     private int catsSold;
     private int catsBought;
     private int dealsRejected;
 
-    // What is due tonight (0 before the first rent day)
-    private int RentToday => day >= firstRentDay ? baseRent + extraRent + lateFeeOwed : 0;
+    // ==========================================
+    // UNITY EVENTS
+    // ==========================================
 
     private void Awake()
     {
@@ -69,29 +77,19 @@ public class DayManager : MonoBehaviour
 
     private void Start()
     {
+        if (RentSystem.Instance == null)
+        {
+            Debug.LogWarning($"[{systemName}] No RentSystem found. Add a RentSystem component to the DayManager object. The game will run without rent.");
+        }
+
         BeginDay();
     }
 
     private void Update()
     {
-        // The day timer only runs while the shop is open
-        if (dayEnded || !shopOpen) return;
-
-        // Time.deltaTime is 0 while the game is paused, so the timer stops by itself
-        timeLeft -= Time.deltaTime;
-        UpdateTimerText();
-
-        // Give the player a fair warning before the rent is taken
-        if (!rentWarned && day >= firstRentDay && timeLeft <= 30f)
-        {
-            rentWarned = true;
-            int gp = CoreEconomySystem.Instance.GetGP(systemName);
-            string warning = $"Rent is due in 30 seconds: {RentToday} GP";
-            if (gp < RentToday) warning += $". You have {gp} GP.";
-            MessageUI.Notify(warning);
-        }
-
-        if (timeLeft <= 0f) EndDay();
+        // Time.deltaTime is 0 while the game is paused, so every timer here stops by itself
+        if (Phase == DayPhase.Open) UpdateOpenPhase();
+        else if (Phase == DayPhase.LastCall) UpdateLastCallPhase();
     }
 
     // ==========================================
@@ -113,22 +111,55 @@ public class DayManager : MonoBehaviour
         if (Instance != null) Instance.dealsRejected++;
     }
 
-    // For store expansions later: each upgrade can raise the daily rent
-    public static void AddRent(int amount)
+    // ==========================================
+    // THE SIGN
+    // ==========================================
+
+    // The sign calls this when the player presses it. What it means depends on the phase.
+    public void OnSignPressed()
     {
-        if (Instance == null) return;
-        Instance.extraRent += amount;
-        Instance.UpdateRentText();
+        switch (Phase)
+        {
+            case DayPhase.Prep:
+                OpenShop();
+                break;
+            case DayPhase.Open:
+                MessageUI.Notify("The shop stays open until closing time.");
+                break;
+            case DayPhase.LastCall:
+                TryCloseShop();
+                break;
+        }
+    }
+
+    // The text shown when the player looks at the sign
+    public string GetSignPrompt(string key)
+    {
+        switch (Phase)
+        {
+            case DayPhase.Prep:
+                return $"Open the shop [{key}]";
+
+            case DayPhase.LastCall:
+                if (CustomersInside == 0) return $"Close the shop [{key}]";
+                if (LastCallExpired) return $"Close anyway [{key}]";
+                return "Customers are still inside";
+
+            default:
+                return "";
+        }
     }
 
     // ==========================================
-    // DAY FLOW
+    // THE PHASES
     // ==========================================
 
+    // PREP: the day starts here
     private void BeginDay()
     {
-        dayEnded = false;
-        shopOpen = false;
+        Phase = DayPhase.Prep;
+        CustomersInside = 0;
+        LastCallExpired = false;
         rentWarned = false;
         timeLeft = dayLengthSeconds;
         lastShownSeconds = -1;
@@ -148,11 +179,10 @@ public class DayManager : MonoBehaviour
         CustomerSpawner spawner = FindFirstObjectByType<CustomerSpawner>();
         if (spawner != null) spawner.StopSpawning();
 
-        UpdateRentText();
+        RefreshRentText();
         UpdateTimerText();
 
-        // If there is no sign in the scene (or you turned the requirement off), open straight away
-        if (requireOpenSign && OpenSign.Instance != null)
+        if (UsesSign())
         {
             MessageUI.Notify("Prep time: look after your cats, then open the shop.");
         }
@@ -162,12 +192,12 @@ public class DayManager : MonoBehaviour
         }
     }
 
-    // Called by the Open sign
-    public void OpenShop()
+    // PREP -> OPEN
+    private void OpenShop()
     {
-        if (shopOpen || dayEnded) return;
+        if (Phase != DayPhase.Prep) return;
 
-        shopOpen = true;
+        Phase = DayPhase.Open;
 
         if (OpenSign.Instance != null) OpenSign.Instance.SetOpen(true);
 
@@ -178,16 +208,94 @@ public class DayManager : MonoBehaviour
         UpdateTimerText();
     }
 
+    // OPEN: count down, warn about rent, then move to closing time
+    private void UpdateOpenPhase()
+    {
+        timeLeft -= Time.deltaTime;
+        UpdateTimerText();   // only rewrites the text when the second changes
+        WarnAboutRent();
+
+        if (timeLeft <= 0f) EnterLastCall();
+    }
+
+    // OPEN -> LAST CALL
+    private void EnterLastCall()
+    {
+        Phase = DayPhase.LastCall;
+        timeLeft = 0f;
+        lastCallElapsed = 0f;
+        countTimer = 0f;
+        LastCallExpired = false;
+
+        // No new customers from now on. The ones already inside carry on.
+        CustomerSpawner spawner = FindFirstObjectByType<CustomerSpawner>();
+        if (spawner != null) spawner.StopSpawning();
+
+        CustomersInside = CountCustomers();
+
+        if (CustomersInside > 0) MessageUI.Notify("Closing time! Serve the last customers, then close the shop.");
+        else MessageUI.Notify("Closing time! Close the shop when you are ready.");
+
+        UpdateTimerText();
+    }
+
+    // LAST CALL: wait for the customers to finish
+    private void UpdateLastCallPhase()
+    {
+        lastCallElapsed += Time.deltaTime;
+
+        // Recount the customers twice a second (cheaper than every frame)
+        countTimer -= Time.deltaTime;
+        if (countTimer <= 0f)
+        {
+            countTimer = 0.5f;
+
+            int count = CountCustomers();
+            if (count != CustomersInside)
+            {
+                CustomersInside = count;
+                UpdateTimerText();
+            }
+        }
+
+        // After the safety limit, the player may close even with customers inside
+        if (!LastCallExpired && lastCallElapsed >= lastCallSeconds)
+        {
+            LastCallExpired = true;
+            if (CustomersInside > 0) MessageUI.Notify("You can close the shop now, even with customers inside.");
+        }
+
+        // Testing without a sign: close automatically
+        if (!UsesSign() && (CustomersInside == 0 || LastCallExpired)) EndDay();
+    }
+
+    // LAST CALL -> SUMMARY, when the player presses the sign
+    private void TryCloseShop()
+    {
+        if (Phase != DayPhase.LastCall) return;
+
+        CustomersInside = CountCustomers();
+
+        if (CustomersInside > 0 && !LastCallExpired)
+        {
+            MessageUI.Notify("Customers are still inside. Wait for them to finish.");
+            return;
+        }
+
+        EndDay();
+    }
+
+    // SUMMARY: rent, results, freeze
     private void EndDay()
     {
-        dayEnded = true;
-        shopOpen = false;
+        if (Phase == DayPhase.Summary) return;
+
+        Phase = DayPhase.Summary;
         timeLeft = 0f;
-        UpdateTimerText();
 
         if (OpenSign.Instance != null) OpenSign.Instance.SetOpen(false);
 
-        // 1. Stop new customers, and send everyone home so tomorrow feels like a new day
+        // 1. Make sure nobody new arrives, and send anyone still inside home
         CustomerSpawner spawner = FindFirstObjectByType<CustomerSpawner>();
         if (spawner != null) spawner.StopSpawning();
 
@@ -202,41 +310,17 @@ public class DayManager : MonoBehaviour
         // Handy while tuning the rent: look for these lines in the Console
         Debug.Log($"[{systemName}] Day {day} profit before rent: {profit} GP");
 
-        // 3. Rent
+        // 3. Rent (RentSystem decides what happens)
         bool shopClosed = false;
         string rentSection;
 
-        if (day < firstRentDay)
+        if (RentSystem.Instance != null)
         {
-            rentSection = $"Rent starts on day {firstRentDay}: {baseRent + extraRent} GP per day.";
+            shopClosed = RentSystem.Instance.SettleRent(day, gpNow, out rentSection);
         }
         else
         {
-            int due = RentToday;
-
-            if (gpNow >= due)
-            {
-                CoreEconomySystem.Instance.ModifyGP(-due, systemName);
-                missedPayments = 0;
-                lateFeeOwed = 0;
-                rentSection = $"Rent paid: {due} GP\nGP left: {gpNow - due}";
-            }
-            else
-            {
-                missedPayments++;
-
-                if (missedPayments >= missedPaymentsToClose)
-                {
-                    shopClosed = true;
-                    rentSection = $"The rent of {due} GP could not be paid. You had {gpNow} GP.";
-                }
-                else
-                {
-                    lateFeeOwed = Mathf.CeilToInt((baseRent + extraRent) * lateFeePercent / 100f);
-                    rentSection = $"The rent of {due} GP could not be paid. You had {gpNow} GP.\n" +
-                                  $"The landlord sent a notice. Tomorrow's rent includes a late fee of {lateFeeOwed} GP.";
-                }
-            }
+            rentSection = "There is no rent system in this scene.";
         }
 
         // 4. Build the summary text
@@ -262,9 +346,41 @@ public class DayManager : MonoBehaviour
 
         if (nextDayButton != null) nextDayButton.SetActive(!shopClosed);
         endPanel.SetActive(true);
+
+        UpdateTimerText();
     }
 
-    // Everyone goes home. Cats stay in their enclosures, because they are the shop's stock.
+    // Hooked up to the Next day button. Starts the next day in PREP.
+    public void StartNextDay()
+    {
+        if (Phase != DayPhase.Summary) return;
+
+        day++;
+
+        PauseMenu pauseMenu = FindFirstObjectByType<PauseMenu>();
+        if (pauseMenu != null) pauseMenu.UnfreezeGame();
+
+        BeginDay();
+    }
+
+    // ==========================================
+    // HELPERS
+    // ==========================================
+
+    // True when the player uses the sign to open and close the shop
+    private bool UsesSign()
+    {
+        return requireOpenSign && OpenSign.Instance != null;
+    }
+
+    // Everyone in the shop, including customers who are on their way out
+    private int CountCustomers()
+    {
+        return FindObjectsByType<CustomerAI>(FindObjectsSortMode.None).Length;
+    }
+
+    // Fallback: sends anyone still inside home, so the next day feels like a new day.
+    // Cats stay in their enclosures, because they are the shop's stock.
     private void ClearShopForNewDay()
     {
         ReceptionDesk desk = FindFirstObjectByType<ReceptionDesk>();
@@ -277,18 +393,25 @@ public class DayManager : MonoBehaviour
         }
 
         if (CustomerQueueManager.Instance != null) CustomerQueueManager.Instance.ClearQueue();
+
+        CustomersInside = 0;
     }
 
-    // Hooked up to the Next day button
-    public void StartNextDay()
+    // Gives the player a fair warning before the rent is taken
+    private void WarnAboutRent()
     {
-        day++;
+        if (rentWarned) return;
+        if (RentSystem.Instance == null || !RentSystem.Instance.IsRentDay(day)) return;
+        if (timeLeft > 30f) return;
 
-        PauseMenu pauseMenu = FindFirstObjectByType<PauseMenu>();
-        if (pauseMenu != null) pauseMenu.UnfreezeGame();
+        rentWarned = true;
 
-        // The new day starts in the prep phase, with the shop closed
-        BeginDay();
+        int due = RentSystem.Instance.RentDue(day);
+        int gp = CoreEconomySystem.Instance.GetGP(systemName);
+
+        string warning = $"Rent is due when you close the shop: {due} GP.";
+        if (gp < due) warning += $" You have {gp} GP.";
+        MessageUI.Notify(warning);
     }
 
     // ==========================================
@@ -299,35 +422,39 @@ public class DayManager : MonoBehaviour
     {
         if (timerText == null) return;
 
-        if (!shopOpen && !dayEnded)
+        switch (Phase)
         {
-            timerText.text = $"Day {day}   Prep time";
-            lastShownSeconds = -1;
-            return;
+            case DayPhase.Prep:
+                timerText.text = $"Day {day}   Prep time";
+                break;
+
+            case DayPhase.Open:
+            {
+                int seconds = Mathf.CeilToInt(Mathf.Max(0f, timeLeft));
+                if (seconds == lastShownSeconds) return;   // only rewrite the text when the second changes
+
+                lastShownSeconds = seconds;
+                timerText.text = $"Day {day}   Time left: {seconds / 60}:{seconds % 60:00}";
+                break;
+            }
+
+            case DayPhase.LastCall:
+                timerText.text = CustomersInside > 0
+                    ? $"Day {day}   Closing time: serve the last customers"
+                    : $"Day {day}   Closing time: close the shop";
+                break;
+
+            case DayPhase.Summary:
+                timerText.text = $"Day {day}   Closed";
+                break;
         }
-
-        int seconds = Mathf.CeilToInt(Mathf.Max(0f, timeLeft));
-        if (seconds == lastShownSeconds) return; // only rewrite the text when the second changes
-
-        lastShownSeconds = seconds;
-        timerText.text = $"Day {day}   Time left: {seconds / 60}:{seconds % 60:00}";
     }
 
-    private void UpdateRentText()
+    // Public because RentSystem calls it when the rent changes
+    public void RefreshRentText()
     {
         if (rentText == null) return;
 
-        if (day < firstRentDay)
-        {
-            rentText.text = $"Rent starts on day {firstRentDay}";
-        }
-        else if (lateFeeOwed > 0)
-        {
-            rentText.text = $"Rent due tonight: {RentToday} GP (includes late fee)";
-        }
-        else
-        {
-            rentText.text = $"Rent due tonight: {RentToday} GP";
-        }
+        rentText.text = RentSystem.Instance != null ? RentSystem.Instance.GetRentLabel(day) : "";
     }
 }
