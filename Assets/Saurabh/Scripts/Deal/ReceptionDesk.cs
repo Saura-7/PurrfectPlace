@@ -131,7 +131,7 @@ public class ReceptionDesk : MonoBehaviour
             {
                 // Debug.LogWarning($"[SOA {systemName}] ACCEPT failed: Player GP ({playerMoney}) < Cost ({currentDealPrice}) or no empty cage available. Auto-rejecting deal.");
                 MessageUI.Notify(emptyCage == null ? "No free cage!" : "Not enough GP!");
-                RejectDeal();
+                HandleReject(true);
                 return;
             }
         }
@@ -145,7 +145,8 @@ public class ReceptionDesk : MonoBehaviour
         currentInteractingCustomer = null;
     }
 
-    public void RejectDeal()
+    // The shared rejection logic. forcedByGame is true when the game rejects the deal for the player.
+    private void HandleReject(bool forcedByGame)
     {
         if (currentInteractingCustomer == null) return;
 
@@ -156,20 +157,29 @@ public class ReceptionDesk : MonoBehaviour
             if (returnedCat != null)
             {
                 CageManager.Instance.ReturnCatToCage(currentInteractingCustomer.HomeCage, returnedCat);
-                // Debug.Log($"[SOA {systemName}] REJECTED Taker deal. Cat '{returnedCat.name}' placed back in cage '{currentInteractingCustomer.HomeCage.name}'.");
             }
         }
         else if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Giver)
         {
             currentInteractingCustomer.RejectGiverOfferAndLeave();
-            // Debug.Log($"[SOA {systemName}] REJECTED Giver deal. Customer departing with cat.");
         }
 
+        // Both kinds of rejection cost reputation
         int repLoss = Random.Range(minReputationChange, maxReputationChange + 1);
         CoreEconomySystem.Instance.ModifyReputation(-repLoss, systemName);
-        DayManager.RecordRejected();
-        MessageUI.Notify($"Deal rejected: -{repLoss} reputation");
-        
+
+        // Count it in the right place, and tell the player what happened
+        if (forcedByGame)
+        {
+            DayManager.RecordMissed();
+            MessageUI.Notify($"Deal missed: -{repLoss} reputation");
+        }
+        else
+        {
+            DayManager.RecordDeclined();
+            MessageUI.Notify($"Deal declined: -{repLoss} reputation");
+        }
+
         dealUIPanel.SetActive(false);
         CustomerQueueManager.Instance.AdvanceQueue();
         currentInteractingCustomer = null;

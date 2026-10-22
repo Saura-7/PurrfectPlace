@@ -61,6 +61,13 @@ public class InteractionPromptUI : MonoBehaviour
             return sign.GetPrompt(InputPrompts.Get(PromptAction.CompleteDeal));
         }
 
+        // Looking at the decor monitor
+        DecorMonitor decorMonitor = hit.collider.GetComponentInParent<DecorMonitor>();
+        if (decorMonitor != null && hit.distance <= deskDistance)
+        {
+            return decorMonitor.GetPrompt(hit.collider, InputPrompts.Get(PromptAction.CompleteDeal));
+        }
+
         // 2. Looking at an Accept / Reject button
         if (hit.distance <= deskDistance && hit.collider.GetComponent<WorldSpaceUIButton>() != null)
         {

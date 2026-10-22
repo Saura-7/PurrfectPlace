@@ -59,7 +59,8 @@ public class DayManager : MonoBehaviour
     // Simple stats for the summary (reset every day)
     private int catsSold;
     private int catsBought;
-    private int dealsRejected;
+    private int dealsDeclined;   // the player pressed Reject
+    private int dealsMissed;     // the game rejected it (not enough GP or no free cage)
 
     // ==========================================
     // UNITY EVENTS
@@ -106,9 +107,14 @@ public class DayManager : MonoBehaviour
         if (Instance != null) Instance.catsBought++;
     }
 
-    public static void RecordRejected()
+    public static void RecordDeclined()
     {
-        if (Instance != null) Instance.dealsRejected++;
+        if (Instance != null) Instance.dealsDeclined++;
+    }
+
+    public static void RecordMissed()
+    {
+        if (Instance != null) Instance.dealsMissed++;
     }
 
     // ==========================================
@@ -169,7 +175,8 @@ public class DayManager : MonoBehaviour
 
         catsSold = 0;
         catsBought = 0;
-        dealsRejected = 0;
+        dealsDeclined = 0;
+        dealsMissed = 0;
 
         if (endPanel != null) endPanel.SetActive(false);
 
@@ -328,10 +335,12 @@ public class DayManager : MonoBehaviour
 
         string stats =
             $"Profit today: {profit} GP\n" +
-            $"Reputation: {reputationNow} ({reputationChange:+#;-#;0})\n" +
+            $"Reputation: {reputationNow} \n" +
+            $"Reputation Change : {reputationChange:+#;-#;0}\n" +
             $"Cats sold: {catsSold}\n" +
             $"Cats bought: {catsBought}\n" +
-            $"Deals rejected: {dealsRejected}";
+            $"Declined by you: {dealsDeclined}\n" +
+            $"Missed (no GP or space): {dealsMissed}";
 
         string closing = shopClosed
             ? $"\n\nYou kept the shelter open for {day} days.\nTip: keep some GP aside for the rent."
