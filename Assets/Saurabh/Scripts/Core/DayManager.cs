@@ -212,6 +212,7 @@ public class DayManager : MonoBehaviour
         if (spawner != null) spawner.StartSpawning();
 
         MessageUI.Notify("The shop is open!");
+        TutorialNote.Complete(TutorialStep.OpenShop);
         UpdateTimerText();
     }
 
@@ -298,6 +299,7 @@ public class DayManager : MonoBehaviour
         if (Phase == DayPhase.Summary) return;
 
         Phase = DayPhase.Summary;
+        TutorialNote.Complete(TutorialStep.CloseShop);
         timeLeft = 0f;
 
         if (OpenSign.Instance != null) OpenSign.Instance.SetOpen(false);

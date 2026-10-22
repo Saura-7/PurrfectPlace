@@ -93,6 +93,7 @@ private void TryCareForCat(bool isFeeding)
         else clickedCat.UpgradeCleanliness();
 
         clickedCat.PlayInteractAnimation();
+        TutorialNote.Complete(isFeeding ? TutorialStep.Feed : TutorialStep.Clean);
     }
     else
     {

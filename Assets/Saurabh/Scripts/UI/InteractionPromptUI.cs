@@ -65,6 +65,7 @@ public class InteractionPromptUI : MonoBehaviour
         DecorMonitor decorMonitor = hit.collider.GetComponentInParent<DecorMonitor>();
         if (decorMonitor != null && hit.distance <= deskDistance)
         {
+            TutorialNote.Complete(TutorialStep.Computer);
             return decorMonitor.GetPrompt(hit.collider, InputPrompts.Get(PromptAction.CompleteDeal));
         }
 

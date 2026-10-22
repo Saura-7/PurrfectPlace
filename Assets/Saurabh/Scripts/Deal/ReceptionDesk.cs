@@ -139,10 +139,17 @@ public class ReceptionDesk : MonoBehaviour
         int repGain = Random.Range(minReputationChange, maxReputationChange + 1);
         CoreEconomySystem.Instance.ModifyReputation(repGain, systemName);  
         MessageUI.Notify($"+{repGain} reputation"); 
+        TutorialNote.Complete(TutorialStep.Serve);
         
         dealUIPanel.SetActive(false);
         CustomerQueueManager.Instance.AdvanceQueue();
         currentInteractingCustomer = null;
+    }
+
+    // The Reject button on the deal monitor calls this. The player chose to say no.
+    public void RejectDeal()
+    {
+        HandleReject(false);
     }
 
     // The shared rejection logic. forcedByGame is true when the game rejects the deal for the player.
@@ -179,6 +186,8 @@ public class ReceptionDesk : MonoBehaviour
             DayManager.RecordDeclined();
             MessageUI.Notify($"Deal declined: -{repLoss} reputation");
         }
+
+        TutorialNote.Complete(TutorialStep.Serve);
 
         dealUIPanel.SetActive(false);
         CustomerQueueManager.Instance.AdvanceQueue();
