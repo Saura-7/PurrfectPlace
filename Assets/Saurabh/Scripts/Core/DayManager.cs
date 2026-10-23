@@ -28,6 +28,8 @@ public class DayManager : MonoBehaviour
     [SerializeField] private float dayLengthSeconds = 300f;   // 5 minutes of open shop
     [SerializeField] private float lastCallSeconds = 60f;     // After this long, the player may close even with customers inside
     [SerializeField] private bool requireOpenSign = true;     // Untick to open and close the shop automatically (handy for testing)
+    [SerializeField] private int openingHour = 9;     // 9 = 9:00 AM
+    [SerializeField] private int closingHour = 21;    // 21 = 9:00 PM (24-hour number)
 
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI timerText;
@@ -47,7 +49,7 @@ public class DayManager : MonoBehaviour
 
     private int day = 1;
     private float timeLeft;
-    private int lastShownSeconds = -1;
+    private int lastShownClock = -1;   // the clock time we last drew (in game minutes), so we only redraw when it changes
     private bool rentWarned;
 
     private float lastCallElapsed;   // seconds since closing time began
@@ -168,7 +170,7 @@ public class DayManager : MonoBehaviour
         LastCallExpired = false;
         rentWarned = false;
         timeLeft = dayLengthSeconds;
-        lastShownSeconds = -1;
+        lastShownClock = -1;
 
         dayStartGP = CoreEconomySystem.Instance.GetGP(systemName);
         dayStartReputation = CoreEconomySystem.Instance.GetReputation(systemName);
@@ -429,6 +431,17 @@ public class DayManager : MonoBehaviour
     // UI
     // ==========================================
 
+    // Turns a number of minutes after midnight into text like "9:40 AM"
+    private string ClockText(int minutesAfterMidnight)
+    {
+        int hour24 = minutesAfterMidnight / 60;            // whole hours
+        int minute = minutesAfterMidnight % 60;            // minutes left over
+        string suffix = hour24 >= 12 ? "PM" : "AM";
+        int hour12 = hour24 % 12;                          // 13 -> 1, 12 -> 0
+        if (hour12 == 0) hour12 = 12;                      // 0 means 12 o'clock in a 12-hour clock
+        return $"{hour12}:{minute:00} {suffix}";
+    }
+    
     private void UpdateTimerText()
     {
         if (timerText == null) return;
@@ -436,23 +449,31 @@ public class DayManager : MonoBehaviour
         switch (Phase)
         {
             case DayPhase.Prep:
-                timerText.text = $"Day {day}   Prep time";
-                break;
+            // Shop closed, so the clock is frozen at opening time
+            timerText.text = $"Day {day}   {ClockText(openingHour * 60)}";
+            break;
 
-            case DayPhase.Open:
+           case DayPhase.Open:
             {
-                int seconds = Mathf.CeilToInt(Mathf.Max(0f, timeLeft));
-                if (seconds == lastShownSeconds) return;   // only rewrite the text when the second changes
+                // How far through the day we are: 0 at opening, 1 at closing
+                float progress = 1f - Mathf.Clamp01(timeLeft / dayLengthSeconds);
 
-                lastShownSeconds = seconds;
-                timerText.text = $"Day {day}   Time left: {seconds / 60}:{seconds % 60:00}";
+                // Minutes after midnight, rounded down to a multiple of 10 so the clock doesn't flicker
+                int openMinutes  = openingHour * 60;
+                int totalMinutes = (closingHour - openingHour) * 60;
+                int clock = openMinutes + Mathf.FloorToInt(progress * totalMinutes / 10f) * 10;
+
+                if (clock == lastShownClock) return;   // only rewrite the text when the clock changes
+
+                lastShownClock = clock;
+                timerText.text = $"Day {day}   {ClockText(clock)}";
                 break;
             }
 
             case DayPhase.LastCall:
                 timerText.text = CustomersInside > 0
-                    ? $"Day {day}   Closing time: serve the last customers"
-                    : $"Day {day}   Closing time: close the shop";
+                    ? $"Day {day}   {ClockText(closingHour * 60)}   Finish serving"
+                    : $"Day {day}   {ClockText(closingHour * 60)}   Close the shop";
                 break;
 
             case DayPhase.Summary:
