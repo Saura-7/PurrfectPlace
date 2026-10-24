@@ -215,6 +215,7 @@ public class DayManager : MonoBehaviour
 
         MessageUI.Notify("The shop is open!");
         TutorialNote.Complete(TutorialStep.OpenShop);
+        AudioManager.Play(Sfx.ShopOpen);
         UpdateTimerText();
     }
 
@@ -232,6 +233,7 @@ public class DayManager : MonoBehaviour
     private void EnterLastCall()
     {
         Phase = DayPhase.LastCall;
+        AudioManager.Play(Sfx.ShopClosing);
         timeLeft = 0f;
         lastCallElapsed = 0f;
         countTimer = 0f;
@@ -302,6 +304,7 @@ public class DayManager : MonoBehaviour
 
         Phase = DayPhase.Summary;
         TutorialNote.Complete(TutorialStep.CloseShop);
+        AudioManager.Play(Sfx.DaySummary);
         timeLeft = 0f;
 
         if (OpenSign.Instance != null) OpenSign.Instance.SetOpen(false);

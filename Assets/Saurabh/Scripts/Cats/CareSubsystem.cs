@@ -93,6 +93,7 @@ private void TryCareForCat(bool isFeeding)
         else clickedCat.UpgradeCleanliness();
 
         clickedCat.PlayInteractAnimation();
+        AudioManager.Play(isFeeding ? Sfx.MeowFeed : Sfx.PurrClean);
         TutorialNote.Complete(isFeeding ? TutorialStep.Feed : TutorialStep.Clean);
     }
     else

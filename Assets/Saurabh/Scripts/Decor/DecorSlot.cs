@@ -40,6 +40,7 @@ public class DecorSlot : MonoBehaviour
 
         // A negative amount means spending. This is the GP sink: the money leaves the game for good
         CoreEconomySystem.Instance.ModifyGP(-price, "DecorSlot");
+        AudioManager.Play(Sfx.CoinsOut);
 
         IsBought = true;
         ShowBought(true);

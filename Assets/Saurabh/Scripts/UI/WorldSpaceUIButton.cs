@@ -9,6 +9,7 @@ public class WorldSpaceUIButton : MonoBehaviour
 
     public void PressButton()
     {
+        AudioManager.Play(Sfx.ButtonClick);
         onClick?.Invoke();
     }
 }

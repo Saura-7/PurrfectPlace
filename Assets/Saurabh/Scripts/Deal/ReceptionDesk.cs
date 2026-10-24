@@ -105,6 +105,7 @@ public class ReceptionDesk : MonoBehaviour
         if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Taker)
         {
             CoreEconomySystem.Instance.ModifyGP(currentDealPrice, systemName);
+            AudioManager.Play(Sfx.CoinsOut);
             DayManager.RecordCatSold();
             currentInteractingCustomer.CompleteTakerTransactionAndLeave();
             CageManager.Instance.FreeCage(currentInteractingCustomer.HomeCage); // the cat is sold, so the cage is free now
@@ -188,6 +189,7 @@ public class ReceptionDesk : MonoBehaviour
         }
 
         TutorialNote.Complete(TutorialStep.Serve);
+        AudioManager.Play(Sfx.PoliteNo);
 
         dealUIPanel.SetActive(false);
         CustomerQueueManager.Instance.AdvanceQueue();

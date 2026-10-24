@@ -52,6 +52,7 @@ public class CustomerSpawner : MonoBehaviour
             CustomerAI ai = newCustomer.GetComponent<CustomerAI>();
             
             ai.InitializeCustomer(typeToSpawn);
+            // AudioManager.Play(Sfx.DoorChime);
         }
     }
 

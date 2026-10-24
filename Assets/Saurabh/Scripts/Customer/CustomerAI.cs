@@ -19,6 +19,10 @@ public class CustomerAI : MonoBehaviour
     private Transform exitDoor;
     private Transform targetCage; 
     private bool isAtFrontOfLine = false;
+
+    private Transform doorChimePoint;
+    private bool hasChimed;                    // the bell rings once per customer
+    private const float doorChimeDistance = 1.5f;   // metres from the marker
     
     // How greedy this Giver is: 0.7 = asks 30% less than the cat is worth, 1.3 = asks 30% more
     public float AskFactor { get; private set; }
@@ -32,6 +36,8 @@ public class CustomerAI : MonoBehaviour
         
         GameObject exitObj = GameObject.Find("ExitDoorTarget");
         if (exitObj != null) exitDoor = exitObj.transform;
+        GameObject doorObj = GameObject.Find("DoorChimePoint");
+        if (doorObj != null) doorChimePoint = doorObj.transform;
         AskFactor = Random.Range(0.6f, 1.2f);   
     }
 
@@ -67,6 +73,16 @@ public class CustomerAI : MonoBehaviour
 
     private void Update()
     {
+
+        // Ring the bell once, when a customer walking in reaches the door
+        if (!hasChimed && doorChimePoint != null && currentState != CustomerState.Leaving
+            && Vector3.Distance(transform.position, doorChimePoint.position) <= doorChimeDistance)
+        {
+            hasChimed = true;
+            AudioManager.Play(Sfx.DoorChime);
+        }
+
+
         if (currentState == CustomerState.LookingForCat)
         {
             if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
