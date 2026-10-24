@@ -36,7 +36,7 @@ public class UIManager : MonoBehaviour
         int currentReputation = CoreEconomySystem.Instance.GetReputation(systemName);
 
         // Update the visual text
-        gpText.text = $"Gold Points: {currentGP}";
-        reputationText.text = $"Reputation: {currentReputation}";
+        gpText.text = $"{currentGP} GP";
+        reputationText.text = $"Rep {currentReputation} - {ReputationLevels.Name}";
     }
 }

@@ -18,9 +18,14 @@ public class ReceptionDesk : MonoBehaviour
     private CustomerAI currentInteractingCustomer;
     private int currentDealPrice;
 
-    [Header("Reputation Settings")]
-    public int minReputationChange = 5;
-    public int maxReputationChange = 10;
+    [Header("Reputation from care (care = feed + clean, 0 to 12)")]
+    [SerializeField] private int wellCaredFrom = 8;          // care at or above this counts as well cared for
+    [SerializeField] private int averageFrom = 4;            // care at or above this (but below well cared) is average
+    [SerializeField] private int wellCaredAdoptionRep = 8;   // reputation for adopting out a well-cared cat
+    [SerializeField] private int averageAdoptionRep = 3;     // reputation for an average cat
+    [SerializeField] private int neglectedAdoptionRep = 0;   // reputation for a neglected cat (no penalty)
+    [SerializeField] private int giverRescueRep = 3;         // reputation for taking in a Giver's cat
+    [SerializeField] private int missedDealRep = 3;          // reputation LOST when the shop cannot complete a deal
 
     private void OnEnable()
     {
@@ -77,8 +82,11 @@ public class ReceptionDesk : MonoBehaviour
             if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Taker)
             {
                 currentDealPrice = cat.CalculateFinalPrice();
-                dealText.text = $"SELL CAT?\nFeed: {cat.feedingLevel}/6\nClean: {cat.cleanlinessLevel}/6\nPayout: +{currentDealPrice} GP";
+                int donation = ReputationLevels.Donation;
+                dealText.text = $"ADOPTION?\nFeed: {cat.feedingLevel}/6\nClean: {cat.cleanlinessLevel}/6\nAdoption fee: +{currentDealPrice} GP";
+                if (donation > 0) dealText.text += $"\nDonation ({ReputationLevels.Name}): +{donation} GP";
                 dealUIPanel.SetActive(true);
+                string traits = $"{cat.Pattern} · {cat.Body} · {cat.Behavior}";
 
                 // Debug.Log($"[SOA {systemName}] Generated Taker sale offer for cat '{cat.name}'. Payout: {currentDealPrice} GP.");
             }
@@ -90,6 +98,7 @@ public class ReceptionDesk : MonoBehaviour
 
                 dealText.text = $"BUY CAT?\nFeed: {cat.feedingLevel}/6\nClean: {cat.cleanlinessLevel}/6\nWorth about: {catValue} GP\nCost: -{currentDealPrice} GP";
                 dealUIPanel.SetActive(true);
+                string traits = $"{cat.Pattern} · {cat.Body} · {cat.Behavior}";
             }
         }
         else
@@ -102,16 +111,29 @@ public class ReceptionDesk : MonoBehaviour
     {
         if (currentInteractingCustomer == null) return;
 
+        int repGain = 0;   // how much reputation this deal earns (0 = none)
+
         if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Taker)
         {
-            CoreEconomySystem.Instance.ModifyGP(currentDealPrice, systemName);
-            AudioManager.Play(Sfx.CoinsOut);
+            // Read the cat's care BEFORE the Taker leaves with it
+            BaseCat adoptedCat = currentInteractingCustomer.heldCat;
+            int care = adoptedCat != null ? adoptedCat.feedingLevel + adoptedCat.cleanlinessLevel : 0;
+            repGain = AdoptionReputation(care);
+
+            // A trusted shelter gets a donation on top of the adoption fee
+            int donation = ReputationLevels.Donation;
+
+            CoreEconomySystem.Instance.ModifyGP(currentDealPrice + donation, systemName);
+            AudioManager.Play(Sfx.CoinsIn);
             DayManager.RecordCatSold();
             currentInteractingCustomer.CompleteTakerTransactionAndLeave();
-            CageManager.Instance.FreeCage(currentInteractingCustomer.HomeCage); // the cat is sold, so the cage is free now
-            
-            // Debug.Log($"[SOA {systemName}] ACCEPTED deal: Sold cat for +{currentDealPrice} GP.");
-            MessageUI.Notify($"Deal accepted: +{currentDealPrice} GP");
+            CageManager.Instance.FreeCage(currentInteractingCustomer.HomeCage); // the cat is adopted, so the cage is free now
+
+            MessageUI.Notify(donation > 0
+                ? $"Adopted! +{currentDealPrice} GP and a +{donation} GP donation"
+                : $"Adopted! +{currentDealPrice} GP");
+
+            if (care >= wellCaredFrom) MessageUI.Notify("A happy adoption!");
         }
         else if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Giver)
         {
@@ -121,30 +143,41 @@ public class ReceptionDesk : MonoBehaviour
             if (playerMoney >= currentDealPrice && emptyCage != null)
             {
                 CoreEconomySystem.Instance.ModifyGP(-currentDealPrice, systemName);
+                AudioManager.Play(Sfx.CoinsOut);
                 DayManager.RecordCatBought();
                 BaseCat boughtCat = currentInteractingCustomer.AcceptGiverOfferAndLeave();
                 CageManager.Instance.OccupyCage(emptyCage, boughtCat);
 
-                // Debug.Log($"[SOA {systemName}] ACCEPTED deal: Bought cat for - {currentDealPrice} GP and assigned to cage '{emptyCage.name}'.");
-                MessageUI.Notify($"Deal accepted: -{currentDealPrice} GP"); 
+                repGain = giverRescueRep;   // you gave a cat a safe place
+                MessageUI.Notify($"Deal accepted: -{currentDealPrice} GP");
             }
             else
             {
-                // Debug.LogWarning($"[SOA {systemName}] ACCEPT failed: Player GP ({playerMoney}) < Cost ({currentDealPrice}) or no empty cage available. Auto-rejecting deal.");
                 MessageUI.Notify(emptyCage == null ? "No free cage!" : "Not enough GP!");
                 HandleReject(true);
                 return;
             }
         }
 
-        int repGain = Random.Range(minReputationChange, maxReputationChange + 1);
-        CoreEconomySystem.Instance.ModifyReputation(repGain, systemName);  
-        MessageUI.Notify($"+{repGain} reputation"); 
+        if (repGain > 0)
+        {
+            CoreEconomySystem.Instance.ModifyReputation(repGain, systemName);
+            MessageUI.Notify($"+{repGain} reputation");
+        }
+
         TutorialNote.Complete(TutorialStep.Serve);
-        
+
         dealUIPanel.SetActive(false);
         CustomerQueueManager.Instance.AdvanceQueue();
         currentInteractingCustomer = null;
+    }
+
+    // How much reputation an adoption earns, from how well the cat was cared for
+    private int AdoptionReputation(int care)
+    {
+        if (care >= wellCaredFrom) return wellCaredAdoptionRep;
+        if (care >= averageFrom) return averageAdoptionRep;
+        return neglectedAdoptionRep;
     }
 
     // The Reject button on the deal monitor calls this. The player chose to say no.
@@ -172,24 +205,21 @@ public class ReceptionDesk : MonoBehaviour
             currentInteractingCustomer.RejectGiverOfferAndLeave();
         }
 
-        // Both kinds of rejection cost reputation
-        int repLoss = Random.Range(minReputationChange, maxReputationChange + 1);
-        CoreEconomySystem.Instance.ModifyReputation(-repLoss, systemName);
-
-        // Count it in the right place, and tell the player what happened
+        // Saying no is free. Only a deal the shop could not complete costs reputation
         if (forcedByGame)
         {
+            CoreEconomySystem.Instance.ModifyReputation(-missedDealRep, systemName);
             DayManager.RecordMissed();
-            MessageUI.Notify($"Deal missed: -{repLoss} reputation");
+            MessageUI.Notify($"Deal missed: -{missedDealRep} reputation");
         }
         else
         {
             DayManager.RecordDeclined();
-            MessageUI.Notify($"Deal declined: -{repLoss} reputation");
+            MessageUI.Notify("Deal declined");
         }
 
-        TutorialNote.Complete(TutorialStep.Serve);
         AudioManager.Play(Sfx.PoliteNo);
+        TutorialNote.Complete(TutorialStep.Serve);
 
         dealUIPanel.SetActive(false);
         CustomerQueueManager.Instance.AdvanceQueue();

@@ -3107,6 +3107,27 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1512836312}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1537271469 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6403831348967640821, guid: 6a2de57a98b309941b6e8c8ff4c6769b, type: 3}
+  m_PrefabInstance: {fileID: 929830881332833745}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1537271472
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1537271469}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b3fb18f2984daf41bf5d731d15ba4fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ReputationLevels
+  trustedAt: 150
+  belovedAt: 400
+  trustedDonation: 5
+  belovedDonation: 10
 --- !u!1 &1594266950
 GameObject:
   m_ObjectHideFlags: 0
@@ -3279,7 +3300,7 @@ MonoBehaviour:
     randomPitch: 1
   - sound: 2
     clip: {fileID: 8300000, guid: 6c0d4d93634019045bcfefd28261d602, type: 3}
-    volume: 1
+    volume: 2
     randomPitch: 1
   - sound: 3
     clip: {fileID: 8300000, guid: 62ebbfc39e91b7941b469171801ad6c1, type: 3}
@@ -5081,7 +5102,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7144870123635434133, guid: 6a2de57a98b309941b6e8c8ff4c6769b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1597809806}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6403831348967640821, guid: 6a2de57a98b309941b6e8c8ff4c6769b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1537271472}
   m_SourcePrefab: {fileID: 100100000, guid: 6a2de57a98b309941b6e8c8ff4c6769b, type: 3}
 --- !u!1 &984754669416412331
 GameObject:
