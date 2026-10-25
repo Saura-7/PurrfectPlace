@@ -136,7 +136,7 @@ MonoBehaviour:
   averageAdoptionRep: 3
   neglectedAdoptionRep: 0
   giverRescueRep: 3
-  missedDealRep: 3
+  missedDealRep: 1
 --- !u!114 &6768451859411651862
 MonoBehaviour:
   m_ObjectHideFlags: 0
