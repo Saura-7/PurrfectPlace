@@ -886,16 +886,22 @@ MonoBehaviour:
     shake: 0
     shakeCount: 3
   angry:
-    hopHeight: 0
-    duration: 0.4
-    squash: 0.04
-    shake: 0.05
+    hopHeight: 0.12
+    duration: 0.3
+    squash: 0.1
+    shake: 0
     shakeCount: 3
   skittish:
     hopHeight: 0.2
     duration: 0.3
     squash: 0.18
     shake: 0
+    shakeCount: 3
+  denied:
+    hopHeight: 0
+    duration: 0.4
+    squash: 0
+    shake: 0.06
     shakeCount: 3
   feedEffect: {fileID: 7035382954692211420, guid: cedab9ee433ad17458db0f91a449820d, type: 3}
   cleanEffect: {fileID: 5412635656377573232, guid: 986af369da4c8e547a88d178059595db, type: 3}
