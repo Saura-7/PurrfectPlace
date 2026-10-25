@@ -40,6 +40,7 @@ Transform:
   - {fileID: 2346056321898723824}
   - {fileID: 1246714455242479598}
   - {fileID: 4786980272007824474}
+  - {fileID: 499308027454704845}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &166442767574192192
@@ -614,6 +615,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6666238183272846533, guid: 086c435f374920047a345414d658ac17, type: 3}
+      propertyPath: infoTag
+      value: 
+      objectReference: {fileID: 4910548294585889827}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -624,6 +629,79 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4010877499428159060, guid: 086c435f374920047a345414d658ac17, type: 3}
   m_PrefabInstance: {fileID: 6958162896469087340}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &7590408532044215049
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 7144870123635434133}
+    m_Modifications:
+    - target: {fileID: 6494293660752300437, guid: fea3497a3cba80e4eb7cf49a21df395c, type: 3}
+      propertyPath: m_Name
+      value: CatInfoTag
+      objectReference: {fileID: 0}
+    - target: {fileID: 8051145691309195204, guid: fea3497a3cba80e4eb7cf49a21df395c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8051145691309195204, guid: fea3497a3cba80e4eb7cf49a21df395c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.9099999
+      objectReference: {fileID: 0}
+    - target: {fileID: 8051145691309195204, guid: fea3497a3cba80e4eb7cf49a21df395c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8051145691309195204, guid: fea3497a3cba80e4eb7cf49a21df395c, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8051145691309195204, guid: fea3497a3cba80e4eb7cf49a21df395c, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8051145691309195204, guid: fea3497a3cba80e4eb7cf49a21df395c, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8051145691309195204, guid: fea3497a3cba80e4eb7cf49a21df395c, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8051145691309195204, guid: fea3497a3cba80e4eb7cf49a21df395c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8051145691309195204, guid: fea3497a3cba80e4eb7cf49a21df395c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8051145691309195204, guid: fea3497a3cba80e4eb7cf49a21df395c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: fea3497a3cba80e4eb7cf49a21df395c, type: 3}
+--- !u!4 &499308027454704845 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8051145691309195204, guid: fea3497a3cba80e4eb7cf49a21df395c, type: 3}
+  m_PrefabInstance: {fileID: 7590408532044215049}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4910548294585889827 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3275042649230788394, guid: fea3497a3cba80e4eb7cf49a21df395c, type: 3}
+  m_PrefabInstance: {fileID: 7590408532044215049}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6361bdab83359d940afc91185cebb4ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CatInfoTag
 --- !u!1001 &7788802770989509370
 PrefabInstance:
   m_ObjectHideFlags: 0

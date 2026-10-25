@@ -25,7 +25,7 @@ public class ReceptionDesk : MonoBehaviour
     [SerializeField] private int averageAdoptionRep = 3;     // reputation for an average cat
     [SerializeField] private int neglectedAdoptionRep = 0;   // reputation for a neglected cat (no penalty)
     [SerializeField] private int giverRescueRep = 3;         // reputation for taking in a Giver's cat
-    [SerializeField] private int missedDealRep = 3;          // reputation LOST when the shop cannot complete a deal
+    [SerializeField] private int missedDealRep = 1;          // reputation LOST when the shop cannot complete a deal
 
     private void OnEnable()
     {
@@ -94,9 +94,19 @@ public class ReceptionDesk : MonoBehaviour
             {
                 // What the cat is really worth, and what this Giver asks for it
                 int catValue = cat.CalculateFinalPrice();
-                currentDealPrice = Mathf.Max(10, Mathf.RoundToInt(catValue * currentInteractingCustomer.AskFactor));
 
-                dealText.text = $"BUY CAT?\n{traits}Feed: {cat.feedingLevel}/6\nClean: {cat.cleanlinessLevel}/6\nWorth about: {catValue} GP\nCost: -{currentDealPrice} GP";
+                if (currentInteractingCustomer.IsStray)
+                {
+                    // A stray finder asks for nothing
+                    currentDealPrice = 0;
+                    dealText.text = $"TAKE IN A STRAY?\n{traits}Feed: {cat.feedingLevel}/6\nClean: {cat.cleanlinessLevel}/6\nFound outside\nCost: Free";
+                }
+                else
+                {
+                    currentDealPrice = Mathf.Max(10, Mathf.RoundToInt(catValue * currentInteractingCustomer.AskFactor));
+                    dealText.text = $"BUY CAT?\n{traits}Feed: {cat.feedingLevel}/6\nClean: {cat.cleanlinessLevel}/6\nWorth about: {catValue} GP\nCost: -{currentDealPrice} GP";
+                }
+
                 dealUIPanel.SetActive(true);
             }
         }
@@ -139,16 +149,22 @@ public class ReceptionDesk : MonoBehaviour
             int playerMoney = CoreEconomySystem.Instance.GetGP(systemName);
             Transform emptyCage = CageManager.Instance.GetAvailableCage();
 
-            if (playerMoney >= currentDealPrice && emptyCage != null)
+            // A free stray can always be taken in, even if GP is negative
+            bool canAfford = currentDealPrice == 0 || playerMoney >= currentDealPrice;
+
+            if (canAfford && emptyCage != null)
             {
-                CoreEconomySystem.Instance.ModifyGP(-currentDealPrice, systemName);
-                AudioManager.Play(Sfx.CoinsOut);
+                if (currentDealPrice > 0)
+                {
+                    CoreEconomySystem.Instance.ModifyGP(-currentDealPrice, systemName);
+                    AudioManager.Play(Sfx.CoinsOut);
+                }
                 DayManager.RecordCatBought();
                 BaseCat boughtCat = currentInteractingCustomer.AcceptGiverOfferAndLeave();
                 CageManager.Instance.OccupyCage(emptyCage, boughtCat);
 
                 repGain = giverRescueRep;   // you gave a cat a safe place
-                MessageUI.Notify($"Deal accepted: -{currentDealPrice} GP");
+                MessageUI.Notify(currentDealPrice > 0 ? $"Deal accepted: -{currentDealPrice} GP" : "Stray taken in!");
             }
             else
             {

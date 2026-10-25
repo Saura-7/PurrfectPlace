@@ -27,6 +27,9 @@ public class CustomerAI : MonoBehaviour
     // How greedy this Giver is: 0.7 = asks 30% less than the cat is worth, 1.3 = asks 30% more
     public float AskFactor { get; private set; }
 
+    // A Stray finder is a Giver who found a cat outside and asks for nothing
+    public bool IsStray { get; private set; }
+
     public Transform HomeCage => targetCage;
 
     private void Awake()
@@ -41,9 +44,11 @@ public class CustomerAI : MonoBehaviour
         AskFactor = Random.Range(0.6f, 1.2f);   
     }
 
-    public void InitializeCustomer(CustomerType type)
+    // isStray is optional, so old calls like InitializeCustomer(type) still work
+    public void InitializeCustomer(CustomerType type, bool isStray = false)
     {
         myType = type;
+        IsStray = isStray && type == CustomerType.Giver;
         
         if (myType == CustomerType.Giver)
         {
@@ -55,6 +60,13 @@ public class CustomerAI : MonoBehaviour
             }
 
             heldCat = CatFactory.Instance.GenerateGiverCat(handHoldPoint);
+
+            // A stray was living outside, so it arrives hungry and dirty
+            if (IsStray)
+            {
+                heldCat.feedingLevel = 0;
+                heldCat.cleanlinessLevel = 0;
+            }
             // Debug.Log($"[SOA {systemName}] Giver initialized with cat '{heldCat.name}'. Joining queue.");
             CustomerQueueManager.Instance.JoinQueue(this);
         }

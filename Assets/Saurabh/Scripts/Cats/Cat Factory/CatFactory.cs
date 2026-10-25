@@ -57,7 +57,10 @@ public class CatFactory : MonoBehaviour
         // Add this method to your existing CatFactory.cs
     public BaseCat GenerateGiverCat(Transform handPoint)
     {
-        GameObject newCatObj = Instantiate(catPrefab, handPoint.position, handPoint.rotation, handPoint);
+        // Spawn without a parent first, so the cat keeps its normal size
+        GameObject newCatObj = Instantiate(catPrefab, handPoint.position, handPoint.rotation);
+        // "true" = keep the cat's world size when attaching it to the hand
+        newCatObj.transform.SetParent(handPoint, true);
         BaseCat newCat = SetupCat(newCatObj);
 
         // IMPORTANT: set the stats AFTER SetupCat, because InitializeCat resets them to 0

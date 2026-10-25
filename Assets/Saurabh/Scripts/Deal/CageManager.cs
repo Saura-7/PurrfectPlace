@@ -24,6 +24,19 @@ public class CageManager : MonoBehaviour
         return occupiedCages.Count < allCages.Count;
     }
 
+    // How many cats are in the shop (including one a Taker is carrying to the desk)
+    public int CatCount => occupiedCages.Count;
+
+    // True if at least one cat is in a cage and no Taker has claimed it yet
+    public bool HasCatForAdoption()
+    {
+        foreach (var pair in occupiedCages)
+        {
+            if (pair.Value != null && !reservedCages.Contains(pair.Key)) return true;
+        }
+        return false;
+    }
+
     public Transform GetAvailableCage()
     {
         foreach (Transform cage in allCages)

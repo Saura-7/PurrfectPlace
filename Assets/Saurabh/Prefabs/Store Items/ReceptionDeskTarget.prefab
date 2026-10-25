@@ -70,7 +70,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 73c176f402d2c2f4d929aa5da7585d17, type: 2}
+  - {fileID: 2100000, guid: ab4522c34a7bb6e43b82b758b2351054, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -130,8 +130,13 @@ MonoBehaviour:
   maxInteractionDistance: 10
   dealUIPanel: {fileID: 0}
   dealText: {fileID: 0}
-  minReputationChange: 5
-  maxReputationChange: 10
+  wellCaredFrom: 8
+  averageFrom: 4
+  wellCaredAdoptionRep: 8
+  averageAdoptionRep: 3
+  neglectedAdoptionRep: 0
+  giverRescueRep: 3
+  missedDealRep: 3
 --- !u!114 &6768451859411651862
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -148,6 +153,8 @@ MonoBehaviour:
   highlightVisual: {fileID: 6736594685719949442}
   pulseSpeed: 2
   pulseAmount: 0.03
+  fadeStartDistance: 4
+  fadeEndDistance: 1.5
 --- !u!1 &6736594685719949442
 GameObject:
   m_ObjectHideFlags: 0
