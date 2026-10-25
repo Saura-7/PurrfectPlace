@@ -79,16 +79,16 @@ public class ReceptionDesk : MonoBehaviour
         {
             BaseCat cat = currentInteractingCustomer.heldCat;
 
+            // e.g. "Calico | Chonky | Lazy" in a slightly smaller size, then a new line
+            string traits = $"<size=80%>{cat.Pattern} | {cat.Body} | {cat.Behavior}</size>\n";
+
             if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Taker)
             {
                 currentDealPrice = cat.CalculateFinalPrice();
                 int donation = ReputationLevels.Donation;
-                dealText.text = $"ADOPTION?\nFeed: {cat.feedingLevel}/6\nClean: {cat.cleanlinessLevel}/6\nAdoption fee: +{currentDealPrice} GP";
+                dealText.text = $"ADOPTION?\n{traits}Feed: {cat.feedingLevel}/6\nClean: {cat.cleanlinessLevel}/6\nAdoption fee: +{currentDealPrice} GP";
                 if (donation > 0) dealText.text += $"\nDonation ({ReputationLevels.Name}): +{donation} GP";
                 dealUIPanel.SetActive(true);
-                string traits = $"{cat.Pattern} · {cat.Body} · {cat.Behavior}";
-
-                // Debug.Log($"[SOA {systemName}] Generated Taker sale offer for cat '{cat.name}'. Payout: {currentDealPrice} GP.");
             }
             else if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Giver)
             {
@@ -96,9 +96,8 @@ public class ReceptionDesk : MonoBehaviour
                 int catValue = cat.CalculateFinalPrice();
                 currentDealPrice = Mathf.Max(10, Mathf.RoundToInt(catValue * currentInteractingCustomer.AskFactor));
 
-                dealText.text = $"BUY CAT?\nFeed: {cat.feedingLevel}/6\nClean: {cat.cleanlinessLevel}/6\nWorth about: {catValue} GP\nCost: -{currentDealPrice} GP";
+                dealText.text = $"BUY CAT?\n{traits}Feed: {cat.feedingLevel}/6\nClean: {cat.cleanlinessLevel}/6\nWorth about: {catValue} GP\nCost: -{currentDealPrice} GP";
                 dealUIPanel.SetActive(true);
-                string traits = $"{cat.Pattern} · {cat.Body} · {cat.Behavior}";
             }
         }
         else

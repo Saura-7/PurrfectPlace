@@ -733,8 +733,9 @@ GameObject:
   - component: {fileID: 7701640510929130198}
   - component: {fileID: 1716496084014379010}
   - component: {fileID: 8487538371960508835}
+  - component: {fileID: 5110306921422118953}
   m_Layer: 0
-  m_Name: lowpoly cat
+  m_Name: Cat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -860,6 +861,45 @@ MonoBehaviour:
   isAvailable: 1
   feedingLevel: 0
   cleanlinessLevel: 0
+--- !u!114 &5110306921422118953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3812270900494404771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf2f65bf7a953e142a888165d465c63d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CatReaction
+  playful:
+    hopHeight: 0.25
+    duration: 0.5
+    squash: 0.15
+    shake: 0
+    shakeCount: 3
+  lazy:
+    hopHeight: 0.05
+    duration: 0.7
+    squash: 0.08
+    shake: 0
+    shakeCount: 3
+  angry:
+    hopHeight: 0
+    duration: 0.4
+    squash: 0.04
+    shake: 0.05
+    shakeCount: 3
+  skittish:
+    hopHeight: 0.2
+    duration: 0.3
+    squash: 0.18
+    shake: 0
+    shakeCount: 3
+  feedEffect: {fileID: 7035382954692211420, guid: cedab9ee433ad17458db0f91a449820d, type: 3}
+  cleanEffect: {fileID: 5412635656377573232, guid: 986af369da4c8e547a88d178059595db, type: 3}
+  effectHeight: 0.6
 --- !u!1 &5092628558729002485
 GameObject:
   m_ObjectHideFlags: 0
