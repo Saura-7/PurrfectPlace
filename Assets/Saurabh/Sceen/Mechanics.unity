@@ -4824,11 +4824,11 @@ PrefabInstance:
       objectReference: {fileID: 918338445205007204}
     - target: {fileID: 396252616207725974, guid: 6a2de57a98b309941b6e8c8ff4c6769b, type: 3}
       propertyPath: lastCallSeconds
-      value: 60
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 396252616207725974, guid: 6a2de57a98b309941b6e8c8ff4c6769b, type: 3}
       propertyPath: dayLengthSeconds
-      value: 300
+      value: 180
       objectReference: {fileID: 0}
     - target: {fileID: 616887592957599273, guid: 6a2de57a98b309941b6e8c8ff4c6769b, type: 3}
       propertyPath: m_Name

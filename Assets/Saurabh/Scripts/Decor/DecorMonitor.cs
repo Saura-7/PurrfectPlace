@@ -103,8 +103,8 @@ public class DecorMonitor : MonoBehaviour
             // Is the thing the player is looking at THIS row's Buy button?
             if (row.buyButton.gameObject != hitCollider.gameObject) continue;
 
-            if (row.slot.IsBought) return $"{row.slot.ItemName} is already in your shop";
-            return $"Buy {row.slot.ItemName}: {row.slot.Price} GP [{key}]";
+            if (row.slot.IsBought) return "Already in your shop";
+            return $"Buy [{key}]";
         }
 
         return "";

@@ -22,7 +22,7 @@ public class CustomerAI : MonoBehaviour
 
     private Transform doorChimePoint;
     private bool hasChimed;                    // the bell rings once per customer
-    private const float doorChimeDistance = 1.5f;   // metres from the marker
+    private const float doorChimeDistance = 2f;   // metres from the marker (sideways only) to trigger the chime
     
     // How greedy this Giver is: 0.7 = asks 30% less than the cat is worth, 1.3 = asks 30% more
     public float AskFactor { get; private set; }
@@ -85,13 +85,19 @@ public class CustomerAI : MonoBehaviour
 
     private void Update()
     {
-
-        // Ring the bell once, when a customer walking in reaches the door
-        if (!hasChimed && doorChimePoint != null && currentState != CustomerState.Leaving
-            && Vector3.Distance(transform.position, doorChimePoint.position) <= doorChimeDistance)
+        // Ring the bell once, when a customer walking in gets near the door
+        if (!hasChimed && doorChimePoint != null && currentState != CustomerState.Leaving)
         {
-            hasChimed = true;
-            AudioManager.Play(Sfx.DoorChime);
+            // Compare only left/right and forward/back. Ignore height,
+            // because the marker is on the floor and the customer's pivot is higher up.
+            Vector3 offset = transform.position - doorChimePoint.position;
+            offset.y = 0f;
+
+            if (offset.magnitude <= doorChimeDistance)
+            {
+                hasChimed = true;
+                AudioManager.Play(Sfx.DoorChime);
+            }
         }
 
 

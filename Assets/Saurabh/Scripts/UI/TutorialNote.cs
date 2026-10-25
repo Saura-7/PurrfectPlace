@@ -87,7 +87,7 @@ public class TutorialNote : MonoBehaviour
 
             case TutorialStep.CloseShop:
                 // Only once the timer has run out
-                return day != null && day.Phase == DayPhase.LastCall;
+                return day != null && day.Phase == DayPhase.LastCall && day.CustomersInside == 0;
 
             default:
                 // Feed, Clean and Computer can be done any time
@@ -215,7 +215,9 @@ public class TutorialNote : MonoBehaviour
     private string WaitingLine()
     {
         DayManager day = DayManager.Instance;
-        if (day == null || day.Phase != DayPhase.Open) return "";
+        if (day == null) return "";
+        if (day.Phase == DayPhase.LastCall) return "Serve your last customers...";
+        if (day.Phase != DayPhase.Open) return "";
 
         return done.Contains(TutorialStep.Serve)
             ? "Keep the shop running until closing time..."
