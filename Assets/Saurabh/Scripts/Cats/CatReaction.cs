@@ -20,8 +20,11 @@ public class CatReaction : MonoBehaviour
     [Header("Personality reactions")]
     [SerializeField] private Profile playful  = new Profile { hopHeight = 0.25f, duration = 0.5f,  squash = 0.15f };
     [SerializeField] private Profile lazy     = new Profile { hopHeight = 0.05f, duration = 0.7f,  squash = 0.08f };
-    [SerializeField] private Profile angry    = new Profile { hopHeight = 0f,    duration = 0.4f,  squash = 0.04f, shake = 0.05f, shakeCount = 3 };
+    [SerializeField] private Profile angry    = new Profile { hopHeight = 0.12f, duration = 0.3f,  squash = 0.1f };
     [SerializeField] private Profile skittish = new Profile { hopHeight = 0.2f,  duration = 0.3f,  squash = 0.18f };
+
+    [Header("\"No\" reaction (not enough GP, or already full)")]
+    [SerializeField] private Profile denied   = new Profile { hopHeight = 0f,    duration = 0.4f,  squash = 0f,   shake = 0.06f, shakeCount = 3 };
 
     [Header("Effects (Particle System prefabs)")]
     [SerializeField] private GameObject feedEffect;    // pink hearts
@@ -38,8 +41,21 @@ public class CatReaction : MonoBehaviour
         cat = GetComponent<BaseCat>();
     }
 
-    // Called by CareSubsystem after a successful feed or clean.
+    // Called by CareSubsystem after a successful feed or clean: a happy hop.
     public void Play(bool isFeeding)
+    {
+        Begin(GetProfile(), isFeeding ? feedEffect : cleanEffect);
+    }
+
+    // Called by CareSubsystem when care is refused (not enough GP, or the stat is already full):
+    // a side-to-side shake, no hop and no hearts.
+    public void PlayDenied()
+    {
+        Begin(denied, null);
+    }
+
+    // Shared start-up for both reactions
+    private void Begin(Profile profile, GameObject effect)
     {
         // Don't wiggle a cat that a customer is carrying.
         if (cat != null && cat.IsHeldByCustomer) return;
@@ -56,8 +72,8 @@ public class CatReaction : MonoBehaviour
         basePosition = transform.localPosition;
         baseScale = transform.localScale;
 
-        SpawnEffect(isFeeding ? feedEffect : cleanEffect);
-        running = StartCoroutine(ReactRoutine(GetProfile()));
+        SpawnEffect(effect);
+        running = StartCoroutine(ReactRoutine(profile));
     }
 
     private Profile GetProfile()

@@ -75,6 +75,7 @@ private void TryCareForCat(bool isFeeding)
         {
             Debug.Log($"{clickedCat.name} is already at max level for this stat. No GP spent.");
             MessageUI.Notify("This stat is already at max level!");
+            if (clickedCat.TryGetComponent(out CatReaction fullReaction)) fullReaction.PlayDenied();
             return;
         }
 
@@ -84,6 +85,7 @@ private void TryCareForCat(bool isFeeding)
         {
             Debug.LogWarning("Not enough GP!");
             MessageUI.Notify("Not enough GP!");
+            if (clickedCat.TryGetComponent(out CatReaction poorReaction)) poorReaction.PlayDenied();
             return;
         }
 
