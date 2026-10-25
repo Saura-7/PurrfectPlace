@@ -4802,6 +4802,34 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 17839616005798922, guid: 6a2de57a98b309941b6e8c8ff4c6769b, type: 3}
+      propertyPath: entries.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 17839616005798922, guid: 6a2de57a98b309941b6e8c8ff4c6769b, type: 3}
+      propertyPath: entries.Array.data[3].action
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 17839616005798922, guid: 6a2de57a98b309941b6e8c8ff4c6769b, type: 3}
+      propertyPath: entries.Array.data[3].gamepadText
+      value: RT
+      objectReference: {fileID: 0}
+    - target: {fileID: 17839616005798922, guid: 6a2de57a98b309941b6e8c8ff4c6769b, type: 3}
+      propertyPath: entries.Array.data[0].keyboardText
+      value: Q
+      objectReference: {fileID: 0}
+    - target: {fileID: 17839616005798922, guid: 6a2de57a98b309941b6e8c8ff4c6769b, type: 3}
+      propertyPath: entries.Array.data[1].keyboardText
+      value: E
+      objectReference: {fileID: 0}
+    - target: {fileID: 17839616005798922, guid: 6a2de57a98b309941b6e8c8ff4c6769b, type: 3}
+      propertyPath: entries.Array.data[2].keyboardText
+      value: Click
+      objectReference: {fileID: 0}
+    - target: {fileID: 17839616005798922, guid: 6a2de57a98b309941b6e8c8ff4c6769b, type: 3}
+      propertyPath: entries.Array.data[3].keyboardText
+      value: Click
+      objectReference: {fileID: 0}
     - target: {fileID: 396252616207725974, guid: 6a2de57a98b309941b6e8c8ff4c6769b, type: 3}
       propertyPath: endPanel
       value: 
@@ -5048,6 +5076,14 @@ PrefabInstance:
       propertyPath: Target.TrackingTarget
       value: 
       objectReference: {fileID: 2058937962}
+    - target: {fileID: 5239773925953482376, guid: 744df3e5b1ad6504f87f28ee4a5654fe, type: 3}
+      propertyPath: m_ControllerManager.Controllers.Array.data[0].Input.Gain
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 5239773925953482376, guid: 744df3e5b1ad6504f87f28ee4a5654fe, type: 3}
+      propertyPath: m_ControllerManager.Controllers.Array.data[1].Input.Gain
+      value: -50
+      objectReference: {fileID: 0}
     - target: {fileID: 7868558391422392145, guid: 744df3e5b1ad6504f87f28ee4a5654fe, type: 3}
       propertyPath: m_Name
       value: FP CinemachineCam

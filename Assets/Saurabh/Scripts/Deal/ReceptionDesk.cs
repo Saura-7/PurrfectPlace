@@ -41,6 +41,8 @@ public class ReceptionDesk : MonoBehaviour
 
     private void Update()
     {
+        // The Interact action is bound to E and the left mouse button (and the gamepad trigger),
+        // so one check covers every way the player can interact.
         if (CompleteDealAction.WasPressedThisFrame())
         {
             OnInteractPressed();
@@ -51,21 +53,25 @@ public class ReceptionDesk : MonoBehaviour
     {
         if (Camera.main == null) return;
 
+        // While a menu or the day summary is open the cursor is free.
+        // Ignore input then, so clicking a menu button can't also press something in the world behind it.
+        if (Cursor.lockState != CursorLockMode.Locked) return;
+
         Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
 
         if (Physics.Raycast(ray, out RaycastHit hit, maxInteractionDistance))
         {
+            // 1. A world-space button (Accept / Reject, Buy, the sign)
             WorldSpaceUIButton uiButton = hit.collider.GetComponent<WorldSpaceUIButton>();
             if (uiButton != null)
             {
-                // Debug.Log($"[SOA {systemName}] Raycast hit World Space UI Button: {uiButton.gameObject.name}");
                 uiButton.PressButton();
                 return;
             }
 
+            // 2. The desk itself: serve the customer
             if (hit.collider.gameObject == gameObject || hit.collider.GetComponentInParent<ReceptionDesk>() != null)
             {
-                // Debug.Log($"[SOA {systemName}] Raycast hit Reception Desk directly.");
                 ProcessTransaction();
             }
         }

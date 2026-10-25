@@ -4,5 +4,6 @@ public enum PromptAction
 {
     Feed,
     Clean,
-    CompleteDeal
+    CompleteDeal,
+    Click           // left mouse button, for world-space buttons (deal panel, catalogue, sign)
 }
