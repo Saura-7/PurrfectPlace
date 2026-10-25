@@ -194,7 +194,8 @@ public class TutorialNote : MonoBehaviour
     {
         string feed  = InputPrompts.Get(PromptAction.Feed);
         string clean = InputPrompts.Get(PromptAction.Clean);
-        string use   = InputPrompts.Get(PromptAction.CompleteDeal);
+        string use   = InputPrompts.Get(PromptAction.CompleteDeal);   // Z: serve at the desk
+        string click = InputPrompts.Get(PromptAction.Click);          // mouse: press world-space buttons
 
         string label;
         switch (step)
@@ -202,9 +203,9 @@ public class TutorialNote : MonoBehaviour
             case TutorialStep.Feed:     label = $"Feed a cat [{feed}]"; break;
             case TutorialStep.Clean:    label = $"Clean a cat [{clean}]"; break;
             case TutorialStep.Computer: label = "Look at the shop computer"; break;
-            case TutorialStep.OpenShop: label = $"Open the shop at the sign [{use}]"; break;
+            case TutorialStep.OpenShop: label = $"Open the shop at the sign [{click}]"; break;
             case TutorialStep.Serve:    label = $"Serve the customer at the desk [{use}]"; break;
-            default:                    label = $"Close the shop at the sign [{use}]"; break;
+            default:                    label = $"Close the shop at the sign [{click}]"; break;
         }
 
         // Counter: how many are done, plus the one we are on

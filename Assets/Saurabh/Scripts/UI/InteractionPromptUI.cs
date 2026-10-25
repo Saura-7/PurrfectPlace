@@ -74,7 +74,7 @@ public class InteractionPromptUI : MonoBehaviour
         if (sign != null && hit.distance <= deskDistance)
         {
             // The sign asks DayManager what to say, because the answer depends on the phase
-            return sign.GetPrompt(InputPrompts.Get(PromptAction.CompleteDeal));
+            return sign.GetPrompt(InputPrompts.Get(PromptAction.Click));
         }
 
         // Looking at the decor monitor
@@ -82,13 +82,13 @@ public class InteractionPromptUI : MonoBehaviour
         if (decorMonitor != null && hit.distance <= deskDistance)
         {
             TutorialNote.Complete(TutorialStep.Computer);
-            return decorMonitor.GetPrompt(hit.collider, InputPrompts.Get(PromptAction.CompleteDeal));
+            return decorMonitor.GetPrompt(hit.collider, InputPrompts.Get(PromptAction.Click));
         }
 
         // 2. Looking at an Accept / Reject button
         if (hit.distance <= deskDistance && hit.collider.GetComponent<WorldSpaceUIButton>() != null)
         {
-            return $"Choose [{InputPrompts.Get(PromptAction.CompleteDeal)}]";
+            return $"Choose [{InputPrompts.Get(PromptAction.Click)}]";
         }
 
         // 3. Looking at the reception desk
