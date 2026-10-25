@@ -19,16 +19,16 @@ public static class SOALogger
     public static void LogAudit(string sourceSubsystem, string action, int value, string target, int newTotal)
     {
         string formattedValue = value >= 0 ? $"+{value}" : value.ToString();
-        string log = $"<color={Colors.Economy}>[AUDIT]</color> {sourceSubsystem} | {action} | Value: {formattedValue} | Target: {target} | New Total: {newTotal}";
+        string log = $"[AUDIT] <color={Colors.Economy}> {sourceSubsystem} </color>| {action} | Value: {formattedValue} | Target: {target} | New Total: {newTotal}";
         Debug.Log(log);
     }
 
     /// <summary>
-    /// Logs subsystem state transitions, events, and operations using the [SOA] tag.
+    /// Logs subsystem state transitions, events, and operations using the [StateChange] tag.
     /// </summary>
     public static void LogState(string subsystemName, string colorHex, string action, string message)
     {
-        string log = $"<color={colorHex}>[SOA]</color> {subsystemName} | {action} | {message}";
+        string log = $"[StateChange] <color={colorHex}> {subsystemName} </color>| {action} | {message}";
         Debug.Log(log);
     }
 
@@ -37,7 +37,7 @@ public static class SOALogger
     /// </summary>
     public static void LogWarning(string subsystemName, string colorHex, string message)
     {
-        string log = $"<color={colorHex}>[WARNING]</color> {subsystemName} | {message}";
-        Debug.LogWarning(log);
+            string log = $"[WARNING]> <color={colorHex}> {subsystemName} </color | {message}";
+            Debug.LogWarning(log);
     }
 }

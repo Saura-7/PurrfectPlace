@@ -3,6 +3,7 @@ using System;
 
 public class CoreEconomySystem : MonoBehaviour
 {
+
     // 1. SINGLETON SETUP
     public static CoreEconomySystem Instance { get; private set; }
 
@@ -16,6 +17,11 @@ public class CoreEconomySystem : MonoBehaviour
 
     private void Awake()
     {
+   
+    #if !UNITY_EDITOR && !DEVELOPMENT_BUILD
+    Debug.unityLogger.logEnabled = false;
+    #endif
+
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -23,6 +29,7 @@ public class CoreEconomySystem : MonoBehaviour
         }
         Instance = this;
     }
+
 
     // 3. THE AUDIT TRAIL LOGIC
     // private void LogAudit(string subsystemName, string action, int value, string variableName, int newValue)

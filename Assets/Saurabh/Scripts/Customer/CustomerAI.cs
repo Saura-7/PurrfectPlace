@@ -20,19 +20,35 @@ public class CustomerAI : MonoBehaviour
     private Transform targetCage; 
     private bool isAtFrontOfLine = false;
 
+    private Transform doorChimePoint;
+    private bool hasChimed;                    // the bell rings once per customer
+    private const float doorChimeDistance = 2f;   // metres from the marker (sideways only) to trigger the chime
+    
+    // How greedy this Giver is: 0.7 = asks 30% less than the cat is worth, 1.3 = asks 30% more
+    public float AskFactor { get; private set; }
+
+    // A Stray finder is a Giver who found a cat outside and asks for nothing
+    public bool IsStray { get; private set; }
+
     public Transform HomeCage => targetCage;
 
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
+        agent.avoidancePriority = Random.Range(40, 60);
         
         GameObject exitObj = GameObject.Find("ExitDoorTarget");
         if (exitObj != null) exitDoor = exitObj.transform;
+        GameObject doorObj = GameObject.Find("DoorChimePoint");
+        if (doorObj != null) doorChimePoint = doorObj.transform;
+        AskFactor = Random.Range(0.6f, 1.2f);   
     }
 
-    public void InitializeCustomer(CustomerType type)
+    // isStray is optional, so old calls like InitializeCustomer(type) still work
+    public void InitializeCustomer(CustomerType type, bool isStray = false)
     {
         myType = type;
+        IsStray = isStray && type == CustomerType.Giver;
         
         if (myType == CustomerType.Giver)
         {
@@ -44,7 +60,14 @@ public class CustomerAI : MonoBehaviour
             }
 
             heldCat = CatFactory.Instance.GenerateGiverCat(handHoldPoint);
-            Debug.Log($"[SOA {systemName}] Giver initialized with cat '{heldCat.name}'. Joining queue.");
+
+            // A stray was living outside, so it arrives hungry and dirty
+            if (IsStray)
+            {
+                heldCat.feedingLevel = 0;
+                heldCat.cleanlinessLevel = 0;
+            }
+            // Debug.Log($"[SOA {systemName}] Giver initialized with cat '{heldCat.name}'. Joining queue.");
             CustomerQueueManager.Instance.JoinQueue(this);
         }
         else
@@ -55,13 +78,29 @@ public class CustomerAI : MonoBehaviour
                 ChangeState(CustomerState.Leaving);
                 return;
             }
-            Debug.Log($"[SOA {systemName}] Taker initialized. Setting state to Entering.");
+            // Debug.Log($"[SOA {systemName}] Taker initialized. Setting state to Entering.");
             ChangeState(CustomerState.Entering);
         }
     }
 
     private void Update()
     {
+        // Ring the bell once, when a customer walking in gets near the door
+        if (!hasChimed && doorChimePoint != null && currentState != CustomerState.Leaving)
+        {
+            // Compare only left/right and forward/back. Ignore height,
+            // because the marker is on the floor and the customer's pivot is higher up.
+            Vector3 offset = transform.position - doorChimePoint.position;
+            offset.y = 0f;
+
+            if (offset.magnitude <= doorChimeDistance)
+            {
+                hasChimed = true;
+                AudioManager.Play(Sfx.DoorChime);
+            }
+        }
+
+
         if (currentState == CustomerState.LookingForCat)
         {
             if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
@@ -75,7 +114,7 @@ public class CustomerAI : MonoBehaviour
             {
                 if (isAtFrontOfLine)
                 {
-                    Debug.Log($"[SOA {systemName}] Customer reached register (Spot 0). Waiting for interaction.");
+                    // Debug.Log($"[SOA {systemName}] Customer reached register (Spot 0). Waiting for interaction.");
                     ChangeState(CustomerState.WaitingAtRegister);
                 }
             }
@@ -84,7 +123,7 @@ public class CustomerAI : MonoBehaviour
         {
             if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
             {
-                Debug.Log($"[SOA {systemName}] Customer reached exit door. Despawning GameObject.");
+                // Debug.Log($"[SOA {systemName}] Customer reached exit door. Despawning GameObject.");
                 Destroy(gameObject);
             }
         }
@@ -113,6 +152,7 @@ public class CustomerAI : MonoBehaviour
                 break;
                 
             case CustomerState.Leaving:
+                agent.avoidancePriority = Random.Range(70, 90); // leaving customers give way to everyone else
                 if (exitDoor != null) agent.SetDestination(exitDoor.position);
                 break;
         }
@@ -214,6 +254,30 @@ public class CustomerAI : MonoBehaviour
         // Debug.Log($"[SOA {systemName}] Giver deal accepted. Handing over cat '{boughtCat?.name}' and leaving.");
         ChangeState(CustomerState.Leaving);
         return boughtCat;
+    }
+
+    public void DismissForNewDay()
+    {
+        if (myType == CustomerType.Taker)
+        {
+            bool waitingWithCat = heldCat != null &&
+                (currentState == CustomerState.WalkingToRegister || currentState == CustomerState.WaitingAtRegister);
+
+            if (waitingWithCat)
+            {
+                // The cat was never sold, so it goes back to its own enclosure
+                BaseCat cat = heldCat;
+                heldCat = null;
+                CageManager.Instance.ReturnCatToCage(HomeCage, cat);
+            }
+            else if (currentState == CustomerState.LookingForCat)
+            {
+                // Still walking to the enclosure, so release the reservation
+                CageManager.Instance.UnreserveCage(targetCage);
+            }
+        }
+
+        Destroy(gameObject); 
     }
 
     private void OnDestroy()
