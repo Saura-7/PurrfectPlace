@@ -16,9 +16,7 @@ public class BaseCat : MonoBehaviour
     [Header("MVP Gameplay Stats")]
     public bool isAvailable = true; // True if waiting on a shelf. False if a customer claimed it.
 
-    // The base value of a cat with no care, and what each care point adds
-        private const int BaseValue = 30;
-        private const int ValuePerPoint = 15;
+    // The cat's worth and care costs now live in CareRules (one place to tune them)
 
     public const int MaxLevel = 6;
 
@@ -27,6 +25,7 @@ public class BaseCat : MonoBehaviour
 
     public bool CanUpgradeFeeding => feedingLevel < MaxLevel;
     public bool CanUpgradeCleanliness => cleanlinessLevel < MaxLevel;
+    public int TotalCare => feedingLevel + cleanlinessLevel;   // 0 to 12, decides the care tier
     public bool IsHeldByCustomer => GetComponentInParent<CustomerAI>() != null; 
 
     // Getters for subsystems to read the DNA
@@ -96,8 +95,7 @@ public class BaseCat : MonoBehaviour
 
     public int CalculateFinalPrice()
     {
-        // Base price is 30. Each stat point (max 12 total) adds 15 to the value.
-        // Debug.Log($"[BaseCat] Final price calculated for {name}: 30 + ({feedingLevel} * 15) + ({cleanlinessLevel} * 15)");
-        return BaseValue + (feedingLevel * ValuePerPoint) + (cleanlinessLevel * ValuePerPoint);
+        // Base worth + worth per care point. The numbers are set in CareRules.
+        return CareRules.Value(this);
     }
 }

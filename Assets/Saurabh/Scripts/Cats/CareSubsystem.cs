@@ -6,7 +6,7 @@ public class CareSubsystem : MonoBehaviour
     private readonly string systemName = "CareSubsystem";
     
     [Header("Economy Settings")]
-    public int careCost = 10; // Cost to upgrade 1 stat point
+    // public int careCost = 10; // OLD: one flat cost. Costs now rise per level, see CareRules
     [SerializeField] private float maxInteractionDistance = 5f; // Max distance to interact with a cat
 
     private InputSystem_Actions inputActions;
@@ -80,11 +80,12 @@ private void TryCareForCat(bool isFeeding)
         }
 
         int currentMoney = CoreEconomySystem.Instance.GetGP(systemName);
+        int careCost = CareRules.NextCost(clickedCat, isFeeding);   // the price of THIS level (5, 8, 11 ...)
 
         if (currentMoney < careCost)
         {
             Debug.LogWarning("Not enough GP!");
-            MessageUI.Notify("Not enough GP!");
+            MessageUI.Notify($"Not enough GP! This care costs {careCost} GP.");
             if (clickedCat.TryGetComponent(out CatReaction poorReaction)) poorReaction.PlayDenied();
             return;
         }
