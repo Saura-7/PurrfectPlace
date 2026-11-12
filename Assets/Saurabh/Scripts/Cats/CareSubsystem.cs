@@ -6,7 +6,7 @@ public class CareSubsystem : MonoBehaviour
     private readonly string systemName = "CareSubsystem";
     
     [Header("Economy Settings")]
-    public int careCost = 10; // Cost to upgrade 1 stat point
+    // public int careCost = 10; // OLD: one flat cost. Costs now rise per level, see CareRules
     [SerializeField] private float maxInteractionDistance = 5f; // Max distance to interact with a cat
 
     private InputSystem_Actions inputActions;
@@ -80,19 +80,24 @@ private void TryCareForCat(bool isFeeding)
         }
 
         int currentMoney = CoreEconomySystem.Instance.GetGP(systemName);
+        int careCost = CareRules.NextCost(clickedCat, isFeeding);   // the price of THIS level (5, 8, 11 ...)
 
         if (currentMoney < careCost)
         {
             Debug.LogWarning("Not enough GP!");
-            MessageUI.Notify("Not enough GP!");
+            MessageUI.Notify($"Not enough GP! This care costs {careCost} GP.");
             if (clickedCat.TryGetComponent(out CatReaction poorReaction)) poorReaction.PlayDenied();
             return;
         }
 
         CoreEconomySystem.Instance.ModifyGP(-careCost, systemName);
 
+        CareTier tierBefore = CareRules.TierOf(clickedCat.TotalCare);   // remember the tier BEFORE the upgrade
+
         if (isFeeding) clickedCat.UpgradeFeeding();
         else clickedCat.UpgradeCleanliness();
+
+        ShowCarePopup(clickedCat, careCost, tierBefore);
 
         clickedCat.PlayInteractAnimation();
         if (clickedCat.TryGetComponent(out CatReaction reaction)) reaction.Play(isFeeding);
@@ -103,6 +108,25 @@ private void TryCareForCat(bool isFeeding)
     {
         Debug.Log("Raycast hit nothing.");
     }
+}
+
+
+// The pop-up next to the cat: "-8 GP  +15 worth", plus the new tier if the cat just reached one
+private void ShowCarePopup(BaseCat cat, int cost, CareTier tierBefore)
+{
+
+    // Built in two parts: Unity's C# version can't put quotes inside a {...} of another $"..." string
+    string spent = FloatingNumbers.Spend("-" + cost + " GP");
+    string gained = FloatingNumbers.Gain("+" + CareRules.ValuePerPoint + " worth");
+    string text = spent + "  " + gained;
+
+    CareTier tierNow = CareRules.TierOf(cat.TotalCare);
+    // Celebrate only the tiers worth aiming for (Well-cared and Purrfect)
+    if (tierNow != tierBefore && tierNow >= CareTier.WellCared)
+        text += "\n<b>" + CareRules.ColoredName(tierNow) + "!</b>";
+
+    FloatingNumbers.Show(cat.CenterPosition, text);
+
 }
 
 }

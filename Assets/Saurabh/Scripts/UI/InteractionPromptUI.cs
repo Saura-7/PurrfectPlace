@@ -65,9 +65,9 @@ public class InteractionPromptUI : MonoBehaviour
             string feed = InputPrompts.Get(PromptAction.Feed);
             string clean = InputPrompts.Get(PromptAction.Clean);
 
-            // The screen prompt now only shows what you can DO, on one line
-            return $"Feed [{feed}] {cat.feedingLevel}/{BaseCat.MaxLevel}     " +
-                   $"Clean [{clean}] {cat.cleanlinessLevel}/{BaseCat.MaxLevel}";
+            // The screen prompt shows what you can DO: key, level, and the price of the next level
+            return $"Feed [{feed}] {cat.feedingLevel}/{BaseCat.MaxLevel}{CostText(cat, true)}     " +
+                   $"Clean [{clean}] {cat.cleanlinessLevel}/{BaseCat.MaxLevel}{CostText(cat, false)}";
         }
 
         OpenSign sign = hit.collider.GetComponentInParent<OpenSign>();
@@ -103,5 +103,14 @@ public class InteractionPromptUI : MonoBehaviour
         }
 
         return "";
+    }
+
+    // " (-8 GP)" for the next level, or " (max)" when the stat is full.
+    // The minus sign matches the rest of the game: minus = money you spend.
+    private string CostText(BaseCat cat, bool feeding)
+    {
+        bool canUpgrade = feeding ? cat.CanUpgradeFeeding : cat.CanUpgradeCleanliness;
+        if (!canUpgrade) return " (max)";
+        return $" (-{CareRules.NextCost(cat, feeding)} GP)";
     }
 }

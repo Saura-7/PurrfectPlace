@@ -6,6 +6,10 @@ using UnityEngine;
 // Put this on the cat prefab (same object as BaseCat).
 public class CatReaction : MonoBehaviour
 {
+
+    private Transform baseParent;     // who held the cat when the hop started
+    private Vector3 baseWorldScale;   // the cat's real size in the world
+
     // One row of numbers per personality. Shown in the Inspector so you can tweak without code.
     [System.Serializable]
     public class Profile
@@ -68,9 +72,11 @@ public class CatReaction : MonoBehaviour
             Restore();
         }
 
-        // Remember where the cat really is and how big it really is.
+        // Remember where the cat really is, how big it really is, and who holds it.
         basePosition = transform.localPosition;
         baseScale = transform.localScale;
+        baseParent = transform.parent;
+        baseWorldScale = transform.lossyScale;
 
         SpawnEffect(effect);
         running = StartCoroutine(ReactRoutine(profile));
@@ -95,6 +101,14 @@ public class CatReaction : MonoBehaviour
 
         while (t < p.duration)
         {
+            // A customer picked the cat up mid-hop, so stop moving it
+            if (transform.parent != baseParent)
+            {
+                Restore();
+                running = null;
+                yield break;
+            }
+
             t += Time.deltaTime;
             float n = Mathf.Clamp01(t / p.duration);   // 0 at the start, 1 at the end
 
@@ -123,8 +137,21 @@ public class CatReaction : MonoBehaviour
     // Puts the cat exactly back to its real position and size.
     private void Restore()
     {
-        transform.localPosition = basePosition;
-        transform.localScale = baseScale;
+        // Normal case: the cat is still in its cage
+        if (transform.parent == baseParent)
+        {
+            transform.localPosition = basePosition;
+            transform.localScale = baseScale;
+            return;
+        }
+
+        // Picked up mid-hop: leave the position to the customer's hand,
+        // and only return the cat to its normal size
+        Vector3 parentScale = transform.parent != null ? transform.parent.lossyScale : Vector3.one;
+        transform.localScale = new Vector3(
+            baseWorldScale.x / parentScale.x,
+            baseWorldScale.y / parentScale.y,
+            baseWorldScale.z / parentScale.z);
     }
 
     private void SpawnEffect(GameObject prefab)

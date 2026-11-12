@@ -18,14 +18,11 @@ public class ReceptionDesk : MonoBehaviour
     private CustomerAI currentInteractingCustomer;
     private int currentDealPrice;
 
-    [Header("Reputation from care (care = feed + clean, 0 to 12)")]
-    [SerializeField] private int wellCaredFrom = 8;          // care at or above this counts as well cared for
-    [SerializeField] private int averageFrom = 4;            // care at or above this (but below well cared) is average
-    [SerializeField] private int wellCaredAdoptionRep = 8;   // reputation for adopting out a well-cared cat
-    [SerializeField] private int averageAdoptionRep = 3;     // reputation for an average cat
-    [SerializeField] private int neglectedAdoptionRep = 0;   // reputation for a neglected cat (no penalty)
+    [Header("Reputation from deals")]
+    // Care tiers and their adoption reputation moved to CareRules (one place for every care number)
     [SerializeField] private int giverRescueRep = 3;         // reputation for taking in a Giver's cat
-    [SerializeField] private int missedDealRep = 1;          // reputation LOST when the shop cannot complete a deal
+    // [SerializeField] private int missedDealRep = 1;          // reputation LOST when the shop cannot complete a deal
+    [SerializeField] private int noDealRep = 3;              // reputation LOST for every "no", chosen or forced
 
     private void OnEnable()
     {
@@ -92,7 +89,9 @@ public class ReceptionDesk : MonoBehaviour
             {
                 currentDealPrice = cat.CalculateFinalPrice();
                 int donation = ReputationLevels.Donation;
-                dealText.text = $"ADOPTION?\n{traits}Feed: {cat.feedingLevel}/6\nClean: {cat.cleanlinessLevel}/6\nAdoption fee: +{currentDealPrice} GP";
+                int rep = CareRules.ReputationFor(cat.TotalCare);
+                dealText.text = $"ADOPTION?\n{traits}{CareLine(cat)}Adoption fee: +{currentDealPrice} GP";
+                if (rep > 0) dealText.text += $"\nReputation: +{rep}";
                 if (donation > 0) dealText.text += $"\nDonation ({ReputationLevels.Name}): +{donation} GP";
                 dealUIPanel.SetActive(true);
             }
@@ -105,12 +104,12 @@ public class ReceptionDesk : MonoBehaviour
                 {
                     // A stray finder asks for nothing
                     currentDealPrice = 0;
-                    dealText.text = $"TAKE IN A STRAY?\n{traits}Feed: {cat.feedingLevel}/6\nClean: {cat.cleanlinessLevel}/6\nFound outside\nCost: Free";
+                    dealText.text = $"TAKE IN A STRAY?\n{traits}{CareLine(cat)}Found outside\nCost: Free";
                 }
                 else
                 {
                     currentDealPrice = Mathf.Max(10, Mathf.RoundToInt(catValue * currentInteractingCustomer.AskFactor));
-                    dealText.text = $"BUY CAT?\n{traits}Feed: {cat.feedingLevel}/6\nClean: {cat.cleanlinessLevel}/6\nWorth about: {catValue} GP\nCost: -{currentDealPrice} GP";
+                    dealText.text = $"BUY CAT?\n{traits}{CareLine(cat)}Worth about: {catValue} GP\nCost: -{currentDealPrice} GP";
                 }
 
                 dealUIPanel.SetActive(true);
@@ -148,7 +147,9 @@ public class ReceptionDesk : MonoBehaviour
                 ? $"Adopted! +{currentDealPrice} GP and a +{donation} GP donation"
                 : $"Adopted! +{currentDealPrice} GP");
 
-            if (care >= wellCaredFrom) MessageUI.Notify("A happy adoption!");
+            CareTier tier = CareRules.TierOf(care);
+            if (tier == CareTier.Purrfect) MessageUI.Notify("A purrfect adoption!");
+            else if (tier == CareTier.WellCared) MessageUI.Notify("A happy adoption!");
         }
         else if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Giver)
         {
@@ -196,9 +197,13 @@ public class ReceptionDesk : MonoBehaviour
     // How much reputation an adoption earns, from how well the cat was cared for
     private int AdoptionReputation(int care)
     {
-        if (care >= wellCaredFrom) return wellCaredAdoptionRep;
-        if (care >= averageFrom) return averageAdoptionRep;
-        return neglectedAdoptionRep;
+        return CareRules.ReputationFor(care);
+    }
+
+    // One line for the deal screen, e.g. "Feed 4/6 · Clean 4/6 · Well-cared"
+    private string CareLine(BaseCat cat)
+    {
+        return $"Feed {cat.feedingLevel}/{BaseCat.MaxLevel} · Clean {cat.cleanlinessLevel}/{BaseCat.MaxLevel} · {CareRules.ColoredName(CareRules.TierOf(cat.TotalCare))}\n";
     }
 
     // The Reject button on the deal monitor calls this. The player chose to say no.
@@ -226,17 +231,18 @@ public class ReceptionDesk : MonoBehaviour
             currentInteractingCustomer.RejectGiverOfferAndLeave();
         }
 
-        // Saying no is free. Only a deal the shop could not complete costs reputation
+        // A lost deal is a lost deal: every "no" costs reputation, chosen or forced
+        CoreEconomySystem.Instance.ModifyReputation(-noDealRep, systemName);
+
         if (forcedByGame)
         {
-            CoreEconomySystem.Instance.ModifyReputation(-missedDealRep, systemName);
-            DayManager.RecordMissed();
-            MessageUI.Notify($"Deal missed: -{missedDealRep} reputation");
+            DayManager.RecordMissed();      // counted as "missed" in the day summary
+            MessageUI.Notify($"Deal missed: -{noDealRep} reputation");
         }
         else
         {
-            DayManager.RecordDeclined();
-            MessageUI.Notify("Deal declined");
+            DayManager.RecordDeclined();    // counted as "declined" in the day summary
+            MessageUI.Notify($"Deal declined: -{noDealRep} reputation");
         }
 
         AudioManager.Play(Sfx.PoliteNo);
