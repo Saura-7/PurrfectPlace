@@ -74,11 +74,8 @@ public class CatInfoTag : MonoBehaviour
         Camera cam = Camera.main;
         if (cam == null) return;
 
-        // Find the top of the cat using its real size in the world.
-        Renderer rend = target.GetComponentInChildren<Renderer>();
-        Vector3 top = rend != null
-            ? rend.bounds.center + Vector3.up * rend.bounds.extents.y
-            : target.transform.position;
+        // Find the top of the cat using its real size in the world (BaseCat works it out)
+        Vector3 top = target.TopPosition;
 
         // WorldToScreenPoint turns a 3D position into a pixel position on the screen.
         // x and y are pixels; z is how far in front of the camera the point is.

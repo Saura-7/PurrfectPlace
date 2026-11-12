@@ -26,6 +26,26 @@ public class BaseCat : MonoBehaviour
     public bool CanUpgradeFeeding => feedingLevel < MaxLevel;
     public bool CanUpgradeCleanliness => cleanlinessLevel < MaxLevel;
     public int TotalCare => feedingLevel + cleanlinessLevel;   // 0 to 12, decides the care tier
+    // The top of the cat's head in the world, from the model's real size (works with any model scale)
+    public Vector3 TopPosition
+    {
+        get
+        {
+            Renderer rend = GetComponentInChildren<Renderer>();
+            return rend != null ? rend.bounds.center + Vector3.up * rend.bounds.extents.y : transform.position;
+        }
+    }
+
+    // The middle of the cat's body in the world
+    public Vector3 CenterPosition
+    {
+        get
+        {
+            Renderer rend = GetComponentInChildren<Renderer>();
+            return rend != null ? rend.bounds.center : transform.position;
+        }
+    }
+
     public bool IsHeldByCustomer => GetComponentInParent<CustomerAI>() != null; 
 
     // Getters for subsystems to read the DNA
@@ -83,14 +103,14 @@ public class BaseCat : MonoBehaviour
     {
         if (feedingLevel < MaxLevel) feedingLevel++;
         // Debug.Log($"[BaseCat] Feeding level upgraded to {feedingLevel} for {name}");
-        MessageUI.Notify("Feeding level upgraded! to " + feedingLevel);
+        // MessageUI.Notify("Feeding level upgraded! to " + feedingLevel); // replaced by the pop-up number
     }
 
     public void UpgradeCleanliness()
     {
         if (cleanlinessLevel < MaxLevel) cleanlinessLevel++;
         // Debug.Log($"[BaseCat] Cleanliness level upgraded to {cleanlinessLevel} for {name}");
-        MessageUI.Notify("Cleanliness level upgraded! to " + cleanlinessLevel);
+        // MessageUI.Notify("Cleanliness level upgraded! to " + cleanlinessLevel); // replaced by the pop-up number
     }
 
     public int CalculateFinalPrice()

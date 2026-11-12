@@ -92,8 +92,12 @@ private void TryCareForCat(bool isFeeding)
 
         CoreEconomySystem.Instance.ModifyGP(-careCost, systemName);
 
+        CareTier tierBefore = CareRules.TierOf(clickedCat.TotalCare);   // remember the tier BEFORE the upgrade
+
         if (isFeeding) clickedCat.UpgradeFeeding();
         else clickedCat.UpgradeCleanliness();
+
+        ShowCarePopup(clickedCat, careCost, tierBefore);
 
         clickedCat.PlayInteractAnimation();
         if (clickedCat.TryGetComponent(out CatReaction reaction)) reaction.Play(isFeeding);
@@ -104,6 +108,25 @@ private void TryCareForCat(bool isFeeding)
     {
         Debug.Log("Raycast hit nothing.");
     }
+}
+
+
+// The pop-up next to the cat: "-8 GP  +15 worth", plus the new tier if the cat just reached one
+private void ShowCarePopup(BaseCat cat, int cost, CareTier tierBefore)
+{
+
+    // Built in two parts: Unity's C# version can't put quotes inside a {...} of another $"..." string
+    string spent = FloatingNumbers.Spend("-" + cost + " GP");
+    string gained = FloatingNumbers.Gain("+" + CareRules.ValuePerPoint + " worth");
+    string text = spent + "  " + gained;
+
+    CareTier tierNow = CareRules.TierOf(cat.TotalCare);
+    // Celebrate only the tiers worth aiming for (Well-cared and Purrfect)
+    if (tierNow != tierBefore && tierNow >= CareTier.WellCared)
+        text += "\n<b>" + CareRules.ColoredName(tierNow) + "!</b>";
+
+    FloatingNumbers.Show(cat.CenterPosition, text);
+
 }
 
 }
