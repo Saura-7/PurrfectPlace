@@ -25,7 +25,8 @@ public class ReceptionDesk : MonoBehaviour
     [SerializeField] private int averageAdoptionRep = 3;     // reputation for an average cat
     [SerializeField] private int neglectedAdoptionRep = 0;   // reputation for a neglected cat (no penalty)
     [SerializeField] private int giverRescueRep = 3;         // reputation for taking in a Giver's cat
-    [SerializeField] private int missedDealRep = 1;          // reputation LOST when the shop cannot complete a deal
+    // [SerializeField] private int missedDealRep = 1;          // reputation LOST when the shop cannot complete a deal
+    [SerializeField] private int noDealRep = 3;              // reputation LOST for every "no", chosen or forced
 
     private void OnEnable()
     {
@@ -226,17 +227,18 @@ public class ReceptionDesk : MonoBehaviour
             currentInteractingCustomer.RejectGiverOfferAndLeave();
         }
 
-        // Saying no is free. Only a deal the shop could not complete costs reputation
+        // A lost deal is a lost deal: every "no" costs reputation, chosen or forced
+        CoreEconomySystem.Instance.ModifyReputation(-noDealRep, systemName);
+
         if (forcedByGame)
         {
-            CoreEconomySystem.Instance.ModifyReputation(-missedDealRep, systemName);
-            DayManager.RecordMissed();
-            MessageUI.Notify($"Deal missed: -{missedDealRep} reputation");
+            DayManager.RecordMissed();      // counted as "missed" in the day summary
+            MessageUI.Notify($"Deal missed: -{noDealRep} reputation");
         }
         else
         {
-            DayManager.RecordDeclined();
-            MessageUI.Notify("Deal declined");
+            DayManager.RecordDeclined();    // counted as "declined" in the day summary
+            MessageUI.Notify($"Deal declined: -{noDealRep} reputation");
         }
 
         AudioManager.Play(Sfx.PoliteNo);

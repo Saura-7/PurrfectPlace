@@ -73,7 +73,7 @@ public class CoreEconomySystem : MonoBehaviour
 
     public void ModifyReputation(int amount, string subsystemName)
     {
-        reputation += amount;
+        reputation = Mathf.Max(0, reputation + amount);   // never drops below 0
         string actionType = amount >= 0 ? "ADD" : "SUBTRACT";
         SOALogger.LogAudit(subsystemName, actionType, amount, "Reputation", reputation);
         
