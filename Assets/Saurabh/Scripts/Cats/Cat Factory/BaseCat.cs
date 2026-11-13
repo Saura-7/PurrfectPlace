@@ -26,24 +26,36 @@ public class BaseCat : MonoBehaviour
     public bool CanUpgradeFeeding => feedingLevel < MaxLevel;
     public bool CanUpgradeCleanliness => cleanlinessLevel < MaxLevel;
     public int TotalCare => feedingLevel + cleanlinessLevel;   // 0 to 12, decides the care tier
-    // The top of the cat's head in the world, from the model's real size (works with any model scale)
+    // The top of the cat's head in the world (used by the info tag)
     public Vector3 TopPosition
     {
         get
         {
-            Renderer rend = GetComponentInChildren<Renderer>();
-            return rend != null ? rend.bounds.center + Vector3.up * rend.bounds.extents.y : transform.position;
+            Bounds b = WorldBounds();
+            return b.center + Vector3.up * b.extents.y;
         }
     }
 
-    // The middle of the cat's body in the world
-    public Vector3 CenterPosition
+    // The middle of the cat's body in the world (used by the pop-up numbers)
+    public Vector3 CenterPosition => WorldBounds().center;
+
+    // An invisible box around the cat, in world space.
+    // We use the collider first: it's the same box the crosshair raycast hits, so it's always where the cat is.
+    // (The cat prefab's ROOT has a MeshRenderer with no mesh. Its bounds never move, so they stay
+    //  wherever the cat was created: fine for starter cats made in a cage, wrong for a Giver's cat made at the door.)
+    private Bounds WorldBounds()
     {
-        get
+        Collider col = GetComponent<Collider>();
+        if (col != null && col.enabled) return col.bounds;
+
+        // Fallback: the first renderer that actually draws a mesh
+        foreach (Renderer r in GetComponentsInChildren<Renderer>())
         {
-            Renderer rend = GetComponentInChildren<Renderer>();
-            return rend != null ? rend.bounds.center : transform.position;
+            MeshFilter filter = r.GetComponent<MeshFilter>();
+            bool drawsSomething = !(r is MeshRenderer) || (filter != null && filter.sharedMesh != null);
+            if (drawsSomething) return r.bounds;
         }
+        return new Bounds(transform.position, Vector3.zero);
     }
 
     public bool IsHeldByCustomer => GetComponentInParent<CustomerAI>() != null; 

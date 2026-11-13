@@ -24,7 +24,11 @@ public class CustomerAI : MonoBehaviour
     private bool hasChimed;                    // the bell rings once per customer
     private const float doorChimeDistance = 2f;   // metres from the marker (sideways only) to trigger the chime
     
-    // How greedy this Giver is: 0.7 = asks 30% less than the cat is worth, 1.3 = asks 30% more
+    // How greedy a Giver is: 0.85 = asks 15% less than the cat is worth, 1.35 = asks 35% more.
+    // Average 1.1: re-selling a cat WITHOUT caring for it loses a little, so care is where profit comes from.
+    [Header("Giver asking price (x the cat's worth)")]
+    [SerializeField] private float minAskFactor = 0.85f;
+    [SerializeField] private float maxAskFactor = 1.35f;
     public float AskFactor { get; private set; }
 
     // A Stray finder is a Giver who found a cat outside and asks for nothing
@@ -41,7 +45,7 @@ public class CustomerAI : MonoBehaviour
         if (exitObj != null) exitDoor = exitObj.transform;
         GameObject doorObj = GameObject.Find("DoorChimePoint");
         if (doorObj != null) doorChimePoint = doorObj.transform;
-        AskFactor = Random.Range(0.6f, 1.2f);   
+        AskFactor = Random.Range(minAskFactor, maxAskFactor);
     }
 
     // isStray is optional, so old calls like InitializeCustomer(type) still work
