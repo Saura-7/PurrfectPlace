@@ -8753,7 +8753,7 @@ MonoBehaviour:
   pool:
   - label: Adopter (Taker)
     kind: 0
-    weight: 5
+    weight: 0
     emptyShopBonus: 0
     weightPerCatShown: 2
     needsCatToAdopt: 1
