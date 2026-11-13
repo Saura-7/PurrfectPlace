@@ -58,6 +58,7 @@ public class PauseMenu : MonoBehaviour
     private void Update()
     {
         if (PauseDisabled) return;
+        if (DevConsole.BlocksPause) return;   // Esc closes the console instead of pausing
 
         if (inputActions.Player.Pause.WasPressedThisFrame())
         {

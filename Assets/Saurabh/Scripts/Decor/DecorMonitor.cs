@@ -82,6 +82,11 @@ public class DecorMonitor : MonoBehaviour
                 row.buttonLabel.text = "BOUGHT";
                 row.buttonImage.color = disabledColor;
             }
+            else if (!slot.IsAvailable)
+            {
+                row.buttonLabel.text = "LOCKED";
+                row.buttonImage.color = disabledColor;
+            }
             else if (gp < slot.Price)
             {
                 row.buttonLabel.text = $"Need {slot.Price - gp} more";
@@ -104,6 +109,7 @@ public class DecorMonitor : MonoBehaviour
             if (row.buyButton.gameObject != hitCollider.gameObject) continue;
 
             if (row.slot.IsBought) return "Already in your shop";
+            if (!row.slot.IsAvailable) return $"Buy {row.slot.RequiresName} first";
             return $"Buy [{key}]";
         }
 

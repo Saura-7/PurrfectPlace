@@ -11,6 +11,10 @@ public class DecorSlot : MonoBehaviour
     [SerializeField] private string itemName = "Cat Scratcher";
     [SerializeField] private int price = 100;
 
+    [Header("Optional")]
+    [SerializeField] private DecorSlot requires;   // must be bought first (e.g. the 5th cage needs the 4th)
+    [SerializeField] private Transform addsCage;   // for cage items: the cage point cats sit on once bought
+
     [Header("Visuals (gray box now, artists' model later)")]
     [SerializeField] private GameObject itemVisual;      // the bought item, hidden at the start
     [SerializeField] private GameObject forSaleMarker;   // optional floor marker shown until bought
@@ -19,6 +23,8 @@ public class DecorSlot : MonoBehaviour
     public string ItemName => itemName;
     public int Price => price;
     public bool IsBought { get; private set; }
+    public bool IsAvailable => requires == null || requires.IsBought;   // can it be bought yet?
+    public string RequiresName => requires != null ? requires.ItemName : "";
 
     private void Awake()
     {
@@ -29,6 +35,12 @@ public class DecorSlot : MonoBehaviour
     public bool TryBuy()
     {
         if (IsBought) return false;
+
+        if (!IsAvailable)
+        {
+            MessageUI.Notify($"Buy {requires.ItemName} first");
+            return false;
+        }
 
         int gp = CoreEconomySystem.Instance.GetGP("DecorSlot");
 
@@ -44,6 +56,9 @@ public class DecorSlot : MonoBehaviour
 
         IsBought = true;
         ShowBought(true);
+
+        // A cage item also becomes a real cage the shop can use
+        if (addsCage != null) CageManager.Instance.AddCage(addsCage);
         MessageUI.Notify($"Bought {itemName}! -{price} GP");
         return true;
     }

@@ -15,6 +15,7 @@ public class CustomerSpawner : MonoBehaviour
         public CustomerKind kind;
         [Min(0)] public float weight = 1f;       // how often this customer comes (bigger = more often)
         [Min(0)] public float emptyShopBonus;    // extra weight added when the shop has no cats at all
+        [Min(0)] public float weightPerCatShown; // extra weight for each cat waiting for adoption (more choice = more adopters)
         public bool needsCatToAdopt;             // only comes if a cat is waiting for adoption
     }
 
@@ -29,7 +30,7 @@ public class CustomerSpawner : MonoBehaviour
     [Header("Customer Pool")]
     public List<PoolEntry> pool = new List<PoolEntry>
     {
-        new PoolEntry { label = "Adopter (Taker)",       kind = CustomerKind.Taker, weight = 5f, needsCatToAdopt = true },
+        new PoolEntry { label = "Adopter (Taker)",       kind = CustomerKind.Taker, weight = 0f, weightPerCatShown = 2f, needsCatToAdopt = true },
         new PoolEntry { label = "Owner giving up a cat", kind = CustomerKind.Giver, weight = 4f },
         new PoolEntry { label = "Stray finder (free)",   kind = CustomerKind.Stray, weight = 0.5f, emptyShopBonus = 4f },
     };
@@ -54,28 +55,39 @@ public class CustomerSpawner : MonoBehaviour
             PoolEntry picked = PickFromPool();
             if (picked == null) continue;   // nobody can visit right now, try again next time
 
-            // 2. Turn the pool kind into the customer's type
-            CustomerAI.CustomerType type = picked.kind == CustomerKind.Taker
-                ? CustomerAI.CustomerType.Taker
-                : CustomerAI.CustomerType.Giver;   // a Stray finder is a Giver who asks for nothing
-            bool isStray = picked.kind == CustomerKind.Stray;
-
-            // 3. Spawn and initialize
-            GameObject newCustomer = Instantiate(customerPrefab, spawnPoint.position, spawnPoint.rotation);
-            CustomerAI ai = newCustomer.GetComponent<CustomerAI>();
-            ai.InitializeCustomer(type, isStray);
+            // 2. Spawn them
+            SpawnCustomer(picked.kind);
         }
+    }
+
+    // Sends one customer of this kind right now. Returns false if the queue is full.
+    // Used by the normal spawn loop and by the developer console ("customer giver").
+    public bool SpawnCustomer(CustomerKind kind)
+    {
+        if (CustomerQueueManager.Instance.IsQueueFull()) return false;
+
+        // Turn the pool kind into the customer's type
+        CustomerAI.CustomerType type = kind == CustomerKind.Taker
+            ? CustomerAI.CustomerType.Taker
+            : CustomerAI.CustomerType.Giver;   // a Stray finder is a Giver who asks for nothing
+        bool isStray = kind == CustomerKind.Stray;
+
+        // Spawn and initialize
+        GameObject newCustomer = Instantiate(customerPrefab, spawnPoint.position, spawnPoint.rotation);
+        CustomerAI ai = newCustomer.GetComponent<CustomerAI>();
+        ai.InitializeCustomer(type, isStray);
+        return true;
     }
 
     // Weighted random pick: a row with weight 4 is picked twice as often as a row with weight 2
     private PoolEntry PickFromPool()
     {
         bool shopEmpty = CageManager.Instance.CatCount == 0;
-        bool catToAdopt = CageManager.Instance.HasCatForAdoption();
+        int catsShown = CageManager.Instance.CatsForAdoption;
 
         // Add up the weights of everyone who is allowed to come right now
         float total = 0f;
-        foreach (PoolEntry entry in pool) total += WeightOf(entry, shopEmpty, catToAdopt);
+        foreach (PoolEntry entry in pool) total += WeightOf(entry, shopEmpty, catsShown);
         if (total <= 0f) return null;
 
         // Roll a number between 0 and the total, then walk the list until the roll lands in a row
@@ -84,7 +96,7 @@ public class CustomerSpawner : MonoBehaviour
 
         foreach (PoolEntry entry in pool)
         {
-            float w = WeightOf(entry, shopEmpty, catToAdopt);
+            float w = WeightOf(entry, shopEmpty, catsShown);
             if (w <= 0f) continue;
 
             lastValid = entry;
@@ -96,10 +108,13 @@ public class CustomerSpawner : MonoBehaviour
     }
 
     // This entry's chance right now (0 = cannot come)
-    private float WeightOf(PoolEntry entry, bool shopEmpty, bool catToAdopt)
+    // Example: a Taker with weight 0 and 2 per cat shown has weight 6 when 3 cats are waiting
+    private float WeightOf(PoolEntry entry, bool shopEmpty, int catsShown)
     {
-        if (entry.needsCatToAdopt && !catToAdopt) return 0f;
-        return entry.weight + (shopEmpty ? entry.emptyShopBonus : 0f);
+        if (entry.needsCatToAdopt && catsShown == 0) return 0f;
+        return entry.weight
+             + entry.weightPerCatShown * catsShown
+             + (shopEmpty ? entry.emptyShopBonus : 0f);
     }
 
     public void StopSpawning()

@@ -48,6 +48,7 @@ public class DayManager : MonoBehaviour
     public bool LastCallExpired { get; private set; }
 
     private int day = 1;
+    public int Day => day;   // read-only for other scripts (the developer console's "status")
     private float timeLeft;
     private int lastShownClock = -1;   // the clock time we last drew (in game minutes), so we only redraw when it changes
     private bool rentWarned;
@@ -364,6 +365,26 @@ public class DayManager : MonoBehaviour
         endPanel.SetActive(true);
 
         UpdateTimerText();
+    }
+
+    // ==========================================
+    // DEVELOPER CONSOLE HOOKS (only called by DevCommandsCore)
+    // ==========================================
+
+    // Skips the rest of the open day. The next Update sees no time left and enters last call.
+    public bool DevSkipToLastCall()
+    {
+        if (Phase != DayPhase.Open) return false;
+        timeLeft = 0f;
+        return true;
+    }
+
+    // Ends the day straight away, exactly as if the player had closed the shop
+    public bool DevEndDay()
+    {
+        if (Phase != DayPhase.Open && Phase != DayPhase.LastCall) return false;
+        EndDay();
+        return true;
     }
 
     // Hooked up to the Next day button. Starts the next day in PREP.
