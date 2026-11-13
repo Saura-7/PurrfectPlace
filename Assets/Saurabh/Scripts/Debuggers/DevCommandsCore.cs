@@ -45,6 +45,9 @@ public class DevCommandsCore : MonoBehaviour
             return $"GP set to {amount}";
         });
 
+        DevConsole.Add("ledger", "ledger · where today's GP came from and went, and who arrived", args =>
+            CoreEconomySystem.Instance.LedgerText());
+
         DevConsole.Add("rep", "rep <amount> · add reputation (negative removes, stops at 0)", args =>
         {
             if (!DevConsole.TryGetInt(args, 0, out int amount))

@@ -138,6 +138,9 @@ public class ReceptionDesk : MonoBehaviour
             int donation = ReputationLevels.Donation;
 
             CoreEconomySystem.Instance.ModifyGP(currentDealPrice + donation, systemName);
+            CoreEconomySystem.Tally($"Adopted · {CareRules.Name(CareRules.TierOf(care))}");
+            CoreEconomySystem.Tally("Adoption fees (GP)", currentDealPrice);
+            if (donation > 0) CoreEconomySystem.Tally("Donations (GP)", donation);
             AudioManager.Play(Sfx.CoinsIn);
             DayManager.RecordCatSold();
             currentInteractingCustomer.CompleteTakerTransactionAndLeave();
@@ -167,6 +170,8 @@ public class ReceptionDesk : MonoBehaviour
                     AudioManager.Play(Sfx.CoinsOut);
                 }
                 DayManager.RecordCatBought();
+                CoreEconomySystem.Tally(currentDealPrice > 0 ? "Bought from a Giver" : "Stray taken in");
+                if (currentDealPrice > 0) CoreEconomySystem.Tally("Paid to Givers (GP)", currentDealPrice);
                 BaseCat boughtCat = currentInteractingCustomer.AcceptGiverOfferAndLeave();
                 CageManager.Instance.OccupyCage(emptyCage, boughtCat);
 
@@ -216,6 +221,7 @@ public class ReceptionDesk : MonoBehaviour
     private void HandleReject(bool forcedByGame)
     {
         if (currentInteractingCustomer == null) return;
+        CoreEconomySystem.Tally(forcedByGame ? "Refused · couldn't" : "Refused · chose to");
 
         if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Taker)
         {

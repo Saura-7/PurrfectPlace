@@ -72,6 +72,8 @@ public class CustomerSpawner : MonoBehaviour
             : CustomerAI.CustomerType.Giver;   // a Stray finder is a Giver who asks for nothing
         bool isStray = kind == CustomerKind.Stray;
 
+        CoreEconomySystem.Tally($"Arrived · {kind}");
+
         // Spawn and initialize
         GameObject newCustomer = Instantiate(customerPrefab, spawnPoint.position, spawnPoint.rotation);
         CustomerAI ai = newCustomer.GetComponent<CustomerAI>();

@@ -393,6 +393,7 @@ public class DayManager : MonoBehaviour
         if (Phase != DayPhase.Summary) return;
 
         day++;
+        if (CoreEconomySystem.Instance != null) CoreEconomySystem.Instance.ResetLedger();   // a fresh ledger every day
 
         PauseMenu pauseMenu = FindFirstObjectByType<PauseMenu>();
         if (pauseMenu != null) pauseMenu.UnfreezeGame();
