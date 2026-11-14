@@ -148,11 +148,11 @@ public class ReceptionDesk : MonoBehaviour
 
             MessageUI.Notify(donation > 0
                 ? $"Adopted! +{currentDealPrice} GP and a +{donation} GP donation"
-                : $"Adopted! +{currentDealPrice} GP");
+                : $"Adopted! +{currentDealPrice} GP", ToastKind.Good);
 
             CareTier tier = CareRules.TierOf(care);
-            if (tier == CareTier.Purrfect) MessageUI.Notify("A purrfect adoption!");
-            else if (tier == CareTier.WellCared) MessageUI.Notify("A happy adoption!");
+            if (tier == CareTier.Purrfect) MessageUI.Notify("A purrfect adoption!", ToastKind.Heart);
+            else if (tier == CareTier.WellCared) MessageUI.Notify("A happy adoption!", ToastKind.Heart);
         }
         else if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Giver)
         {
@@ -176,11 +176,11 @@ public class ReceptionDesk : MonoBehaviour
                 CageManager.Instance.OccupyCage(emptyCage, boughtCat);
 
                 repGain = giverRescueRep;   // you gave a cat a safe place
-                MessageUI.Notify(currentDealPrice > 0 ? $"Deal accepted: -{currentDealPrice} GP" : "Stray taken in!");
+                MessageUI.Notify(currentDealPrice > 0 ? $"Deal accepted: -{currentDealPrice} GP" : "Stray taken in!", ToastKind.Good);
             }
             else
             {
-                MessageUI.Notify(emptyCage == null ? "No free cage!" : "Not enough GP!");
+                MessageUI.Notify(emptyCage == null ? "No free cage!" : "Not enough GP!", ToastKind.Bad);
                 HandleReject(true);
                 return;
             }
@@ -189,7 +189,7 @@ public class ReceptionDesk : MonoBehaviour
         if (repGain > 0)
         {
             CoreEconomySystem.Instance.ModifyReputation(repGain, systemName);
-            MessageUI.Notify($"+{repGain} reputation");
+            MessageUI.Notify($"+{repGain} reputation", ToastKind.Heart);
         }
 
         TutorialNote.Complete(TutorialStep.Serve);
@@ -243,12 +243,12 @@ public class ReceptionDesk : MonoBehaviour
         if (forcedByGame)
         {
             DayManager.RecordMissed();      // counted as "missed" in the day summary
-            MessageUI.Notify($"Deal missed: -{noDealRep} reputation");
+            MessageUI.Notify($"Deal missed: -{noDealRep} reputation", ToastKind.Bad);
         }
         else
         {
             DayManager.RecordDeclined();    // counted as "declined" in the day summary
-            MessageUI.Notify($"Deal declined: -{noDealRep} reputation");
+            MessageUI.Notify($"Deal declined: -{noDealRep} reputation", ToastKind.Bad);
         }
 
         AudioManager.Play(Sfx.PoliteNo);

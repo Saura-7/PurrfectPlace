@@ -214,7 +214,7 @@ public class DayManager : MonoBehaviour
         CustomerSpawner spawner = FindFirstObjectByType<CustomerSpawner>();
         if (spawner != null) spawner.StartSpawning();
 
-        MessageUI.Notify("The shop is open!");
+        MessageUI.Notify("The shop is open!", ToastKind.Good);
         TutorialNote.Complete(TutorialStep.OpenShop);
         AudioManager.Play(Sfx.ShopOpen);
         UpdateTimerText();
@@ -246,8 +246,8 @@ public class DayManager : MonoBehaviour
 
         CustomersInside = CountCustomers();
 
-        if (CustomersInside > 0) MessageUI.Notify("Closing time! Serve the last customers, then close the shop.");
-        else MessageUI.Notify("Closing time! Close the shop when you are ready.");
+        if (CustomersInside > 0) MessageUI.Notify("Closing time! Serve the last customers, then close the shop.", ToastKind.Warning);
+        else MessageUI.Notify("Closing time! Close the shop when you are ready.", ToastKind.Warning);
 
         UpdateTimerText();
     }
@@ -291,7 +291,7 @@ public class DayManager : MonoBehaviour
 
         if (CustomersInside > 0 && !LastCallExpired)
         {
-            MessageUI.Notify("Customers are still inside. Wait for them to finish.");
+            MessageUI.Notify("Customers are still inside. Wait for them to finish.", ToastKind.Warning);
             return;
         }
 
@@ -449,7 +449,7 @@ public class DayManager : MonoBehaviour
 
         string warning = $"Rent is due when you close the shop: {due} GP.";
         if (gp < due) warning += $" You have {gp} GP.";
-        MessageUI.Notify(warning);
+        MessageUI.Notify(warning, ToastKind.Warning);
     }
 
     // ==========================================

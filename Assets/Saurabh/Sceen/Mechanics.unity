@@ -176,6 +176,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 856f60964d04d9a45abc7f59e26b52c2, type: 3}
+--- !u!224 &51930164 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 5450143640666006405, guid: 41dbbb02421723a4eb885d8faed2b1a9, type: 3}
+  m_PrefabInstance: {fileID: 4960166248507395057}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &70104424
 GameObject:
   m_ObjectHideFlags: 0
@@ -5024,6 +5029,68 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1544518657}
   m_CullTransparentMesh: 1
+--- !u!1 &1560933032
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1560933033}
+  - component: {fileID: 1560933034}
+  m_Layer: 5
+  m_Name: Toasts
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1560933033
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1560933032}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 51930164}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 0, y: -40}
+  m_SizeDelta: {x: 800, y: 300}
+  m_Pivot: {x: 0.5, y: 1}
+--- !u!114 &1560933034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1560933032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.VerticalLayoutGroup
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 1
+  m_Spacing: 8
+  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandHeight: 0
+  m_ChildControlWidth: 1
+  m_ChildControlHeight: 1
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
 --- !u!114 &1570556370 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1366768779413998087, guid: 41dbbb02421723a4eb885d8faed2b1a9, type: 3}
@@ -9381,6 +9448,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2875146412704652715, guid: 41dbbb02421723a4eb885d8faed2b1a9, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3062323822650295910, guid: 41dbbb02421723a4eb885d8faed2b1a9, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -9607,20 +9678,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 5450143640666006405, guid: 41dbbb02421723a4eb885d8faed2b1a9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1560933033}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 41dbbb02421723a4eb885d8faed2b1a9, type: 3}
---- !u!114 &5080119337800813241 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7758228168203853115, guid: 41dbbb02421723a4eb885d8faed2b1a9, type: 3}
-  m_PrefabInstance: {fileID: 4960166248507395057}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1 &5214312357643714234
 GameObject:
   m_ObjectHideFlags: 0
@@ -9952,9 +10015,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd4a1379bfa3afa48b23d50635e7fd04, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MessageUI
-  messageText: {fileID: 5080119337800813241}
+  container: {fileID: 1560933033}
+  toastPrefab: {fileID: 3260265413444493291, guid: cfdb1bc3e12df384c9b726bd24be4e79, type: 3}
   showTime: 2.5
-  maxLines: 3
+  problemTimeMultiplier: 1.5
+  maxToasts: 3
+  infoColor: {r: 0.6039216, g: 0.5803922, b: 0.5411765, a: 1}
+  goodColor: {r: 0.24705882, g: 0.63529414, b: 0.54901963, a: 1}
+  warningColor: {r: 0.9137255, g: 0.63529414, b: 0.23137255, a: 1}
+  badColor: {r: 0.9098039, g: 0.3647059, b: 0.2901961, a: 1}
+  heartColor: {r: 0.9098039, g: 0.5137255, b: 0.6509804, a: 1}
 --- !u!1001 &5640051698657846135
 PrefabInstance:
   m_ObjectHideFlags: 0

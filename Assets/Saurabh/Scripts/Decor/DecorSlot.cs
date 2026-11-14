@@ -46,7 +46,7 @@ public class DecorSlot : MonoBehaviour
 
         if (gp < price)
         {
-            MessageUI.Notify($"Need {price} GP for {itemName}");
+            MessageUI.Notify($"Need {price} GP for {itemName}", ToastKind.Bad);
             return false;
         }
 
@@ -59,7 +59,7 @@ public class DecorSlot : MonoBehaviour
 
         // A cage item also becomes a real cage the shop can use
         if (addsCage != null) CageManager.Instance.AddCage(addsCage);
-        MessageUI.Notify($"Bought {itemName}! -{price} GP");
+        MessageUI.Notify($"Bought {itemName}! -{price} GP", ToastKind.Good);
         return true;
     }
 

@@ -172,7 +172,7 @@ public class TutorialNote : MonoBehaviour
     {
         finished = true;
         if (notePanel != null) notePanel.SetActive(false);
-        if (allDone) MessageUI.Notify("You're ready! Run your shop your way.");
+        if (allDone) MessageUI.Notify("You're ready! Run your shop your way.", ToastKind.Good);
     }
 
     private void Redraw()
