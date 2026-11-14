@@ -13,7 +13,7 @@ public class ReceptionDesk : MonoBehaviour
 
     [Header("UI References")]
     public GameObject dealUIPanel; 
-    public TMPro.TextMeshProUGUI dealText; 
+    [SerializeField] private DealScreen dealScreen;   // draws the deal on the monitor (header, big number, buttons)
 
     private InputSystem_Actions inputActions;
     private InputAction CompleteDealAction;
@@ -95,37 +95,35 @@ public class ReceptionDesk : MonoBehaviour
         {
             BaseCat cat = currentInteractingCustomer.heldCat;
 
-            // e.g. "Calico | Chonky | Lazy" in a slightly smaller size, then a new line
-            string traits = $"<size=80%>{cat.Pattern} | {cat.Body} | {cat.Behavior}</size>\n";
+            // Turn the panel on FIRST, so its text objects are active when we fill them in
+            dealUIPanel.SetActive(true);
 
             if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Taker)
             {
                 currentDealPrice = cat.CalculateFinalPrice();
                 int donation = ReputationLevels.Donation;
                 int rep = CareRules.ReputationFor(cat.TotalCare);
-                dealText.text = $"ADOPTION?\n{traits}{CareLine(cat)}Adoption fee: +{currentDealPrice} GP";
-                if (rep > 0) dealText.text += $"\nReputation: +{rep}";
-                if (donation > 0) dealText.text += $"\nDonation ({ReputationLevels.Name}): +{donation} GP";
-                dealUIPanel.SetActive(true);
+                dealScreen.ShowAdoption(cat, currentDealPrice, donation, rep, noDealRep);
             }
             else if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Giver)
             {
-                // What the cat is really worth, and what this Giver asks for it
-                int catValue = cat.CalculateFinalPrice();
+                // What the player has, so the screen can warn BEFORE they press Buy
+                int gp = CoreEconomySystem.Instance.GetGP(systemName);
+                int freeCages = CageManager.Instance.allCages.Count - CageManager.Instance.CatCount;
 
                 if (currentInteractingCustomer.IsStray)
                 {
                     // A stray finder asks for nothing
                     currentDealPrice = 0;
-                    dealText.text = $"TAKE IN A STRAY?\n{traits}{CareLine(cat)}Found outside\nCost: Free";
+                    dealScreen.ShowStray(cat, gp, freeCages, noDealRep);
                 }
                 else
                 {
+                    // What the cat is really worth, and what this Giver asks for it
+                    int catValue = cat.CalculateFinalPrice();
                     currentDealPrice = Mathf.Max(10, Mathf.RoundToInt(catValue * currentInteractingCustomer.AskFactor));
-                    dealText.text = $"BUY CAT?\n{traits}{CareLine(cat)}Worth about: {catValue} GP\nCost: -{currentDealPrice} GP";
+                    dealScreen.ShowPurchase(cat, currentDealPrice, catValue, gp, freeCages, noDealRep);
                 }
-
-                dealUIPanel.SetActive(true);
             }
 
             // Both kinds of customer set the cat down on the desk while you decide
@@ -225,12 +223,6 @@ public class ReceptionDesk : MonoBehaviour
     private int AdoptionReputation(int care)
     {
         return CareRules.ReputationFor(care);
-    }
-
-    // One line for the deal screen, e.g. "Feed 4/6 · Clean 4/6 · Well-cared"
-    private string CareLine(BaseCat cat)
-    {
-        return $"Feed {cat.feedingLevel}/{BaseCat.MaxLevel} · Clean {cat.cleanlinessLevel}/{BaseCat.MaxLevel} · {CareRules.ColoredName(CareRules.TierOf(cat.TotalCare))}\n";
     }
 
     // The Reject button on the deal monitor calls this. The player chose to say no.

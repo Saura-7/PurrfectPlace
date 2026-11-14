@@ -98,9 +98,14 @@ public class InteractionPromptUI : MonoBehaviour
         }
 
         // 2. Looking at an Accept / Reject button
-        if (hit.distance <= deskDistance && hit.collider.GetComponent<WorldSpaceUIButton>() != null)
+        WorldSpaceUIButton button = hit.collider.GetComponent<WorldSpaceUIButton>();
+        if (hit.distance <= deskDistance && button != null)
         {
-            return $"Choose [{InputPrompts.Get(PromptAction.Click)}]";
+            // Use the button's own label as the verb: "Approve [Click]", "Decline [Click]".
+            // The prompt then says exactly what the click will do, not just "Choose".
+            TMP_Text label = button.GetComponentInChildren<TMP_Text>();
+            string verb = label != null && label.text != "" ? TitleCase(label.text) : "Choose";
+            return $"{verb} [{InputPrompts.Get(PromptAction.Click)}]";
         }
 
         // 3. Looking at a customer (or the cat they are holding)
@@ -127,6 +132,13 @@ public class InteractionPromptUI : MonoBehaviour
         }
 
         return "";
+    }
+
+    // "TAKE IN" -> "Take in": button labels are in capitals, prompts are in sentence case
+    private static string TitleCase(string text)
+    {
+        string lower = text.ToLowerInvariant();
+        return char.ToUpperInvariant(lower[0]) + lower.Substring(1);
     }
 
     // " (-8 GP)" for the next level, or " (max)" when the stat is full.
