@@ -10,6 +10,9 @@ using UnityEngine;
 ///   Skittish → looks left and right, and flinches when the door chimes
 ///   Angry    → turns its back on you for a moment, or a grumpy shake
 ///
+/// It also NOTICES you when you come close: Playful faces you, Skittish shies away,
+/// Angry gives you a side-eye, and Lazy can't be bothered.
+///
 /// Put this on the cat prefab next to BaseCat and CatReaction.
 /// Movement (hop, shake) goes through CatReaction; this script only turns the cat,
 /// so the two never fight over the same values.
@@ -23,6 +26,12 @@ public class CatIdle : MonoBehaviour
     [SerializeField] private Vector2 skittishGap = new Vector2(7f, 14f);
     [SerializeField] private Vector2 angryGap    = new Vector2(8f, 16f);
 
+    [Header("Noticing the player")]
+    [SerializeField] private float noticeDistance = 3f;     // metres: closer than this and the cat reacts to you
+    [SerializeField] private float maxNoticeTurn = 60f;     // the most it will turn its head/body (degrees)
+    [SerializeField] private float noticeTurnSpeed = 4f;    // how quickly it turns (higher = snappier)
+    [SerializeField] private float modelFacingOffset = 0f;  // if the cat model's front isn't +Z, fix it here (degrees)
+
     [Header("Text pop-ups")]
     [SerializeField] private float textWithinDistance = 8f;   // only show "z z z" or "!" if the player is this close
 
@@ -30,6 +39,8 @@ public class CatIdle : MonoBehaviour
     private CatReaction reaction;
     private float nextIdleTime;
     private Coroutine turning;   // the turn currently playing, or null
+    private float noticeYaw;     // how far the cat is turned toward (or away from) the player right now
+    private float lastSide = 1f; // which side of the cat the player was last clearly on
 
     private void Awake()
     {
@@ -51,10 +62,60 @@ public class CatIdle : MonoBehaviour
 
     private void Update()
     {
+        UpdateNotice();
+
         if (Time.time < nextIdleTime) return;
 
         if (CanAct()) DoIdle();
         ScheduleNext();   // try again later either way
+    }
+
+    // ==========================================
+    // NOTICING THE PLAYER
+    // ==========================================
+
+    // Every frame: how should this cat turn because the player is near?
+    //   Playful  → faces you        Skittish → shies away
+    //   Angry    → side-eye         Lazy     → can't be bothered
+    private void UpdateNotice()
+    {
+        // While an idle turn plays, or the cat is with a customer, the turn script / customer is in charge
+        if (turning != null || cat.IsHeldByCustomer || transform.parent == null) { noticeYaw = 0f; return; }
+
+        float goal = 0f;   // 0 = facing its normal way (the front of the cage)
+        Camera cam = Camera.main;
+
+        if (cam != null && cat.Behavior != CatBehavior.Lazy)
+        {
+            Vector3 toPlayer = cam.transform.position - transform.position;
+            if (toPlayer.magnitude < noticeDistance)
+            {
+                // The player's direction in the CAGE's own space, flattened, as an angle from the cage's front.
+                // Atan2(x, z) = how many degrees to the side the player is (0 = straight ahead).
+                Vector3 local = transform.parent.InverseTransformDirection(toPlayer);
+                float playerAngle = Mathf.Atan2(local.x, local.z) * Mathf.Rad2Deg - modelFacingOffset;
+
+                // Which side you're on: +1 = to the cat's right, -1 = to its left.
+                // Only switch sides once you're clearly (10°+) on the other side. Without this, standing
+                // straight in front would flip the side every frame and the cat would jitter back and forth.
+                if (Mathf.Abs(playerAngle) > 10f) lastSide = playerAngle > 0f ? 1f : -1f;
+                float side = lastSide;
+
+                switch (cat.Behavior)
+                {
+                    case CatBehavior.Playful:  goal = playerAngle;                       break;   // looks right at you
+                    case CatBehavior.Skittish: goal = -side * 55f - playerAngle * 0.3f;  break;   // turns well away from you
+                    case CatBehavior.Angry:    goal = -side * 25f;                       break;   // a small "hmph" turn: side-eye
+                }
+                goal = Mathf.Clamp(goal, -maxNoticeTurn, maxNoticeTurn);
+            }
+        }
+
+        // Ease toward the goal. 1 - Exp(-speed × time) gives the same smoothness at any frame rate.
+        float blend = 1f - Mathf.Exp(-noticeTurnSpeed * Time.deltaTime);
+        noticeYaw = Mathf.Lerp(noticeYaw, goal, blend);
+
+        transform.localRotation = Quaternion.Euler(0f, noticeYaw, 0f);
     }
 
     // ==========================================
@@ -164,9 +225,11 @@ public class CatIdle : MonoBehaviour
             if (i == 0 && holdAtFirst > 0f) yield return new WaitForSeconds(holdAtFirst);
         }
 
-        // Always finish facing exactly the way it started (a 360° spin also ends here)
+        // Always finish facing exactly the way it started
         if (transform.parent == startParent) transform.localRotation = startRotation;
         turning = null;
+        // Carry on noticing from where the cat now faces, so there's no snap
+        noticeYaw = Mathf.DeltaAngle(0f, transform.localEulerAngles.y);
     }
 
     private void ShowText(string text)

@@ -85,7 +85,7 @@ public class CatReaction : MonoBehaviour
             return "Hiss!";
         }
 
-        Begin(GetProfile(), feedEffect);   // feedEffect = the pink hearts
+        BeginPoses(PetPoses(), feedEffect);   // each personality's own pet animation, with the pink hearts
 
         switch (cat.Behavior)
         {
@@ -106,8 +106,22 @@ public class CatReaction : MonoBehaviour
     // Shared start-up for both reactions
     private void Begin(Profile profile, GameObject effect)
     {
+        if (!Prepare(effect)) return;
+        running = StartCoroutine(ReactRoutine(profile));
+    }
+
+    // Start-up for a pet animation made of poses
+    private void BeginPoses(Pose[] poses, GameObject effect)
+    {
+        if (!Prepare(effect)) return;
+        running = StartCoroutine(PoseRoutine(poses));
+    }
+
+    // Everything a reaction needs before it starts. Returns false if the cat shouldn't react.
+    private bool Prepare(GameObject effect)
+    {
         // Don't wiggle a cat that a customer is carrying.
-        if (cat != null && cat.IsHeldByCustomer) return;
+        if (cat != null && cat.IsHeldByCustomer) return false;
 
         // If a reaction is already playing, put the cat back first.
         // This stops it drifting or growing when the player mashes the key.
@@ -124,7 +138,85 @@ public class CatReaction : MonoBehaviour
         baseWorldScale = transform.lossyScale;
 
         SpawnEffect(effect);
-        running = StartCoroutine(ReactRoutine(profile));
+        return true;
+    }
+
+    // ==========================================
+    // PET ANIMATIONS (each personality its own)
+    // ==========================================
+
+    // One pose in a pet animation: how high the cat is and its shape, reached over "duration", then held.
+    // stretch: +0.1 = 10% taller (and a little thinner), -0.2 = 20% flatter (and wider)
+    private struct Pose
+    {
+        public float hop, stretch, duration, hold;
+        public Pose(float hop, float stretch, float duration, float hold = 0f)
+        {
+            this.hop = hop; this.stretch = stretch; this.duration = duration; this.hold = hold;
+        }
+    }
+
+    private Pose[] PetPoses()
+    {
+        switch (cat.Behavior)
+        {
+            case CatBehavior.Lazy:      // melts into your hand: goes flat, stays there, slowly comes back
+                return new[] { new Pose(0f, -0.18f, 0.5f, 0.8f), new Pose(0f, 0f, 0.7f) };
+
+            case CatBehavior.Skittish:  // freezes small for a moment... then decides it likes it: a little hop
+                return new[] { new Pose(0f, -0.15f, 0.08f, 0.25f), new Pose(0.12f, 0.1f, 0.18f), new Pose(0f, 0f, 0.18f) };
+
+            case CatBehavior.Angry:     // goes stiff and tall, puts up with it, then relaxes
+                return new[] { new Pose(0f, 0.08f, 0.35f, 0.4f), new Pose(0f, 0f, 0.3f) };
+
+            default:                    // Playful: two happy bounces
+                return new[] { new Pose(0.12f, 0.12f, 0.14f), new Pose(0f, -0.08f, 0.12f),
+                               new Pose(0.08f, 0.08f, 0.12f), new Pose(0f, 0f, 0.14f) };
+        }
+    }
+
+    private IEnumerator PoseRoutine(Pose[] poses)
+    {
+        float fromHop = 0f, fromStretch = 0f;
+
+        foreach (Pose p in poses)
+        {
+            // Move from the last pose to this one
+            float t = 0f;
+            while (t < p.duration)
+            {
+                if (transform.parent != baseParent) { Restore(); running = null; yield break; }   // picked up mid-pet
+
+                t += Time.deltaTime;
+                float e = Juice.EaseOut(Mathf.Clamp01(t / p.duration));
+                ApplyPose(Mathf.Lerp(fromHop, p.hop, e), Mathf.Lerp(fromStretch, p.stretch, e));
+                yield return null;
+            }
+            ApplyPose(p.hop, p.stretch);
+            fromHop = p.hop;
+            fromStretch = p.stretch;
+
+            // Hold this pose (e.g. the lazy cat stays melted for a moment)
+            float held = 0f;
+            while (held < p.hold)
+            {
+                if (transform.parent != baseParent) { Restore(); running = null; yield break; }
+                held += Time.deltaTime;
+                yield return null;
+            }
+        }
+
+        Restore();
+        running = null;
+    }
+
+    private void ApplyPose(float hop, float stretch)
+    {
+        transform.localPosition = basePosition + new Vector3(0f, hop, 0f);
+        transform.localScale = new Vector3(
+            baseScale.x * (1f - stretch * 0.5f),
+            baseScale.y * (1f + stretch),
+            baseScale.z * (1f - stretch * 0.5f));
     }
 
     private Profile GetProfile()

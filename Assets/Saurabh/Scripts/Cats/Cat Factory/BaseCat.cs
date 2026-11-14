@@ -65,6 +65,35 @@ public class BaseCat : MonoBehaviour
     // Care and reactions check this, so you can't feed a cat that's being sold or bought.
     public bool IsHeldByCustomer => OnDesk || GetComponentInParent<CustomerAI>() != null;
 
+    // How this cat's meows and purrs sound. All cats share one clip; pitch and volume give each personality its voice.
+    public float VoicePitch
+    {
+        get
+        {
+            switch (currentBehavior)
+            {
+                case CatBehavior.Lazy:     return 0.85f;   // low and slow
+                case CatBehavior.Skittish: return 1.3f;    // high and quick
+                case CatBehavior.Angry:    return 0.95f;   // a little low, said firmly (louder)
+                default:                   return 1.1f;    // playful: bright
+            }
+        }
+    }
+
+    public float VoiceVolume
+    {
+        get
+        {
+            switch (currentBehavior)
+            {
+                case CatBehavior.Lazy:     return 0.75f;   // can barely be bothered
+                case CatBehavior.Skittish: return 0.8f;    // shy
+                case CatBehavior.Angry:    return 1.15f;   // loud about it
+                default:                   return 1f;
+            }
+        }
+    }
+
     // ==========================================
     // MOVING THE CAT (hand, desk, cage)
     // ==========================================

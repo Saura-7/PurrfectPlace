@@ -83,7 +83,7 @@ private void TryPetCat()
 
     string said = reaction.PlayPet();          // the cat reacts in its own way and tells us what it "said"
     cat.PlayInteractAnimation();               // its own voice clip
-    AudioManager.Play(Sfx.PurrClean);
+    AudioManager.Play(Sfx.PurrClean, cat.VoicePitch, cat.VoiceVolume);
     if (said == "") return;
     bool refused = said == "Hiss!";
     FloatingNumbers.Show(cat.CenterPosition, refused ? FloatingNumbers.Spend(said) : FloatingNumbers.Gain(said));
@@ -143,7 +143,7 @@ private void TryCareForCat(bool isFeeding)
 
         clickedCat.PlayInteractAnimation();
         if (clickedCat.TryGetComponent(out CatReaction reaction)) reaction.Play(isFeeding);
-        AudioManager.Play(isFeeding ? Sfx.MeowFeed : Sfx.PurrClean);
+        AudioManager.Play(isFeeding ? Sfx.MeowFeed : Sfx.PurrClean, clickedCat.VoicePitch, clickedCat.VoiceVolume);
         TutorialNote.Complete(isFeeding ? TutorialStep.Feed : TutorialStep.Clean);
     }
     else

@@ -99,18 +99,24 @@ public class AudioManager : MonoBehaviour
     // It fires even if no clip is set yet, so behaviour doesn't depend on audio being finished.
     public static event System.Action<Sfx> OnSoundPlayed;
 
-    public static void Play(Sfx sound)
+    public static void Play(Sfx sound) => Play(sound, 1f, 1f);
+
+    /// <summary>
+    /// Same as Play, but higher/lower and louder/quieter. Used for cat voices:
+    /// one meow clip, and each personality sounds different (pitch 1.3 = higher, 0.85 = lower).
+    /// </summary>
+    public static void Play(Sfx sound, float pitch, float volume)
     {
         OnSoundPlayed?.Invoke(sound);
         if (instance == null) return;
-        instance.PlayInternal(sound);
+        instance.PlayInternal(sound, pitch, volume);
     }
 
     // ==========================================
     // INSIDE THE MANAGER
     // ==========================================
 
-    private void PlayInternal(Sfx sound)
+    private void PlayInternal(Sfx sound, float pitchScale, float volumeScale)
     {
         // No row for this sound, or no clip assigned yet: do nothing instead of breaking
         if (!lookup.TryGetValue(sound, out SfxEntry entry) || entry.clip == null) return;
@@ -120,10 +126,11 @@ public class AudioManager : MonoBehaviour
         nextVoice = (nextVoice + 1) % voices.Length;
 
         voice.clip = entry.clip;
-        voice.volume = sfxVolume * entry.volume;
-        voice.pitch = entry.randomPitch
+        voice.volume = sfxVolume * entry.volume * volumeScale;
+        float pitch = entry.randomPitch
             ? 1f + UnityEngine.Random.Range(-pitchVariation, pitchVariation)
             : 1f;
+        voice.pitch = pitch * pitchScale;   // the small random wobble, then the cat's own voice on top
         voice.Play();
     }
 }
