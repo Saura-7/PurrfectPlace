@@ -14,6 +14,12 @@ public class CustomerAI : MonoBehaviour
     [Header("References")]
     public Transform handHoldPoint; 
     public BaseCat heldCat;
+
+    [Header("Talking")]
+    // A collider around the customer's body, so the player can look at them and click.
+    // It is only switched ON while they wait at the desk. Walking customers never block your
+    // view of a cat, and the player can only "talk" to someone who is ready for a deal.
+    [SerializeField] private Collider talkCollider;
     
     private NavMeshAgent agent;
     private Transform exitDoor;
@@ -39,6 +45,7 @@ public class CustomerAI : MonoBehaviour
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
+        if (talkCollider != null) talkCollider.enabled = false;   // nobody is at the desk yet
         agent.avoidancePriority = Random.Range(40, 60);
         
         GameObject exitObj = GameObject.Find("ExitDoorTarget");
@@ -142,6 +149,9 @@ public class CustomerAI : MonoBehaviour
         }
 
         currentState = newState;
+
+        // Clickable only while waiting at the desk (see talkCollider above)
+        if (talkCollider != null) talkCollider.enabled = currentState == CustomerState.WaitingAtRegister;
         // Debug.Log($"[SOA {systemName}] {gameObject.name} state changed to: {currentState}");
         SOALogger.LogState("CustomerAI", SOALogger.Colors.Customer, "STATE_CHANGE", $"{gameObject.name} state changed to {currentState}");
 
@@ -203,9 +213,7 @@ public class CustomerAI : MonoBehaviour
             if (catInCage != null)
             {
                 heldCat = catInCage;
-                heldCat.transform.SetParent(handHoldPoint);
-                heldCat.transform.localPosition = Vector3.zero;
-                heldCat.transform.localRotation = Quaternion.identity;
+                heldCat.MoveTo(handHoldPoint, standOnSurface: false);   // in the hands: no floor to stand on
 
                 // Debug.Log($"[SOA {systemName}] Taker picked up cat '{heldCat.name}' from cage '{targetCage.name}'.");
 
@@ -220,8 +228,35 @@ public class CustomerAI : MonoBehaviour
         ChangeState(CustomerState.Leaving);
     }
 
+    // ==========================================
+    // THE CAT ON THE DESK DURING A DEAL
+    // ==========================================
+
+    // The deal opened: the customer sets the cat down on the desk so the player can look at it
+    public void PutCatOnDesk(Transform spot)
+    {
+        if (heldCat == null || spot == null) return;
+        PlaceCat(spot, true);   // feet on the desk
+        heldCat.OnDesk = true;
+    }
+
+    // The customer picks the cat back up (adopted, or a Giver who was turned down)
+    public void TakeCatBack()
+    {
+        if (heldCat == null || !heldCat.OnDesk) return;
+        heldCat.OnDesk = false;
+        PlaceCat(handHoldPoint, false);   // back in the hands
+    }
+
+    // Moves the cat into a new parent and snaps it to that spot
+    private void PlaceCat(Transform parent, bool standOnSurface)
+    {
+        heldCat.MoveTo(parent, standOnSurface);   // MoveTo also keeps the cat its normal size (see BaseCat)
+    }
+
     public BaseCat CompleteTakerTransactionAndLeave()
     {
+        TakeCatBack();   // the adopter picks the cat up from the desk and leaves with it
         BaseCat soldCat = heldCat;
         // Debug.Log($"[SOA {systemName}] Taker transaction complete. Leaving with cat '{soldCat?.name}'.");
         ChangeState(CustomerState.Leaving);
@@ -233,6 +268,7 @@ public class CustomerAI : MonoBehaviour
         BaseCat returnedCat = heldCat;
         if (returnedCat != null)
         {
+            returnedCat.OnDesk = false;   // the shop keeps it: it goes back to its cage
             returnedCat.transform.SetParent(null);
         }
         heldCat = null;
@@ -243,6 +279,7 @@ public class CustomerAI : MonoBehaviour
 
     public void RejectGiverOfferAndLeave()
     {
+        TakeCatBack();   // the Giver takes their cat back home
         // Debug.Log($"[SOA {systemName}] Giver deal rejected. Leaving store with cat.");
         ChangeState(CustomerState.Leaving);
     }
@@ -252,6 +289,7 @@ public class CustomerAI : MonoBehaviour
         BaseCat boughtCat = heldCat;
         if (boughtCat != null)
         {
+            boughtCat.OnDesk = false;   // now it's the shop's cat: it goes into a cage
             boughtCat.transform.SetParent(null);
         }
         heldCat = null;
@@ -262,6 +300,10 @@ public class CustomerAI : MonoBehaviour
 
     public void DismissForNewDay()
     {
+        // A cat left on the desk goes back into the customer's hands first,
+        // so it isn't left behind when this customer is removed
+        TakeCatBack();
+
         if (myType == CustomerType.Taker)
         {
             bool waitingWithCat = heldCat != null &&

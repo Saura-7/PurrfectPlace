@@ -4610,6 +4610,37 @@ Mesh:
       - serializedVersion: 1
         m_IndexStart: 0
         m_IndexCount: 0
+--- !u!1 &1333090615
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1333090616}
+  m_Layer: 0
+  m_Name: DeskCatSpot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1333090616
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1333090615}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.500001, z: -0, w: -0.86602485}
+  m_LocalPosition: {x: 11.520006, y: 2.95, z: -6.9200077}
+  m_LocalScale: {x: 5.5551095, y: 2.4054, z: 2.774119}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -120, z: 0}
 --- !u!114 &1357385136 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6648498565523766857, guid: cddda915ad405d842a1a1530a332b59d, type: 3}
@@ -11580,6 +11611,10 @@ PrefabInstance:
       propertyPath: dealUIPanel
       value: 
       objectReference: {fileID: 222404069}
+    - target: {fileID: 6648498565523766857, guid: cddda915ad405d842a1a1530a332b59d, type: 3}
+      propertyPath: deskCatSpot
+      value: 
+      objectReference: {fileID: 1333090616}
     - target: {fileID: 6761412711290637728, guid: cddda915ad405d842a1a1530a332b59d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 11.52001
@@ -12664,6 +12699,7 @@ CanvasRenderer:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 1333090616}
   - {fileID: 136945371}
   - {fileID: 298195927}
   - {fileID: 7534986720296729798}

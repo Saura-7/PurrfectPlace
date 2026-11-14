@@ -65,7 +65,7 @@ private void TryCareForCat(bool isFeeding)
 
         if (clickedCat.IsHeldByCustomer)
         {
-            MessageUI.Notify("The customer is holding this cat.");
+            MessageUI.Notify("This cat is with a customer.");
             return;
         }
 

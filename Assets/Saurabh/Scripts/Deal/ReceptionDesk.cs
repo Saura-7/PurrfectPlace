@@ -8,6 +8,9 @@ public class ReceptionDesk : MonoBehaviour
     [Header("Interaction Settings")]
     public float maxInteractionDistance = 10f;
 
+    [Header("Cat on the desk")]
+    [SerializeField] private Transform deskCatSpot;   // where the customer puts the cat during a deal
+
     [Header("UI References")]
     public GameObject dealUIPanel; 
     public TMPro.TextMeshProUGUI dealText; 
@@ -66,7 +69,16 @@ public class ReceptionDesk : MonoBehaviour
                 return;
             }
 
-            // 2. The desk itself: serve the customer
+            // 2. A customer: talking to the one at the front of the line starts the deal.
+            //    GetComponentInParent also finds the customer when you click the cat they're holding.
+            CustomerAI customer = hit.collider.GetComponentInParent<CustomerAI>();
+            if (customer != null)
+            {
+                if (customer == CustomerQueueManager.Instance.GetCurrentCustomerAtDesk()) ProcessTransaction();
+                return;   // someone further back in the line: nothing happens yet
+            }
+
+            // 3. The desk itself still works too: serve the customer
             if (hit.collider.gameObject == gameObject || hit.collider.GetComponentInParent<ReceptionDesk>() != null)
             {
                 ProcessTransaction();
@@ -114,6 +126,9 @@ public class ReceptionDesk : MonoBehaviour
 
                 dealUIPanel.SetActive(true);
             }
+
+            // Both kinds of customer set the cat down on the desk while you decide
+            currentInteractingCustomer.PutCatOnDesk(deskCatSpot);
         }
         else
         {
@@ -261,6 +276,7 @@ public class ReceptionDesk : MonoBehaviour
 
     public void CancelCurrentDeal()
     {
+        if (currentInteractingCustomer != null) currentInteractingCustomer.TakeCatBack();
         currentInteractingCustomer = null;
         if (dealUIPanel != null) dealUIPanel.SetActive(false);
     }

@@ -77,9 +77,7 @@ public class CageManager : MonoBehaviour
         {
             occupiedCages.Add(cage, cat);
             
-            cat.transform.SetParent(cage);
-            cat.transform.localPosition = Vector3.zero;
-            cat.transform.localRotation = Quaternion.identity;
+            cat.MoveTo(cage);   // into the cage at its normal size
 
             // Debug.Log($"[SOA {systemName}] Cage '{cage.name}' occupied by cat '{cat.name}'. Occupied: {occupiedCages.Count}/{allCages.Count}");
             SOALogger.LogState("CageManager", SOALogger.Colors.Cage, "OCCUPY", $"Cage '{cage.name}' assigned to cat '{cat.name}'. Total Occupied: {occupiedCages.Count}/{allCages.Count}");
@@ -138,8 +136,6 @@ public class CageManager : MonoBehaviour
         occupiedCages[cage] = cat;
         reservedCages.Remove(cage); // the cat is back on the shelf and can be bought again
 
-        cat.transform.SetParent(cage);
-        cat.transform.localPosition = Vector3.zero;
-        cat.transform.localRotation = Quaternion.identity;
+        cat.MoveTo(cage);
     }
 }

@@ -58,6 +58,13 @@ public class InteractionPromptUI : MonoBehaviour
 
         // 1. Looking at a cat
         BaseCat cat = hit.collider.GetComponent<BaseCat>();
+
+        // A cat on the desk in a deal: show its tag so you can inspect it, but no care prompt
+        if (cat != null && cat.OnDesk && hit.distance <= deskDistance)
+        {
+            lookedAtCat = cat;
+            return $"Accept or Reject on the screen [{InputPrompts.Get(PromptAction.Click)}]";
+        }
         if (cat != null && hit.distance <= catDistance && !cat.IsHeldByCustomer)
         {
             lookedAtCat = cat;   // the floating tag shows this cat's traits and worth
@@ -91,7 +98,19 @@ public class InteractionPromptUI : MonoBehaviour
             return $"Choose [{InputPrompts.Get(PromptAction.Click)}]";
         }
 
-        // 3. Looking at the reception desk
+        // 3. Looking at a customer (or the cat they are holding)
+        CustomerAI customer = hit.collider.GetComponentInParent<CustomerAI>();
+        if (customer != null && hit.distance <= deskDistance)
+        {
+            bool atFront = CustomerQueueManager.Instance != null
+                           && CustomerQueueManager.Instance.GetCurrentCustomerAtDesk() == customer;
+
+            return atFront
+                ? $"Talk [{InputPrompts.Get(PromptAction.CompleteDeal)}]"
+                : "Waiting in line";
+        }
+
+        // 4. Looking at the reception desk
         if (hit.distance <= deskDistance && hit.collider.GetComponentInParent<ReceptionDesk>() != null)
         {
             bool customerWaiting = CustomerQueueManager.Instance != null
