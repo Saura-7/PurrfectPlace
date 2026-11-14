@@ -78,8 +78,10 @@ public class InteractionPromptUI : MonoBehaviour
             string clean = InputPrompts.Get(PromptAction.Clean);
 
             // The screen prompt shows what you can DO: key, level, and the price of the next level
+            string pet = InputPrompts.Get(PromptAction.Pet);
             return $"Feed [{feed}] {cat.feedingLevel}/{BaseCat.MaxLevel}{CostText(cat, true)}     " +
-                   $"Clean [{clean}] {cat.cleanlinessLevel}/{BaseCat.MaxLevel}{CostText(cat, false)}";
+                   $"Clean [{clean}] {cat.cleanlinessLevel}/{BaseCat.MaxLevel}{CostText(cat, false)}     " +
+                   $"Pet [{pet}]";
         }
 
         OpenSign sign = hit.collider.GetComponentInParent<OpenSign>();

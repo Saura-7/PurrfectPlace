@@ -51,6 +51,51 @@ public class CatReaction : MonoBehaviour
         Begin(GetProfile(), isFeeding ? feedEffect : cleanEffect);
     }
 
+    // True while a hop, shake or pet reaction is moving the cat (CatIdle waits for it to finish)
+    public bool IsPlaying => running != null;
+
+    /// <summary>A small hop with no particles, for idle life (half the personality's normal hop).</summary>
+    public void PlayIdleHop()
+    {
+        Profile p = GetProfile();
+        Begin(new Profile { hopHeight = p.hopHeight * 0.5f, duration = p.duration, squash = p.squash * 0.5f }, null);
+    }
+
+    /// <summary>A quick startled shake, for a skittish cat hearing the door.</summary>
+    public void PlayFlinch()
+    {
+        Begin(new Profile { hopHeight = 0.08f, duration = 0.25f, squash = 0.1f, shake = 0.04f, shakeCount = 2 }, null);
+    }
+
+    [Header("Petting")]
+    [SerializeField, Range(0f, 1f)] private float angryRefuseChance = 0.4f;   // grumpy cats don't always want it
+
+    /// <summary>
+    /// Pet the cat. Returns what the cat "says", shown as a small pop-up.
+    /// Each personality reacts its own way: that's the point of petting.
+    /// </summary>
+    public string PlayPet()
+    {
+        if (cat == null || cat.IsHeldByCustomer) return "";
+
+        // An angry cat sometimes says no: a shake instead of a happy hop
+        if (cat.Behavior == CatBehavior.Angry && Random.value < angryRefuseChance)
+        {
+            Begin(denied, null);
+            return "Hiss!";
+        }
+
+        Begin(GetProfile(), feedEffect);   // feedEffect = the pink hearts
+
+        switch (cat.Behavior)
+        {
+            case CatBehavior.Lazy:     return "...purr";
+            case CatBehavior.Angry:    return "Hmph. Fine.";
+            case CatBehavior.Skittish: return "Eep! ...purr";
+            default:                   return "Purr!";
+        }
+    }
+
     // Called by CareSubsystem when care is refused (not enough GP, or the stat is already full):
     // a side-to-side shake, no hop and no hearts.
     public void PlayDenied()

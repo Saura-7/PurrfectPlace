@@ -111,15 +111,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""MoneyIncrease"",
-                    ""type"": ""Button"",
-                    ""id"": ""852140f2-7766-474d-8707-702459ba45f3"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": ""Hold"",
-                    ""initialStateCheck"": false
-                },
-                {
                     ""name"": ""Jump"",
                     ""type"": ""Button"",
                     ""id"": ""f1ba0d36-48eb-4cd5-b651-1c94a6531f70"",
@@ -132,24 +123,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""name"": ""Sprint"",
                     ""type"": ""Button"",
                     ""id"": ""641cd816-40e6-41b4-8c3d-04687c349290"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""RepIncrease"",
-                    ""type"": ""Button"",
-                    ""id"": ""d3075d99-624a-4ea3-a6de-5f8ac0633eda"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""SpawnCat"",
-                    ""type"": ""Button"",
-                    ""id"": ""3ab99c4e-7844-48c4-a370-6aaed4663b7a"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -186,6 +159,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""name"": ""Pause"",
                     ""type"": ""Button"",
                     ""id"": ""4e81f9f6-e6a2-4ec8-99ef-d540e318eab5"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PetCat"",
+                    ""type"": ""Button"",
+                    ""id"": ""77734713-a7c5-483d-b58a-cf9d220bb6bc"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -393,72 +375,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""41a5168b-346a-4b10-bcb4-bc0087f47a61"",
-                    ""path"": ""<Keyboard>/f2"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""RepIncrease"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""4f692b7c-3682-421b-bb65-d58328db2bfc"",
-                    ""path"": ""<Gamepad>/buttonWest"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Gamepad"",
-                    ""action"": ""RepIncrease"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""008a2317-5bc0-4a68-ae3b-40534f81d7a6"",
-                    ""path"": ""<XRController>/trigger"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""XR"",
-                    ""action"": ""RepIncrease"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""dee3b2dd-4506-48c7-8abe-55be1b0b9f0e"",
-                    ""path"": ""<Keyboard>/f3"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""SpawnCat"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""f537f36d-e3dc-4027-a579-5e87ac07f17f"",
-                    ""path"": ""<Gamepad>/buttonEast"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Gamepad"",
-                    ""action"": ""SpawnCat"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""853b58e8-b85d-43e2-be80-61670ef72cec"",
-                    ""path"": ""<XRController>/trigger"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""XR"",
-                    ""action"": ""SpawnCat"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""226eb17b-fcb4-4dac-9cdb-143d35bcc7fb"",
                     ""path"": ""<Keyboard>/q"",
                     ""interactions"": """",
@@ -657,23 +573,23 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""1c04ea5f-b012-41d1-a6f7-02e963b52893"",
-                    ""path"": ""<Keyboard>/f1"",
+                    ""id"": ""3f11957a-b82b-42f7-9326-a24ca1c3d719"",
+                    ""path"": ""<Keyboard>/r"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""MoneyIncrease"",
+                    ""groups"": """",
+                    ""action"": ""PetCat"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""b3f66d0b-7751-423f-908b-a11c5bd95930"",
+                    ""id"": ""295688d5-64b5-49e2-b46a-ec46d831d7ed"",
                     ""path"": ""<Gamepad>/buttonNorth"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""Gamepad"",
-                    ""action"": ""MoneyIncrease"",
+                    ""groups"": """",
+                    ""action"": ""PetCat"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1263,15 +1179,13 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
         m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
-        m_Player_MoneyIncrease = m_Player.FindAction("MoneyIncrease", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
-        m_Player_RepIncrease = m_Player.FindAction("RepIncrease", throwIfNotFound: true);
-        m_Player_SpawnCat = m_Player.FindAction("SpawnCat", throwIfNotFound: true);
         m_Player_FeedCat = m_Player.FindAction("FeedCat", throwIfNotFound: true);
         m_Player_CleanCat = m_Player.FindAction("CleanCat", throwIfNotFound: true);
         m_Player_CompleteDeal = m_Player.FindAction("CompleteDeal", throwIfNotFound: true);
         m_Player_Pause = m_Player.FindAction("Pause", throwIfNotFound: true);
+        m_Player_PetCat = m_Player.FindAction("PetCat", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1367,15 +1281,13 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private List<IPlayerActions> m_PlayerActionsCallbackInterfaces = new List<IPlayerActions>();
     private readonly InputAction m_Player_Move;
     private readonly InputAction m_Player_Look;
-    private readonly InputAction m_Player_MoneyIncrease;
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Sprint;
-    private readonly InputAction m_Player_RepIncrease;
-    private readonly InputAction m_Player_SpawnCat;
     private readonly InputAction m_Player_FeedCat;
     private readonly InputAction m_Player_CleanCat;
     private readonly InputAction m_Player_CompleteDeal;
     private readonly InputAction m_Player_Pause;
+    private readonly InputAction m_Player_PetCat;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1396,10 +1308,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Look => m_Wrapper.m_Player_Look;
         /// <summary>
-        /// Provides access to the underlying input action "Player/MoneyIncrease".
-        /// </summary>
-        public InputAction @MoneyIncrease => m_Wrapper.m_Player_MoneyIncrease;
-        /// <summary>
         /// Provides access to the underlying input action "Player/Jump".
         /// </summary>
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
@@ -1407,14 +1315,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Sprint".
         /// </summary>
         public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
-        /// <summary>
-        /// Provides access to the underlying input action "Player/RepIncrease".
-        /// </summary>
-        public InputAction @RepIncrease => m_Wrapper.m_Player_RepIncrease;
-        /// <summary>
-        /// Provides access to the underlying input action "Player/SpawnCat".
-        /// </summary>
-        public InputAction @SpawnCat => m_Wrapper.m_Player_SpawnCat;
         /// <summary>
         /// Provides access to the underlying input action "Player/FeedCat".
         /// </summary>
@@ -1431,6 +1331,10 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Pause".
         /// </summary>
         public InputAction @Pause => m_Wrapper.m_Player_Pause;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/PetCat".
+        /// </summary>
+        public InputAction @PetCat => m_Wrapper.m_Player_PetCat;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1463,21 +1367,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Look.started += instance.OnLook;
             @Look.performed += instance.OnLook;
             @Look.canceled += instance.OnLook;
-            @MoneyIncrease.started += instance.OnMoneyIncrease;
-            @MoneyIncrease.performed += instance.OnMoneyIncrease;
-            @MoneyIncrease.canceled += instance.OnMoneyIncrease;
             @Jump.started += instance.OnJump;
             @Jump.performed += instance.OnJump;
             @Jump.canceled += instance.OnJump;
             @Sprint.started += instance.OnSprint;
             @Sprint.performed += instance.OnSprint;
             @Sprint.canceled += instance.OnSprint;
-            @RepIncrease.started += instance.OnRepIncrease;
-            @RepIncrease.performed += instance.OnRepIncrease;
-            @RepIncrease.canceled += instance.OnRepIncrease;
-            @SpawnCat.started += instance.OnSpawnCat;
-            @SpawnCat.performed += instance.OnSpawnCat;
-            @SpawnCat.canceled += instance.OnSpawnCat;
             @FeedCat.started += instance.OnFeedCat;
             @FeedCat.performed += instance.OnFeedCat;
             @FeedCat.canceled += instance.OnFeedCat;
@@ -1490,6 +1385,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Pause.started += instance.OnPause;
             @Pause.performed += instance.OnPause;
             @Pause.canceled += instance.OnPause;
+            @PetCat.started += instance.OnPetCat;
+            @PetCat.performed += instance.OnPetCat;
+            @PetCat.canceled += instance.OnPetCat;
         }
 
         /// <summary>
@@ -1507,21 +1405,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Look.started -= instance.OnLook;
             @Look.performed -= instance.OnLook;
             @Look.canceled -= instance.OnLook;
-            @MoneyIncrease.started -= instance.OnMoneyIncrease;
-            @MoneyIncrease.performed -= instance.OnMoneyIncrease;
-            @MoneyIncrease.canceled -= instance.OnMoneyIncrease;
             @Jump.started -= instance.OnJump;
             @Jump.performed -= instance.OnJump;
             @Jump.canceled -= instance.OnJump;
             @Sprint.started -= instance.OnSprint;
             @Sprint.performed -= instance.OnSprint;
             @Sprint.canceled -= instance.OnSprint;
-            @RepIncrease.started -= instance.OnRepIncrease;
-            @RepIncrease.performed -= instance.OnRepIncrease;
-            @RepIncrease.canceled -= instance.OnRepIncrease;
-            @SpawnCat.started -= instance.OnSpawnCat;
-            @SpawnCat.performed -= instance.OnSpawnCat;
-            @SpawnCat.canceled -= instance.OnSpawnCat;
             @FeedCat.started -= instance.OnFeedCat;
             @FeedCat.performed -= instance.OnFeedCat;
             @FeedCat.canceled -= instance.OnFeedCat;
@@ -1534,6 +1423,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Pause.started -= instance.OnPause;
             @Pause.performed -= instance.OnPause;
             @Pause.canceled -= instance.OnPause;
+            @PetCat.started -= instance.OnPetCat;
+            @PetCat.performed -= instance.OnPetCat;
+            @PetCat.canceled -= instance.OnPetCat;
         }
 
         /// <summary>
@@ -1849,13 +1741,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnLook(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "MoneyIncrease" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnMoneyIncrease(InputAction.CallbackContext context);
-        /// <summary>
         /// Method invoked when associated input action "Jump" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
@@ -1869,20 +1754,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnSprint(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "RepIncrease" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnRepIncrease(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "SpawnCat" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnSpawnCat(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "FeedCat" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
@@ -1911,6 +1782,13 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnPause(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "PetCat" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnPetCat(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

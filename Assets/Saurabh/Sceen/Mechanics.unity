@@ -12616,6 +12616,9 @@ MonoBehaviour:
   - action: 3
     keyboardText: Click
     gamepadText: RT
+  - action: 4
+    keyboardText: R
+    gamepadText: Y
 --- !u!1 &971389962077531785
 GameObject:
   m_ObjectHideFlags: 0
@@ -16491,6 +16494,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   maxInteractionDistance: 5
+  petCooldown: 0.6
 --- !u!224 &4714593308498865979
 RectTransform:
   m_ObjectHideFlags: 0

@@ -57,11 +57,24 @@ public class CatInfoTag : MonoBehaviour
         int nextTierAt = CareRules.NextTierAt(care);
 
         string text = $"<size=75%>{cat.Pattern} | {cat.Body} | {cat.Behavior}</size>\n";
+        text += $"<size=70%><i>{PersonalityLine(cat.Behavior)}</i></size>\n";
         text += $"<b>{CareRules.ColoredName(CareRules.TierOf(care))}</b>";
         if (nextTierAt > 0)
             text += $"<size=75%>  next: {CareRules.Name(CareRules.TierOf(nextTierAt))} at {nextTierAt} total</size>";
         text += $"\nWorth {cat.CalculateFinalPrice()} GP <size=75%>(+{CareRules.ValuePerPoint} per care)</size>";
         return text;
+    }
+
+    // One short line that turns a trait name into a little character
+    private static string PersonalityLine(CatBehavior behavior)
+    {
+        switch (behavior)
+        {
+            case CatBehavior.Lazy:     return "Would nap all day if you let it";
+            case CatBehavior.Angry:    return "Grumpy, but secretly sweet";
+            case CatBehavior.Skittish: return "Startles at every little sound";
+            default:                   return "Chases anything that moves";
+        }
     }
 
     public void Hide()

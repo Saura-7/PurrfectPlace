@@ -95,8 +95,13 @@ public class AudioManager : MonoBehaviour
     // CALLED BY OTHER SCRIPTS
     // ==========================================
 
+    // Anything can listen for sounds, e.g. skittish cats flinch at the door chime.
+    // It fires even if no clip is set yet, so behaviour doesn't depend on audio being finished.
+    public static event System.Action<Sfx> OnSoundPlayed;
+
     public static void Play(Sfx sound)
     {
+        OnSoundPlayed?.Invoke(sound);
         if (instance == null) return;
         instance.PlayInternal(sound);
     }

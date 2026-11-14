@@ -12,6 +12,11 @@ public class CareSubsystem : MonoBehaviour
     private InputSystem_Actions inputActions;
     private InputAction LeftShoulder;
     private InputAction RightShoulder;
+    private InputAction petAction;
+
+    [Header("Petting")]
+    [SerializeField] private float petCooldown = 0.6f;   // seconds between pets, so mashing R doesn't spam hearts
+    private float nextPetTime;
     // private InputAction interact1Action;
 
     void OnEnable()
@@ -19,8 +24,19 @@ public class CareSubsystem : MonoBehaviour
         inputActions = new InputSystem_Actions();
         RightShoulder = inputActions.Player.FeedCat;
         LeftShoulder = inputActions.Player.CleanCat;
+        petAction = inputActions.Player.PetCat;
         // interact1Action = inputActions.Player.Interact1;
         inputActions.Enable();
+    }
+
+    // Every "new InputSystem_Actions()" must be turned off and thrown away when we're done,
+    // or Unity warns "InputSystem_Actions...Disable() has not been called" (a small leak) when Play stops.
+    void OnDisable()
+    {
+        if (inputActions == null) return;
+        inputActions.Disable();
+        inputActions.Dispose();
+        inputActions = null;
     }
 
  private void Update()
@@ -45,6 +61,32 @@ public class CareSubsystem : MonoBehaviour
     {
         TryCareForCat(isFeeding: true); 
     }
+    else if (petAction.WasPressedThisFrame())
+    {
+        TryPetCat();
+    }
+}
+
+// Petting is free and changes no numbers: it's there so cats feel like characters, not stock
+private void TryPetCat()
+{
+    if (Camera.main == null || Time.time < nextPetTime) return;
+
+    Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
+    if (!Physics.Raycast(ray, out RaycastHit hit, maxInteractionDistance)) return;
+
+    BaseCat cat = hit.collider.GetComponent<BaseCat>();
+    if (cat == null || cat.IsHeldByCustomer) return;
+    if (!cat.TryGetComponent(out CatReaction reaction)) return;
+
+    nextPetTime = Time.time + petCooldown;
+
+    string said = reaction.PlayPet();          // the cat reacts in its own way and tells us what it "said"
+    cat.PlayInteractAnimation();               // its own voice clip
+    AudioManager.Play(Sfx.PurrClean);
+    if (said == "") return;
+    bool refused = said == "Hiss!";
+    FloatingNumbers.Show(cat.CenterPosition, refused ? FloatingNumbers.Spend(said) : FloatingNumbers.Gain(said));
 }
 
 private void TryCareForCat(bool isFeeding)

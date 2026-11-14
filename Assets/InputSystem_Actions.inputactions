@@ -25,15 +25,6 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "MoneyIncrease",
-                    "type": "Button",
-                    "id": "852140f2-7766-474d-8707-702459ba45f3",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "Hold",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "Jump",
                     "type": "Button",
                     "id": "f1ba0d36-48eb-4cd5-b651-1c94a6531f70",
@@ -46,24 +37,6 @@
                     "name": "Sprint",
                     "type": "Button",
                     "id": "641cd816-40e6-41b4-8c3d-04687c349290",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "RepIncrease",
-                    "type": "Button",
-                    "id": "d3075d99-624a-4ea3-a6de-5f8ac0633eda",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "SpawnCat",
-                    "type": "Button",
-                    "id": "3ab99c4e-7844-48c4-a370-6aaed4663b7a",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -100,6 +73,15 @@
                     "name": "Pause",
                     "type": "Button",
                     "id": "4e81f9f6-e6a2-4ec8-99ef-d540e318eab5",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "PetCat",
+                    "type": "Button",
+                    "id": "77734713-a7c5-483d-b58a-cf9d220bb6bc",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -307,72 +289,6 @@
                 },
                 {
                     "name": "",
-                    "id": "41a5168b-346a-4b10-bcb4-bc0087f47a61",
-                    "path": "<Keyboard>/f2",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "RepIncrease",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "4f692b7c-3682-421b-bb65-d58328db2bfc",
-                    "path": "<Gamepad>/buttonWest",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "RepIncrease",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "008a2317-5bc0-4a68-ae3b-40534f81d7a6",
-                    "path": "<XRController>/trigger",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "XR",
-                    "action": "RepIncrease",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "dee3b2dd-4506-48c7-8abe-55be1b0b9f0e",
-                    "path": "<Keyboard>/f3",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "SpawnCat",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "f537f36d-e3dc-4027-a579-5e87ac07f17f",
-                    "path": "<Gamepad>/buttonEast",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "SpawnCat",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "853b58e8-b85d-43e2-be80-61670ef72cec",
-                    "path": "<XRController>/trigger",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "XR",
-                    "action": "SpawnCat",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "226eb17b-fcb4-4dac-9cdb-143d35bcc7fb",
                     "path": "<Keyboard>/q",
                     "interactions": "",
@@ -571,23 +487,23 @@
                 },
                 {
                     "name": "",
-                    "id": "1c04ea5f-b012-41d1-a6f7-02e963b52893",
-                    "path": "<Keyboard>/f1",
+                    "id": "3f11957a-b82b-42f7-9326-a24ca1c3d719",
+                    "path": "<Keyboard>/r",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "MoneyIncrease",
+                    "groups": "",
+                    "action": "PetCat",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "b3f66d0b-7751-423f-908b-a11c5bd95930",
+                    "id": "295688d5-64b5-49e2-b46a-ec46d831d7ed",
                     "path": "<Gamepad>/buttonNorth",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Gamepad",
-                    "action": "MoneyIncrease",
+                    "groups": "",
+                    "action": "PetCat",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -5,5 +5,6 @@ public enum PromptAction
     Feed,
     Clean,
     CompleteDeal,
-    Click           // left mouse button, for world-space buttons (deal panel, catalogue, sign)
+    Click,          // left mouse button, for world-space buttons (deal panel, catalogue, sign)
+    Pet             // pet the cat you're looking at (free, just for love)
 }
