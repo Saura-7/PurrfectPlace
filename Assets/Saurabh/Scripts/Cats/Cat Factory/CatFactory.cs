@@ -19,12 +19,16 @@ public class CatFactory : MonoBehaviour
     }
 
     /// <summary>
-    /// Generates a completely random cat at the given location.
+    /// Generates a cat at the given location. Any trait you don't pass is random.
+    /// "CatBehavior?" means "a CatBehavior OR null" (null = pick one at random).
+    ///     GenerateRandomCat(pos)                              → fully random
+    ///     GenerateRandomCat(pos, behavior: CatBehavior.Lazy) → lazy, the rest random
     /// </summary>
-    public BaseCat GenerateRandomCat(Vector3 spawnPosition)
+    public BaseCat GenerateRandomCat(Vector3 spawnPosition,
+                                     CatBehavior? behavior = null, CatBody? body = null, CatPattern? pattern = null)
     {
         GameObject newCatObj = Instantiate(catPrefab, spawnPosition, Quaternion.identity);
-        return SetupCat(newCatObj);
+        return SetupCat(newCatObj, behavior, body, pattern);
     }
 
     // --- Helper Methods ---
@@ -71,12 +75,14 @@ public class CatFactory : MonoBehaviour
     }
 
     // Shared setup used by every way of creating a cat
-    private BaseCat SetupCat(GameObject catObj)
+    private BaseCat SetupCat(GameObject catObj,
+                             CatBehavior? behavior = null, CatBody? body = null, CatPattern? pattern = null)
     {
-        // 1. Roll the dice for the DNA (Enums)
-        CatBehavior randomBehavior = GetRandomEnum<CatBehavior>();
-        CatBody randomBody = GetRandomEnum<CatBody>();
-        CatPattern randomPattern = GetRandomEnum<CatPattern>();
+        // 1. Roll the dice for the DNA (Enums), unless a trait was chosen.
+        // "a ?? b" means "use a, but if a is null use b".
+        CatBehavior randomBehavior = behavior ?? GetRandomEnum<CatBehavior>();
+        CatBody randomBody = body ?? GetRandomEnum<CatBody>();
+        CatPattern randomPattern = pattern ?? GetRandomEnum<CatPattern>();
 
         // 2. Pick the material from the Pattern enum
         BaseCat catScript = catObj.GetComponent<BaseCat>();

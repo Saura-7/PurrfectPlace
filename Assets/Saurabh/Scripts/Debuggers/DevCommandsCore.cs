@@ -90,29 +90,61 @@ public class DevCommandsCore : MonoBehaviour
 
     private void AddCatCommands()
     {
-        DevConsole.Add("spawncat", "spawncat [feed] [clean] · new cat in a free cage, e.g. spawncat 4 4", args =>
+        DevConsole.Add("spawncat", "spawncat [feed] [clean] [traits] · e.g. spawncat 4 4 skittish chonky calico", args =>
         {
-            int feed = 0, clean = 0;
-            if (args.Length > 0 && !DevConsole.TryGetInt(args, 0, out feed))
-                return DevConsole.Error("feed must be a number from 0 to 6");
-            if (args.Length > 1 && !DevConsole.TryGetInt(args, 1, out clean))
-                return DevConsole.Error("clean must be a number from 0 to 6");
+            // Numbers are care levels (first = feed, second = clean). Words are traits, in any order.
+            // Anything you leave out is random.
+            int feed = 0, clean = 0, numbersSeen = 0;
+            CatBehavior? behavior = null;
+            CatBody? body = null;
+            CatPattern? pattern = null;
+
+            foreach (string word in args)
+            {
+                if (int.TryParse(word, out int number))
+                {
+                    if (numbersSeen == 0) feed = number;
+                    else if (numbersSeen == 1) clean = number;
+                    else return DevConsole.Error("Only two numbers: feed and clean");
+                    numbersSeen++;
+                }
+                else if (TryTrait(word, out CatBehavior b)) behavior = b;
+                else if (TryTrait(word, out CatBody bo)) body = bo;
+                else if (TryTrait(word, out CatPattern p)) pattern = p;
+                else return DevConsole.Error($"Unknown trait '{word}'. Try: {TraitList<CatBehavior>()} · " +
+                                             $"{TraitList<CatBody>()} · {TraitList<CatPattern>()}");
+            }
 
             Transform cage = CageManager.Instance.GetAvailableCage();
             if (cage == null) return DevConsole.Error("Every cage is full");
 
             // Same steps as StarterCats: make the cat, set care AFTER it's made, then put it in the cage
-            BaseCat cat = CatFactory.Instance.GenerateRandomCat(cage.position);
+            BaseCat cat = CatFactory.Instance.GenerateRandomCat(cage.position, behavior, body, pattern);
             cat.feedingLevel = Mathf.Clamp(feed, 0, BaseCat.MaxLevel);
             cat.cleanlinessLevel = Mathf.Clamp(clean, 0, BaseCat.MaxLevel);
             CageManager.Instance.OccupyCage(cage, cat);
 
             string tier = CareRules.Name(CareRules.TierOf(cat.TotalCare));
-            return $"Spawned a {tier} cat ({cat.feedingLevel}/{cat.cleanlinessLevel}) in {cage.name}";
+            return $"Spawned a {tier} {cat.Pattern} {cat.Body} {cat.Behavior} cat ({cat.feedingLevel}/{cat.cleanlinessLevel}) in {cage.name}";
         });
 
         DevConsole.Add("maxcare", "maxcare · every cat to 6/6 (Purrfect)", args => SetAllCare(BaseCat.MaxLevel));
         DevConsole.Add("clearcare", "clearcare · every cat to 0/0", args => SetAllCare(0));
+    }
+
+    // Turns a word like "skittish" into the matching trait (any upper/lower case).
+    // "where T : struct, Enum" means this works for any enum: CatBehavior, CatBody or CatPattern.
+    private static bool TryTrait<T>(string word, out T trait) where T : struct, Enum
+    {
+        // Enum.TryParse also accepts numbers ("2"), so we also check the word is a real name
+        return Enum.TryParse(word, true, out trait) && Enum.IsDefined(typeof(T), trait)
+               && !int.TryParse(word, out _);
+    }
+
+    // "playful/lazy/angry/skittish" for the error message
+    private static string TraitList<T>() where T : struct, Enum
+    {
+        return string.Join("/", Enum.GetNames(typeof(T))).ToLowerInvariant();
     }
 
     private string SetAllCare(int level)

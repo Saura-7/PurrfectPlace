@@ -117,11 +117,27 @@ public class CatReaction : MonoBehaviour
         running = StartCoroutine(PoseRoutine(poses));
     }
 
+    /// <summary>
+    /// The adoption goodbye: the cat's own pet animation and hearts, on the desk, before the adopter picks it up.
+    /// Returns how long it lasts, so the adopter knows how long to wait.
+    /// </summary>
+    public float PlayGoodbye()
+    {
+        Pose[] poses = PetPoses();
+        if (!Prepare(feedEffect, force: true)) return 0f;   // force: the cat is "with a customer", but this is its goodbye
+        running = StartCoroutine(PoseRoutine(poses));
+
+        float total = 0f;
+        foreach (Pose p in poses) total += p.duration + p.hold;
+        return total;
+    }
+
     // Everything a reaction needs before it starts. Returns false if the cat shouldn't react.
-    private bool Prepare(GameObject effect)
+    // force = true skips the "held by a customer" check (only the goodbye uses it).
+    private bool Prepare(GameObject effect, bool force = false)
     {
         // Don't wiggle a cat that a customer is carrying.
-        if (cat != null && cat.IsHeldByCustomer) return false;
+        if (!force && cat != null && cat.IsHeldByCustomer) return false;
 
         // If a reaction is already playing, put the cat back first.
         // This stops it drifting or growing when the player mashes the key.
