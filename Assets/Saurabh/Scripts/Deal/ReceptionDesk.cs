@@ -89,6 +89,7 @@ public class ReceptionDesk : MonoBehaviour
     private void ProcessTransaction()
     {
         currentInteractingCustomer = CustomerQueueManager.Instance.GetCurrentCustomerAtDesk();
+        bool panelWasOpen = dealUIPanel.activeSelf;   // clicking again shouldn't replay the animation
 
         if (currentInteractingCustomer != null && currentInteractingCustomer.heldCat != null)
         {
@@ -129,6 +130,12 @@ public class ReceptionDesk : MonoBehaviour
 
             // Both kinds of customer set the cat down on the desk while you decide
             currentInteractingCustomer.PutCatOnDesk(deskCatSpot);
+
+            if (!panelWasOpen)
+            {
+                Juice.PopIn(dealUIPanel.transform, 0.25f);                    // the deal screen pops open
+                Juice.Squash(currentInteractingCustomer.heldCat.transform);   // the cat lands softly on the desk
+            }
         }
         else
         {

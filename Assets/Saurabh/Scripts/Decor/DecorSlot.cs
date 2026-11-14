@@ -56,6 +56,7 @@ public class DecorSlot : MonoBehaviour
 
         IsBought = true;
         ShowBought(true);
+        if (itemVisual != null) Juice.PopIn(itemVisual.transform, 0.4f);   // the new item bounces into the room
 
         // A cage item also becomes a real cage the shop can use
         if (addsCage != null) CageManager.Instance.AddCage(addsCage);

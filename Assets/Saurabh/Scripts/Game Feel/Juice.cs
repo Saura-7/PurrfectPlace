@@ -50,9 +50,11 @@ public class Juice : MonoBehaviour
     // One running animation per object. Starting a new one on the same object stops the old one.
     private readonly Dictionary<Object, Coroutine> running = new Dictionary<Object, Coroutine>();
 
-    // The object's real size, remembered the first time we animate it.
+    // The object's real size, remembered while an animation is running on it.
     // Without this, punching an object WHILE it's already punched would make it grow a little more
     // every time (100% -> 115% -> 132% ...). We always animate around the real size.
+    // It is forgotten when the animation ends, because an object's real size can change later
+    // (a cat moved into a new parent gets a new local scale).
     private readonly Dictionary<Transform, Vector3> baseScales = new Dictionary<Transform, Vector3>();
 
     private void OnDestroy()
@@ -169,6 +171,7 @@ public class Juice : MonoBehaviour
         }
         if (target != null) target.localScale = finalScale;
         running.Remove(target);
+        baseScales.Remove(target);   // finished: the next animation measures the size fresh
     }
 
     private IEnumerator PopOutRoutine(Transform target, Vector3 baseScale, float duration, bool destroyAfter, bool unscaledTime)
@@ -192,7 +195,7 @@ public class Juice : MonoBehaviour
             baseScales.Remove(target);
             Destroy(target.gameObject);
         }
-        else target.localScale = Vector3.zero;
+        else target.localScale = Vector3.zero;   // keep the real size remembered, so a PopIn can bring it back
     }
 
     private IEnumerator FadeRoutine(CanvasGroup group, float to, float duration, bool unscaledTime)

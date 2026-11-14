@@ -180,6 +180,7 @@ public class TutorialNote : MonoBehaviour
         if (noteText == null || finished) return;
 
         TutorialStep? current = FindCurrentStep();
+        bool newStep = drewOnce && current != shownStep;   // a different task than last time
         shownStep = current;
         drewOnce = true;
 
@@ -188,6 +189,9 @@ public class TutorialNote : MonoBehaviour
         // No text means nothing useful to say, so hide the panel instead of showing an empty box
         if (notePanel != null) notePanel.SetActive(text != "");
         noteText.text = text;
+
+        // A new task: a small bump so the eye notices the note changed
+        if (newStep && notePanel != null && text != "") Juice.Punch(notePanel.transform, 0.1f);
     }
 
     private string StepLine(TutorialStep step)
