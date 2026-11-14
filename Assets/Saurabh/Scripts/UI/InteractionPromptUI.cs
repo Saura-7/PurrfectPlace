@@ -5,6 +5,7 @@ public class InteractionPromptUI : MonoBehaviour
 {
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI promptText;
+    [SerializeField] private GameObject promptCard;   // the dark card behind the prompt (hidden when there's no prompt)
     [SerializeField] private CatInfoTag infoTag;   // the floating tag above cats (optional)
 
     [Header("Distances")]
@@ -23,6 +24,9 @@ public class InteractionPromptUI : MonoBehaviour
         {
             lastText = newText;
             promptText.text = newText;
+
+            // No prompt = no empty dark box floating in the middle of the screen
+            if (promptCard != null) promptCard.SetActive(newText != "");
         }
 
         // Show the floating tag on the cat we look at, hide it otherwise
@@ -41,6 +45,7 @@ public class InteractionPromptUI : MonoBehaviour
 
         // Wipe the text so an old prompt doesn't stay on screen over the pause menu or summary
         if (promptText != null) promptText.text = "";
+        if (promptCard != null) promptCard.SetActive(false);
         if (infoTag != null) infoTag.Hide();
     }
 
