@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 
 public class CoreEconomySystem : MonoBehaviour
 {
@@ -53,6 +54,7 @@ public class CoreEconomySystem : MonoBehaviour
     public void ModifyGP(int amount, string subsystemName)
     {
         currentGP += amount;
+        Tally(amount >= 0 ? $"GP in  · {subsystemName}" : $"GP out · {subsystemName}", Mathf.Abs(amount));   // for the "ledger" command
         
         string actionType = amount >= 0 ? "ADD" : "SUBTRACT";
         SOALogger.LogAudit(subsystemName, actionType, amount, "GP", currentGP);
@@ -66,6 +68,33 @@ public class CoreEconomySystem : MonoBehaviour
         currentGP = exactValue;
         SOALogger.LogAudit(subsystemName, "OVERWRITE", exactValue, "GP", currentGP);
         OnEconomyUpdated?.Invoke();
+    }
+
+    // ==========================================
+    // LEDGER: what happened today, for testing (console command "ledger")
+    // ==========================================
+
+    // line name -> running total, e.g. "Adopted · Purrfect" -> 3, "GP out · CareSubsystem" -> 412
+    private readonly Dictionary<string, int> ledger = new Dictionary<string, int>();
+
+    // Adds to one line of today's ledger. Any script can call it: CoreEconomySystem.Tally("Stray taken in");
+    public static void Tally(string line, int amount = 1)
+    {
+        if (Instance == null) return;
+        Instance.ledger.TryGetValue(line, out int current);   // 0 if the line doesn't exist yet
+        Instance.ledger[line] = current + amount;
+    }
+
+    public void ResetLedger() => ledger.Clear();
+
+    public string LedgerText()
+    {
+        if (ledger.Count == 0) return "Nothing has happened yet today.";
+        List<string> lines = new List<string>(ledger.Keys);
+        lines.Sort();
+        string text = "Today so far:";
+        foreach (string line in lines) text += $"\n  {line}: {ledger[line]}";
+        return text;
     }
 
     // --- REPUTATION ---

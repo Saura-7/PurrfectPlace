@@ -95,7 +95,7 @@ public class ReputationLevels : MonoBehaviour
         if (now > lastLevel)
         {
             int donation = now == 2 ? belovedDonation : trustedDonation;
-            MessageUI.Notify($"Your shelter is now {Name}! Adopters add a +{donation} GP donation.");
+            MessageUI.Notify($"Your shelter is now {Name}! Adopters add a +{donation} GP donation.", ToastKind.Heart);
         }
 
         lastLevel = now;

@@ -172,7 +172,7 @@ public class TutorialNote : MonoBehaviour
     {
         finished = true;
         if (notePanel != null) notePanel.SetActive(false);
-        if (allDone) MessageUI.Notify("You're ready! Run your shop your way.");
+        if (allDone) MessageUI.Notify("You're ready! Run your shop your way.", ToastKind.Good);
     }
 
     private void Redraw()
@@ -180,6 +180,7 @@ public class TutorialNote : MonoBehaviour
         if (noteText == null || finished) return;
 
         TutorialStep? current = FindCurrentStep();
+        bool newStep = drewOnce && current != shownStep;   // a different task than last time
         shownStep = current;
         drewOnce = true;
 
@@ -188,6 +189,9 @@ public class TutorialNote : MonoBehaviour
         // No text means nothing useful to say, so hide the panel instead of showing an empty box
         if (notePanel != null) notePanel.SetActive(text != "");
         noteText.text = text;
+
+        // A new task: a small bump so the eye notices the note changed
+        if (newStep && notePanel != null && text != "") Juice.Punch(notePanel.transform, 0.1f);
     }
 
     private string StepLine(TutorialStep step)
@@ -204,7 +208,7 @@ public class TutorialNote : MonoBehaviour
             case TutorialStep.Clean:    label = $"Clean a cat [{clean}]"; break;
             case TutorialStep.Computer: label = "Look at the shop computer"; break;
             case TutorialStep.OpenShop: label = $"Open the shop at the sign [{click}]"; break;
-            case TutorialStep.Serve:    label = $"Serve the customer at the desk [{use}]"; break;
+            case TutorialStep.Serve:    label = $"Talk to the customer at the desk [{use}]"; break;
             default:                    label = $"Close the shop at the sign [{click}]"; break;
         }
 

@@ -48,6 +48,7 @@ public class DayManager : MonoBehaviour
     public bool LastCallExpired { get; private set; }
 
     private int day = 1;
+    public int Day => day;   // read-only for other scripts (the developer console's "status")
     private float timeLeft;
     private int lastShownClock = -1;   // the clock time we last drew (in game minutes), so we only redraw when it changes
     private bool rentWarned;
@@ -213,7 +214,7 @@ public class DayManager : MonoBehaviour
         CustomerSpawner spawner = FindFirstObjectByType<CustomerSpawner>();
         if (spawner != null) spawner.StartSpawning();
 
-        MessageUI.Notify("The shop is open!");
+        MessageUI.Notify("The shop is open!", ToastKind.Good);
         TutorialNote.Complete(TutorialStep.OpenShop);
         AudioManager.Play(Sfx.ShopOpen);
         UpdateTimerText();
@@ -245,8 +246,8 @@ public class DayManager : MonoBehaviour
 
         CustomersInside = CountCustomers();
 
-        if (CustomersInside > 0) MessageUI.Notify("Closing time! Serve the last customers, then close the shop.");
-        else MessageUI.Notify("Closing time! Close the shop when you are ready.");
+        if (CustomersInside > 0) MessageUI.Notify("Closing time! Serve the last customers, then close the shop.", ToastKind.Warning);
+        else MessageUI.Notify("Closing time! Close the shop when you are ready.", ToastKind.Warning);
 
         UpdateTimerText();
     }
@@ -290,7 +291,7 @@ public class DayManager : MonoBehaviour
 
         if (CustomersInside > 0 && !LastCallExpired)
         {
-            MessageUI.Notify("Customers are still inside. Wait for them to finish.");
+            MessageUI.Notify("Customers are still inside. Wait for them to finish.", ToastKind.Warning);
             return;
         }
 
@@ -366,12 +367,33 @@ public class DayManager : MonoBehaviour
         UpdateTimerText();
     }
 
+    // ==========================================
+    // DEVELOPER CONSOLE HOOKS (only called by DevCommandsCore)
+    // ==========================================
+
+    // Skips the rest of the open day. The next Update sees no time left and enters last call.
+    public bool DevSkipToLastCall()
+    {
+        if (Phase != DayPhase.Open) return false;
+        timeLeft = 0f;
+        return true;
+    }
+
+    // Ends the day straight away, exactly as if the player had closed the shop
+    public bool DevEndDay()
+    {
+        if (Phase != DayPhase.Open && Phase != DayPhase.LastCall) return false;
+        EndDay();
+        return true;
+    }
+
     // Hooked up to the Next day button. Starts the next day in PREP.
     public void StartNextDay()
     {
         if (Phase != DayPhase.Summary) return;
 
         day++;
+        if (CoreEconomySystem.Instance != null) CoreEconomySystem.Instance.ResetLedger();   // a fresh ledger every day
 
         PauseMenu pauseMenu = FindFirstObjectByType<PauseMenu>();
         if (pauseMenu != null) pauseMenu.UnfreezeGame();
@@ -427,7 +449,7 @@ public class DayManager : MonoBehaviour
 
         string warning = $"Rent is due when you close the shop: {due} GP.";
         if (gp < due) warning += $" You have {gp} GP.";
-        MessageUI.Notify(warning);
+        MessageUI.Notify(warning, ToastKind.Warning);
     }
 
     // ==========================================

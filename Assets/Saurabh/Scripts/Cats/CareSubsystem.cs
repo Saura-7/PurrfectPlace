@@ -65,7 +65,7 @@ private void TryCareForCat(bool isFeeding)
 
         if (clickedCat.IsHeldByCustomer)
         {
-            MessageUI.Notify("The customer is holding this cat.");
+            MessageUI.Notify("This cat is with a customer.");
             return;
         }
 
@@ -85,7 +85,7 @@ private void TryCareForCat(bool isFeeding)
         if (currentMoney < careCost)
         {
             Debug.LogWarning("Not enough GP!");
-            MessageUI.Notify($"Not enough GP! This care costs {careCost} GP.");
+            MessageUI.Notify($"Not enough GP! This care costs {careCost} GP.", ToastKind.Bad);
             if (clickedCat.TryGetComponent(out CatReaction poorReaction)) poorReaction.PlayDenied();
             return;
         }

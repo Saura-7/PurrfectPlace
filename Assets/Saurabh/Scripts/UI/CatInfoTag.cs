@@ -31,16 +31,22 @@ public class CatInfoTag : MonoBehaviour
     // Called by InteractionPromptUI while the player looks at a cat.
     public void Show(BaseCat cat)
     {
+        bool newCat = cat != target || (content != null && !content.activeSelf);
         target = cat;
         if (content != null && !content.activeSelf) content.SetActive(true);
 
         // Only rewrite the text when it actually changes (saves work every frame)
         string text = BuildText(cat);
-        if (text != lastText)
+        bool changed = text != lastText;
+        if (changed)
         {
             lastText = text;
             label.text = text;
         }
+
+        if (content == null) return;
+        if (newCat) Juice.PopIn(content.transform, 0.15f);          // looked at a different cat: quick pop
+        else if (changed) Juice.Punch(content.transform, 0.08f);    // same cat, new numbers (you just fed it): small bump
     }
 
     // The tag shows what the cat IS (traits, tier, worth).

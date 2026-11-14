@@ -19,6 +19,35 @@ public class CageManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
+    private void Start()
+    {
+        // Developer console: "cages" shows how many cages and cats there are
+        DevConsole.Add("cages", "cages · how many cages, cats and cats waiting for adoption", args =>
+            $"{allCages.Count} cages · {CatCount} cats · {CatsForAdoption} waiting for adoption");
+    }
+
+    // Adds a newly bought cage. Called by a DecorSlot that has "Adds Cage" set.
+    public void AddCage(Transform cage)
+    {
+        if (cage == null || allCages.Contains(cage)) return;
+        allCages.Add(cage);
+        SOALogger.LogState("CageManager", SOALogger.Colors.Cage, "ADD", $"Cage '{cage.name}' added. Total cages: {allCages.Count}");
+    }
+
+    // How many cats are in cages and not yet claimed by a Taker (the cats "on display")
+    public int CatsForAdoption
+    {
+        get
+        {
+            int count = 0;
+            foreach (var pair in occupiedCages)
+            {
+                if (pair.Value != null && !reservedCages.Contains(pair.Key)) count++;
+            }
+            return count;
+        }
+    }
+
     public bool HasEmptyCage()
     {
         return occupiedCages.Count < allCages.Count;
@@ -30,11 +59,7 @@ public class CageManager : MonoBehaviour
     // True if at least one cat is in a cage and no Taker has claimed it yet
     public bool HasCatForAdoption()
     {
-        foreach (var pair in occupiedCages)
-        {
-            if (pair.Value != null && !reservedCages.Contains(pair.Key)) return true;
-        }
-        return false;
+        return CatsForAdoption > 0;
     }
 
     public Transform GetAvailableCage()
@@ -52,9 +77,7 @@ public class CageManager : MonoBehaviour
         {
             occupiedCages.Add(cage, cat);
             
-            cat.transform.SetParent(cage);
-            cat.transform.localPosition = Vector3.zero;
-            cat.transform.localRotation = Quaternion.identity;
+            cat.MoveTo(cage);   // into the cage at its normal size
 
             // Debug.Log($"[SOA {systemName}] Cage '{cage.name}' occupied by cat '{cat.name}'. Occupied: {occupiedCages.Count}/{allCages.Count}");
             SOALogger.LogState("CageManager", SOALogger.Colors.Cage, "OCCUPY", $"Cage '{cage.name}' assigned to cat '{cat.name}'. Total Occupied: {occupiedCages.Count}/{allCages.Count}");
@@ -113,8 +136,6 @@ public class CageManager : MonoBehaviour
         occupiedCages[cage] = cat;
         reservedCages.Remove(cage); // the cat is back on the shelf and can be bought again
 
-        cat.transform.SetParent(cage);
-        cat.transform.localPosition = Vector3.zero;
-        cat.transform.localRotation = Quaternion.identity;
+        cat.MoveTo(cage);
     }
 }

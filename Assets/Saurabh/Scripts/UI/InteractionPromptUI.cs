@@ -5,6 +5,7 @@ public class InteractionPromptUI : MonoBehaviour
 {
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI promptText;
+    [SerializeField] private GameObject promptCard;   // the dark card behind the prompt (hidden when there's no prompt)
     [SerializeField] private CatInfoTag infoTag;   // the floating tag above cats (optional)
 
     [Header("Distances")]
@@ -23,6 +24,9 @@ public class InteractionPromptUI : MonoBehaviour
         {
             lastText = newText;
             promptText.text = newText;
+
+            // No prompt = no empty dark box floating in the middle of the screen
+            if (promptCard != null) promptCard.SetActive(newText != "");
         }
 
         // Show the floating tag on the cat we look at, hide it otherwise
@@ -41,6 +45,7 @@ public class InteractionPromptUI : MonoBehaviour
 
         // Wipe the text so an old prompt doesn't stay on screen over the pause menu or summary
         if (promptText != null) promptText.text = "";
+        if (promptCard != null) promptCard.SetActive(false);
         if (infoTag != null) infoTag.Hide();
     }
 
@@ -58,6 +63,13 @@ public class InteractionPromptUI : MonoBehaviour
 
         // 1. Looking at a cat
         BaseCat cat = hit.collider.GetComponent<BaseCat>();
+
+        // A cat on the desk in a deal: show its tag so you can inspect it, but no care prompt
+        if (cat != null && cat.OnDesk && hit.distance <= deskDistance)
+        {
+            lookedAtCat = cat;
+            return $"Accept or Reject on the screen [{InputPrompts.Get(PromptAction.Click)}]";
+        }
         if (cat != null && hit.distance <= catDistance && !cat.IsHeldByCustomer)
         {
             lookedAtCat = cat;   // the floating tag shows this cat's traits and worth
@@ -86,12 +98,29 @@ public class InteractionPromptUI : MonoBehaviour
         }
 
         // 2. Looking at an Accept / Reject button
-        if (hit.distance <= deskDistance && hit.collider.GetComponent<WorldSpaceUIButton>() != null)
+        WorldSpaceUIButton button = hit.collider.GetComponent<WorldSpaceUIButton>();
+        if (hit.distance <= deskDistance && button != null)
         {
-            return $"Choose [{InputPrompts.Get(PromptAction.Click)}]";
+            // Use the button's own label as the verb: "Approve [Click]", "Decline [Click]".
+            // The prompt then says exactly what the click will do, not just "Choose".
+            TMP_Text label = button.GetComponentInChildren<TMP_Text>();
+            string verb = label != null && label.text != "" ? TitleCase(label.text) : "Choose";
+            return $"{verb} [{InputPrompts.Get(PromptAction.Click)}]";
         }
 
-        // 3. Looking at the reception desk
+        // 3. Looking at a customer (or the cat they are holding)
+        CustomerAI customer = hit.collider.GetComponentInParent<CustomerAI>();
+        if (customer != null && hit.distance <= deskDistance)
+        {
+            bool atFront = CustomerQueueManager.Instance != null
+                           && CustomerQueueManager.Instance.GetCurrentCustomerAtDesk() == customer;
+
+            return atFront
+                ? $"Talk [{InputPrompts.Get(PromptAction.CompleteDeal)}]"
+                : "Waiting in line";
+        }
+
+        // 4. Looking at the reception desk
         if (hit.distance <= deskDistance && hit.collider.GetComponentInParent<ReceptionDesk>() != null)
         {
             bool customerWaiting = CustomerQueueManager.Instance != null
@@ -103,6 +132,13 @@ public class InteractionPromptUI : MonoBehaviour
         }
 
         return "";
+    }
+
+    // "TAKE IN" -> "Take in": button labels are in capitals, prompts are in sentence case
+    private static string TitleCase(string text)
+    {
+        string lower = text.ToLowerInvariant();
+        return char.ToUpperInvariant(lower[0]) + lower.Substring(1);
     }
 
     // " (-8 GP)" for the next level, or " (max)" when the stat is full.

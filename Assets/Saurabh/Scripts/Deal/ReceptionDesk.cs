@@ -8,9 +8,12 @@ public class ReceptionDesk : MonoBehaviour
     [Header("Interaction Settings")]
     public float maxInteractionDistance = 10f;
 
+    [Header("Cat on the desk")]
+    [SerializeField] private Transform deskCatSpot;   // where the customer puts the cat during a deal
+
     [Header("UI References")]
     public GameObject dealUIPanel; 
-    public TMPro.TextMeshProUGUI dealText; 
+    [SerializeField] private DealScreen dealScreen;   // draws the deal on the monitor (header, big number, buttons)
 
     private InputSystem_Actions inputActions;
     private InputAction CompleteDealAction;
@@ -66,7 +69,16 @@ public class ReceptionDesk : MonoBehaviour
                 return;
             }
 
-            // 2. The desk itself: serve the customer
+            // 2. A customer: talking to the one at the front of the line starts the deal.
+            //    GetComponentInParent also finds the customer when you click the cat they're holding.
+            CustomerAI customer = hit.collider.GetComponentInParent<CustomerAI>();
+            if (customer != null)
+            {
+                if (customer == CustomerQueueManager.Instance.GetCurrentCustomerAtDesk()) ProcessTransaction();
+                return;   // someone further back in the line: nothing happens yet
+            }
+
+            // 3. The desk itself still works too: serve the customer
             if (hit.collider.gameObject == gameObject || hit.collider.GetComponentInParent<ReceptionDesk>() != null)
             {
                 ProcessTransaction();
@@ -77,42 +89,50 @@ public class ReceptionDesk : MonoBehaviour
     private void ProcessTransaction()
     {
         currentInteractingCustomer = CustomerQueueManager.Instance.GetCurrentCustomerAtDesk();
+        bool panelWasOpen = dealUIPanel.activeSelf;   // clicking again shouldn't replay the animation
 
         if (currentInteractingCustomer != null && currentInteractingCustomer.heldCat != null)
         {
             BaseCat cat = currentInteractingCustomer.heldCat;
 
-            // e.g. "Calico | Chonky | Lazy" in a slightly smaller size, then a new line
-            string traits = $"<size=80%>{cat.Pattern} | {cat.Body} | {cat.Behavior}</size>\n";
+            // Turn the panel on FIRST, so its text objects are active when we fill them in
+            dealUIPanel.SetActive(true);
 
             if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Taker)
             {
                 currentDealPrice = cat.CalculateFinalPrice();
                 int donation = ReputationLevels.Donation;
                 int rep = CareRules.ReputationFor(cat.TotalCare);
-                dealText.text = $"ADOPTION?\n{traits}{CareLine(cat)}Adoption fee: +{currentDealPrice} GP";
-                if (rep > 0) dealText.text += $"\nReputation: +{rep}";
-                if (donation > 0) dealText.text += $"\nDonation ({ReputationLevels.Name}): +{donation} GP";
-                dealUIPanel.SetActive(true);
+                dealScreen.ShowAdoption(cat, currentDealPrice, donation, rep, noDealRep);
             }
             else if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Giver)
             {
-                // What the cat is really worth, and what this Giver asks for it
-                int catValue = cat.CalculateFinalPrice();
+                // What the player has, so the screen can warn BEFORE they press Buy
+                int gp = CoreEconomySystem.Instance.GetGP(systemName);
+                int freeCages = CageManager.Instance.allCages.Count - CageManager.Instance.CatCount;
 
                 if (currentInteractingCustomer.IsStray)
                 {
                     // A stray finder asks for nothing
                     currentDealPrice = 0;
-                    dealText.text = $"TAKE IN A STRAY?\n{traits}{CareLine(cat)}Found outside\nCost: Free";
+                    dealScreen.ShowStray(cat, gp, freeCages, noDealRep);
                 }
                 else
                 {
+                    // What the cat is really worth, and what this Giver asks for it
+                    int catValue = cat.CalculateFinalPrice();
                     currentDealPrice = Mathf.Max(10, Mathf.RoundToInt(catValue * currentInteractingCustomer.AskFactor));
-                    dealText.text = $"BUY CAT?\n{traits}{CareLine(cat)}Worth about: {catValue} GP\nCost: -{currentDealPrice} GP";
+                    dealScreen.ShowPurchase(cat, currentDealPrice, catValue, gp, freeCages, noDealRep);
                 }
+            }
 
-                dealUIPanel.SetActive(true);
+            // Both kinds of customer set the cat down on the desk while you decide
+            currentInteractingCustomer.PutCatOnDesk(deskCatSpot);
+
+            if (!panelWasOpen)
+            {
+                Juice.PopIn(dealUIPanel.transform, 0.25f);                    // the deal screen pops open
+                Juice.Squash(currentInteractingCustomer.heldCat.transform);   // the cat lands softly on the desk
             }
         }
         else
@@ -138,6 +158,9 @@ public class ReceptionDesk : MonoBehaviour
             int donation = ReputationLevels.Donation;
 
             CoreEconomySystem.Instance.ModifyGP(currentDealPrice + donation, systemName);
+            CoreEconomySystem.Tally($"Adopted · {CareRules.Name(CareRules.TierOf(care))}");
+            CoreEconomySystem.Tally("Adoption fees (GP)", currentDealPrice);
+            if (donation > 0) CoreEconomySystem.Tally("Donations (GP)", donation);
             AudioManager.Play(Sfx.CoinsIn);
             DayManager.RecordCatSold();
             currentInteractingCustomer.CompleteTakerTransactionAndLeave();
@@ -145,11 +168,11 @@ public class ReceptionDesk : MonoBehaviour
 
             MessageUI.Notify(donation > 0
                 ? $"Adopted! +{currentDealPrice} GP and a +{donation} GP donation"
-                : $"Adopted! +{currentDealPrice} GP");
+                : $"Adopted! +{currentDealPrice} GP", ToastKind.Good);
 
             CareTier tier = CareRules.TierOf(care);
-            if (tier == CareTier.Purrfect) MessageUI.Notify("A purrfect adoption!");
-            else if (tier == CareTier.WellCared) MessageUI.Notify("A happy adoption!");
+            if (tier == CareTier.Purrfect) MessageUI.Notify("A purrfect adoption!", ToastKind.Heart);
+            else if (tier == CareTier.WellCared) MessageUI.Notify("A happy adoption!", ToastKind.Heart);
         }
         else if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Giver)
         {
@@ -167,15 +190,17 @@ public class ReceptionDesk : MonoBehaviour
                     AudioManager.Play(Sfx.CoinsOut);
                 }
                 DayManager.RecordCatBought();
+                CoreEconomySystem.Tally(currentDealPrice > 0 ? "Bought from a Giver" : "Stray taken in");
+                if (currentDealPrice > 0) CoreEconomySystem.Tally("Paid to Givers (GP)", currentDealPrice);
                 BaseCat boughtCat = currentInteractingCustomer.AcceptGiverOfferAndLeave();
                 CageManager.Instance.OccupyCage(emptyCage, boughtCat);
 
                 repGain = giverRescueRep;   // you gave a cat a safe place
-                MessageUI.Notify(currentDealPrice > 0 ? $"Deal accepted: -{currentDealPrice} GP" : "Stray taken in!");
+                MessageUI.Notify(currentDealPrice > 0 ? $"Deal accepted: -{currentDealPrice} GP" : "Stray taken in!", ToastKind.Good);
             }
             else
             {
-                MessageUI.Notify(emptyCage == null ? "No free cage!" : "Not enough GP!");
+                MessageUI.Notify(emptyCage == null ? "No free cage!" : "Not enough GP!", ToastKind.Bad);
                 HandleReject(true);
                 return;
             }
@@ -184,7 +209,7 @@ public class ReceptionDesk : MonoBehaviour
         if (repGain > 0)
         {
             CoreEconomySystem.Instance.ModifyReputation(repGain, systemName);
-            MessageUI.Notify($"+{repGain} reputation");
+            MessageUI.Notify($"+{repGain} reputation", ToastKind.Heart);
         }
 
         TutorialNote.Complete(TutorialStep.Serve);
@@ -200,12 +225,6 @@ public class ReceptionDesk : MonoBehaviour
         return CareRules.ReputationFor(care);
     }
 
-    // One line for the deal screen, e.g. "Feed 4/6 · Clean 4/6 · Well-cared"
-    private string CareLine(BaseCat cat)
-    {
-        return $"Feed {cat.feedingLevel}/{BaseCat.MaxLevel} · Clean {cat.cleanlinessLevel}/{BaseCat.MaxLevel} · {CareRules.ColoredName(CareRules.TierOf(cat.TotalCare))}\n";
-    }
-
     // The Reject button on the deal monitor calls this. The player chose to say no.
     public void RejectDeal()
     {
@@ -216,6 +235,7 @@ public class ReceptionDesk : MonoBehaviour
     private void HandleReject(bool forcedByGame)
     {
         if (currentInteractingCustomer == null) return;
+        CoreEconomySystem.Tally(forcedByGame ? "Refused · couldn't" : "Refused · chose to");
 
         if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Taker)
         {
@@ -237,12 +257,12 @@ public class ReceptionDesk : MonoBehaviour
         if (forcedByGame)
         {
             DayManager.RecordMissed();      // counted as "missed" in the day summary
-            MessageUI.Notify($"Deal missed: -{noDealRep} reputation");
+            MessageUI.Notify($"Deal missed: -{noDealRep} reputation", ToastKind.Bad);
         }
         else
         {
             DayManager.RecordDeclined();    // counted as "declined" in the day summary
-            MessageUI.Notify($"Deal declined: -{noDealRep} reputation");
+            MessageUI.Notify($"Deal declined: -{noDealRep} reputation", ToastKind.Bad);
         }
 
         AudioManager.Play(Sfx.PoliteNo);
@@ -255,6 +275,7 @@ public class ReceptionDesk : MonoBehaviour
 
     public void CancelCurrentDeal()
     {
+        if (currentInteractingCustomer != null) currentInteractingCustomer.TakeCatBack();
         currentInteractingCustomer = null;
         if (dealUIPanel != null) dealUIPanel.SetActive(false);
     }
