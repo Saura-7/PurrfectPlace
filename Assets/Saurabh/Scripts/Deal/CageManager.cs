@@ -56,6 +56,9 @@ public class CageManager : MonoBehaviour
     // How many cats are in the shop (including one a Taker is carrying to the desk)
     public int CatCount => occupiedCages.Count;
 
+    // Every cat sitting in a cage right now (read-only: callers can look, not change the list)
+    public IEnumerable<BaseCat> CatsInCages => occupiedCages.Values;
+
     // True if at least one cat is in a cage and no Taker has claimed it yet
     public bool HasCatForAdoption()
     {

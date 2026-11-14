@@ -57,6 +57,9 @@ public class TutorialNote : MonoBehaviour
         }
     }
 
+    // True while day 1's guide is still going (even when there's nothing to do this second)
+    public static bool IsRunning => instance != null && !instance.finished;
+
     private TutorialStep? FindCurrentStep()
     {
         // Walk the steps in enum order and return the first one that is not done AND can be done now.
