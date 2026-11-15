@@ -154,6 +154,7 @@ public class ReceptionDesk : MonoBehaviour
             BaseCat adoptedCat = currentInteractingCustomer.heldCat;
             int care = adoptedCat != null ? adoptedCat.feedingLevel + adoptedCat.cleanlinessLevel : 0;
             CatBehavior personality = adoptedCat != null ? adoptedCat.Behavior : CatBehavior.Playful;
+            string who = adoptedCat != null ? adoptedCat.DisplayName : "The cat";   // a former resident uses its name
             repGain = AdoptionReputation(care);
 
             // A trusted shelter gets a donation on top of the adoption fee
@@ -176,7 +177,7 @@ public class ReceptionDesk : MonoBehaviour
             string praise = tier == CareTier.Purrfect ? "A purrfect adoption! "
                           : tier == CareTier.WellCared ? "A happy adoption! "
                           : "";
-            MessageUI.Notify(praise + GoodbyeLine(personality), ToastKind.Heart);
+            MessageUI.Notify(praise + GoodbyeLine(personality, who), ToastKind.Heart);
         }
         else if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Giver)
         {
@@ -224,14 +225,15 @@ public class ReceptionDesk : MonoBehaviour
     }
 
     // How each personality leaves the shop
-    private static string GoodbyeLine(CatBehavior personality)
+    // who = the cat's name, or "The lazy one" etc. for unnamed cats
+    private static string GoodbyeLine(CatBehavior personality, string who)
     {
         switch (personality)
         {
-            case CatBehavior.Lazy:     return "The lazy one barely woke up to leave.";
-            case CatBehavior.Skittish: return "The shy one peeked back once, then left happy.";
-            case CatBehavior.Angry:    return "The grumpy one pretended not to care. It cared.";
-            default:                   return "The playful one bounced off with its new family!";
+            case CatBehavior.Lazy:     return $"{who} barely woke up to leave.";
+            case CatBehavior.Skittish: return $"{who} peeked back once, then left happy.";
+            case CatBehavior.Angry:    return $"{who} pretended not to care. It cared.";
+            default:                   return $"{who} bounced off with its new family!";
         }
     }
 

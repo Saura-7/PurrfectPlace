@@ -61,6 +61,24 @@ public class BaseCat : MonoBehaviour
     // RARE CATS (see CatFactory.MakeRare)
     public bool IsRare { get; set; }     // a special cat: worth more, looks different
     public bool OnHold { get; set; }     // rare cats arrive on hold: Takers skip them until YOU decide
+    public bool IsResident { get; set; } // kept by the player: lives on a resident spot, needs no care
+    public string CatName { get; set; } = "";   // only residents get named (empty = no name)
+
+    // "Biscuit" for a named cat, otherwise e.g. "The lazy one"
+    public string DisplayName
+    {
+        get
+        {
+            if (!string.IsNullOrEmpty(CatName)) return CatName;
+            switch (currentBehavior)
+            {
+                case CatBehavior.Lazy:     return "The lazy one";
+                case CatBehavior.Skittish: return "The shy one";
+                case CatBehavior.Angry:    return "The grumpy one";
+                default:                   return "The playful one";
+            }
+        }
+    }
 
     /// <summary>Gives the cat a different coat (used for rare cats).</summary>
     public void SetCoat(Material coat)

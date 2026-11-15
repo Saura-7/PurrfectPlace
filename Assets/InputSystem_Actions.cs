@@ -172,6 +172,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CatOptions"",
+                    ""type"": ""Button"",
+                    ""id"": ""6179fcf5-b647-4025-8a83-ec4f9802ad17"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -590,6 +599,28 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""PetCat"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""54bb4d38-65a0-43c6-99e2-c62f57bf0f71"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CatOptions"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""aa38233d-2420-4e26-97e5-cc942a92807e"",
+                    ""path"": ""<Gamepad>/buttonWest"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CatOptions"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1186,6 +1217,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player_CompleteDeal = m_Player.FindAction("CompleteDeal", throwIfNotFound: true);
         m_Player_Pause = m_Player.FindAction("Pause", throwIfNotFound: true);
         m_Player_PetCat = m_Player.FindAction("PetCat", throwIfNotFound: true);
+        m_Player_CatOptions = m_Player.FindAction("CatOptions", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1288,6 +1320,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_CompleteDeal;
     private readonly InputAction m_Player_Pause;
     private readonly InputAction m_Player_PetCat;
+    private readonly InputAction m_Player_CatOptions;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1335,6 +1368,10 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/PetCat".
         /// </summary>
         public InputAction @PetCat => m_Wrapper.m_Player_PetCat;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/CatOptions".
+        /// </summary>
+        public InputAction @CatOptions => m_Wrapper.m_Player_CatOptions;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1388,6 +1425,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @PetCat.started += instance.OnPetCat;
             @PetCat.performed += instance.OnPetCat;
             @PetCat.canceled += instance.OnPetCat;
+            @CatOptions.started += instance.OnCatOptions;
+            @CatOptions.performed += instance.OnCatOptions;
+            @CatOptions.canceled += instance.OnCatOptions;
         }
 
         /// <summary>
@@ -1426,6 +1466,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @PetCat.started -= instance.OnPetCat;
             @PetCat.performed -= instance.OnPetCat;
             @PetCat.canceled -= instance.OnPetCat;
+            @CatOptions.started -= instance.OnCatOptions;
+            @CatOptions.performed -= instance.OnCatOptions;
+            @CatOptions.canceled -= instance.OnCatOptions;
         }
 
         /// <summary>
@@ -1789,6 +1832,13 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnPetCat(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "CatOptions" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnCatOptions(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

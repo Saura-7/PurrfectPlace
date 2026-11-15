@@ -66,6 +66,16 @@ public class CageManager : MonoBehaviour
         return CatsForAdoption > 0;
     }
 
+    // Which cage this cat is in (null if it isn't in one)
+    public Transform CageOf(BaseCat cat)
+    {
+        foreach (var pair in occupiedCages)
+        {
+            if (pair.Value == cat) return pair.Key;
+        }
+        return null;
+    }
+
     public Transform GetAvailableCage()
     {
         foreach (Transform cage in allCages)

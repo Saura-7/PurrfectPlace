@@ -57,7 +57,9 @@ public class CatInfoTag : MonoBehaviour
         int nextTierAt = CareRules.NextTierAt(care);
 
         string text = "";
-        if (cat.IsRare)
+        if (cat.IsResident)
+            text += $"<b>{cat.CatName}</b> <size=75%><color=#E9A23B>RARE</color> · Resident</size>\n";
+        else if (cat.IsRare)
             text += $"<color=#E9A23B><b>RARE</b></color>{(cat.OnHold ? "<size=75%> · On hold</size>" : "")}\n";
         text += $"<size=75%>{cat.Pattern} | {cat.Body} | {cat.Behavior}</size>\n";
         text += $"<size=70%><i>{PersonalityLine(cat.Behavior)}</i></size>\n";

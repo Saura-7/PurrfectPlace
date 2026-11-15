@@ -115,13 +115,20 @@ public class CustomerSpawner : MonoBehaviour
         return lastValid;   // only reached because of tiny rounding errors
     }
 
+    [Tooltip("Extra adopter weight per resident cat. A cat on display gives 1.5, so keeping a cat is always worth less than selling it")]
+    [SerializeField] private float adopterWeightPerResident = 0.5f;
+
     // This entry's chance right now (0 = cannot come)
     // Example: a Taker with weight 0 and 2 per cat shown has weight 6 when 3 cats are waiting
     private float WeightOf(PoolEntry entry, bool shopEmpty, int catsShown)
     {
         if (entry.needsCatToAdopt && catsShown == 0) return 0f;
+        // Residents make the shop a little more charming to adopters (only affects rows that come for cats)
+        float residentBonus = entry.weightPerCatShown > 0f ? adopterWeightPerResident * ResidentCats.Count : 0f;
+
         return entry.weight
              + entry.weightPerCatShown * catsShown
+             + residentBonus
              + (shopEmpty ? entry.emptyShopBonus : 0f);
     }
 

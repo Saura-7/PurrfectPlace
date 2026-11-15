@@ -59,6 +59,7 @@ public class PauseMenu : MonoBehaviour
     {
         if (PauseDisabled) return;
         if (DevConsole.BlocksPause) return;   // Esc closes the console instead of pausing
+        if (RareCatPanel.BlocksPause) return; // Esc closes the rare cat panel instead of pausing
 
         if (inputActions.Player.Pause.WasPressedThisFrame())
         {

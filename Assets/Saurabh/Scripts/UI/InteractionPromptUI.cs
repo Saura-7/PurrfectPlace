@@ -79,9 +79,17 @@ public class InteractionPromptUI : MonoBehaviour
 
             // The screen prompt shows what you can DO: key, level, and the price of the next level
             string pet = InputPrompts.Get(PromptAction.Pet);
+            string options = InputPrompts.Get(PromptAction.CatOptions);
+
+            // A resident needs no care: just pet it, or open its options
+            if (cat.IsResident) return $"{cat.CatName}     Pet [{pet}]     Options [{options}]";
+
+            // A rare cat on hold: the normal care line, plus a reminder that you need to decide
+            string decide = cat.IsRare && cat.OnHold ? $"\nKeep or put up for adoption [{options}]" : "";
+
             return $"Feed [{feed}] {cat.feedingLevel}/{BaseCat.MaxLevel}{CostText(cat, true)}     " +
                    $"Clean [{clean}] {cat.cleanlinessLevel}/{BaseCat.MaxLevel}{CostText(cat, false)}     " +
-                   $"Pet [{pet}]";
+                   $"Pet [{pet}]" + decide;
         }
 
         OpenSign sign = hit.collider.GetComponentInParent<OpenSign>();

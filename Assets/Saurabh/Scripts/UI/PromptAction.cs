@@ -6,5 +6,6 @@ public enum PromptAction
     Clean,
     CompleteDeal,
     Click,          // left mouse button, for world-space buttons (deal panel, catalogue, sign)
-    Pet             // pet the cat you're looking at (free, just for love)
+    Pet,            // pet the cat you're looking at (free, just for love)
+    CatOptions      // open the options for a rare cat (keep as resident / put up for adoption)
 }

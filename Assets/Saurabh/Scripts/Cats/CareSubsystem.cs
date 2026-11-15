@@ -13,6 +13,7 @@ public class CareSubsystem : MonoBehaviour
     private InputAction LeftShoulder;
     private InputAction RightShoulder;
     private InputAction petAction;
+    private InputAction optionsAction;
 
     [Header("Petting")]
     [SerializeField] private float petCooldown = 0.6f;   // seconds between pets, so mashing R doesn't spam hearts
@@ -25,6 +26,7 @@ public class CareSubsystem : MonoBehaviour
         RightShoulder = inputActions.Player.FeedCat;
         LeftShoulder = inputActions.Player.CleanCat;
         petAction = inputActions.Player.PetCat;
+        optionsAction = inputActions.Player.CatOptions;
         // interact1Action = inputActions.Player.Interact1;
         inputActions.Enable();
     }
@@ -65,6 +67,25 @@ public class CareSubsystem : MonoBehaviour
     {
         TryPetCat();
     }
+    else if (optionsAction.WasPressedThisFrame())
+    {
+        TryOpenCatOptions();
+    }
+}
+
+// F on a rare cat (on hold or a resident): open the keep / adopt panel
+private void TryOpenCatOptions()
+{
+    if (Camera.main == null) return;
+
+    Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
+    if (!Physics.Raycast(ray, out RaycastHit hit, maxInteractionDistance)) return;
+
+    BaseCat cat = hit.collider.GetComponent<BaseCat>();
+    if (cat == null || cat.IsHeldByCustomer || !cat.IsRare) return;
+    if (!cat.OnHold && !cat.IsResident) return;   // already up for adoption: nothing to decide
+
+    RareCatPanel.Open(cat);
 }
 
 // Petting is free and changes no numbers: it's there so cats feel like characters, not stock
@@ -102,6 +123,12 @@ private void TryCareForCat(bool isFeeding)
         if (clickedCat == null)
         {
             Debug.LogWarning("Raycast hit an object, but it is not a Cat.");
+            return;
+        }
+
+        if (clickedCat.IsResident)
+        {
+            MessageUI.Notify($"{clickedCat.CatName} is family: no care needed, just pets.");
             return;
         }
 
