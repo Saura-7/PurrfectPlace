@@ -16,6 +16,8 @@ public class CareRules : MonoBehaviour
     [Header("Cat worth")]
     [SerializeField] private int baseValue = 30;        // worth of a cat with no care
     [SerializeField] private int valuePerPoint = 15;    // worth added by each care point
+    [Tooltip("Rare cats are worth this many times a normal cat")]
+    [SerializeField] private int rareValueMultiplier = 2;
 
     [Header("Care cost (rises with each level)")]
     [SerializeField] private int firstLevelCost = 5;    // cost of level 1
@@ -86,8 +88,12 @@ public class CareRules : MonoBehaviour
 
     public static int Value(BaseCat cat)
     {
-        return I.baseValue + cat.TotalCare * I.valuePerPoint;
+        int value = I.baseValue + cat.TotalCare * I.valuePerPoint;
+        return cat.IsRare ? value * I.rareValueMultiplier : value;   // rare cats are worth more
     }
+
+    // How much one care point adds to THIS cat's worth (rare cats: double)
+    public static int ValuePerPointFor(BaseCat cat) => cat.IsRare ? I.valuePerPoint * I.rareValueMultiplier : I.valuePerPoint;
 
     // ==========================================
     // TIERS

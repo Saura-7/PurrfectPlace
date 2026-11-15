@@ -45,6 +45,9 @@ public class RentSystem : MonoBehaviour
         get { return baseRent + extraRent; }
     }
 
+    // How many more missed payments in a row the shelter can survive (1 = the next miss closes it)
+    public int MissesLeft => missedPaymentsToClose - missedPayments;
+
     // What the player must pay at the end of this day (0 before the first rent day)
     public int RentDue(int day)
     {

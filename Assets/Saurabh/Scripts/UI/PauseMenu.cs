@@ -12,6 +12,8 @@ using Unity.Cinemachine;
 /// </summary>
 public class PauseMenu : MonoBehaviour
 {
+    [SerializeField] private GameObject crosshair;   // hidden while the game is frozen (pause menu, day summary)
+
     public static bool IsPaused { get; private set; }
 
     // Set to true while the day summary is showing, so the pause key can't un-freeze it
@@ -59,6 +61,7 @@ public class PauseMenu : MonoBehaviour
     {
         if (PauseDisabled) return;
         if (DevConsole.BlocksPause) return;   // Esc closes the console instead of pausing
+        if (RareCatPanel.BlocksPause) return; // Esc closes the rare cat panel instead of pausing
 
         if (inputActions.Player.Pause.WasPressedThisFrame())
         {
@@ -119,6 +122,7 @@ public class PauseMenu : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+        if (crosshair != null) crosshair.SetActive(false);   // the mouse cursor takes over
     }
 
     public void UnfreezeGame()
@@ -131,6 +135,7 @@ public class PauseMenu : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        if (crosshair != null) crosshair.SetActive(true);
     }
 
     // ==========================================

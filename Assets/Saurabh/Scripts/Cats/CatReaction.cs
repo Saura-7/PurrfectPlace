@@ -51,6 +51,58 @@ public class CatReaction : MonoBehaviour
         Begin(GetProfile(), isFeeding ? feedEffect : cleanEffect);
     }
 
+    // True while a hop, shake or pet reaction is moving the cat (CatIdle waits for it to finish)
+    public bool IsPlaying => running != null;
+
+    /// <summary>A small hop with no particles, for idle life (a third of the personality's normal hop).</summary>
+    public void PlayIdleHop()
+    {
+        Profile p = GetProfile();
+        Begin(new Profile { hopHeight = p.hopHeight * 0.35f, duration = p.duration, squash = p.squash * 0.35f }, null);
+    }
+
+    /// <summary>A quick startled shake, for a skittish cat hearing the door.</summary>
+    public void PlayFlinch()
+    {
+        Begin(new Profile { hopHeight = 0.08f, duration = 0.25f, squash = 0.1f, shake = 0.04f, shakeCount = 2 }, null);
+    }
+
+    [Header("Petting")]
+    [SerializeField, Range(0f, 1f)] private float angryRefuseChance = 0.4f;   // grumpy cats don't always want it
+
+    /// <summary>
+    /// Pet the cat. Returns what the cat "says" (only "Hiss!" is shown on screen; the rest
+    /// is told by the body and the eyes). Each personality reacts its own way: that's the point of petting.
+    /// </summary>
+    public string PlayPet()
+    {
+        if (cat == null || cat.IsHeldByCustomer) return "";
+
+        // An angry cat sometimes says no: a shake instead of a happy hop
+        if (cat.Behavior == CatBehavior.Angry && Random.value < angryRefuseChance)
+        {
+            Begin(denied, null);
+            return "Hiss!";
+        }
+
+        BeginPoses(PetPoses(), feedEffect);   // each personality's own pet animation, with the pink hearts
+        CloseEyesHappily(1.2f);               // the happy squint: says "purr" without any text
+
+        switch (cat.Behavior)
+        {
+            case CatBehavior.Lazy:     return "...purr";
+            case CatBehavior.Angry:    return "Hmph. Fine.";
+            case CatBehavior.Skittish: return "Eep! ...purr";
+            default:                   return "Purr!";
+        }
+    }
+
+    // Asks CatFace (if the cat has one) for a content, eyes-closed squint
+    private void CloseEyesHappily(float seconds)
+    {
+        if (TryGetComponent(out CatFace face)) face.Content(seconds);
+    }
+
     // Called by CareSubsystem when care is refused (not enough GP, or the stat is already full):
     // a side-to-side shake, no hop and no hearts.
     public void PlayDenied()
@@ -61,8 +113,39 @@ public class CatReaction : MonoBehaviour
     // Shared start-up for both reactions
     private void Begin(Profile profile, GameObject effect)
     {
+        if (!Prepare(effect)) return;
+        running = StartCoroutine(ReactRoutine(profile));
+    }
+
+    // Start-up for a pet animation made of poses
+    private void BeginPoses(Pose[] poses, GameObject effect)
+    {
+        if (!Prepare(effect)) return;
+        running = StartCoroutine(PoseRoutine(poses));
+    }
+
+    /// <summary>
+    /// The adoption goodbye: the cat's own pet animation and hearts, on the desk, before the adopter picks it up.
+    /// Returns how long it lasts, so the adopter knows how long to wait.
+    /// </summary>
+    public float PlayGoodbye()
+    {
+        Pose[] poses = PetPoses();
+        if (!Prepare(feedEffect, force: true)) return 0f;   // force: the cat is "with a customer", but this is its goodbye
+        running = StartCoroutine(PoseRoutine(poses));
+        CloseEyesHappily(1.5f);
+
+        float total = 0f;
+        foreach (Pose p in poses) total += p.duration + p.hold;
+        return total;
+    }
+
+    // Everything a reaction needs before it starts. Returns false if the cat shouldn't react.
+    // force = true skips the "held by a customer" check (only the goodbye uses it).
+    private bool Prepare(GameObject effect, bool force = false)
+    {
         // Don't wiggle a cat that a customer is carrying.
-        if (cat != null && cat.IsHeldByCustomer) return;
+        if (!force && cat != null && cat.IsHeldByCustomer) return false;
 
         // If a reaction is already playing, put the cat back first.
         // This stops it drifting or growing when the player mashes the key.
@@ -79,7 +162,85 @@ public class CatReaction : MonoBehaviour
         baseWorldScale = transform.lossyScale;
 
         SpawnEffect(effect);
-        running = StartCoroutine(ReactRoutine(profile));
+        return true;
+    }
+
+    // ==========================================
+    // PET ANIMATIONS (each personality its own)
+    // ==========================================
+
+    // One pose in a pet animation: how high the cat is and its shape, reached over "duration", then held.
+    // stretch: +0.1 = 10% taller (and a little thinner), -0.2 = 20% flatter (and wider)
+    private struct Pose
+    {
+        public float hop, stretch, duration, hold;
+        public Pose(float hop, float stretch, float duration, float hold = 0f)
+        {
+            this.hop = hop; this.stretch = stretch; this.duration = duration; this.hold = hold;
+        }
+    }
+
+    private Pose[] PetPoses()
+    {
+        switch (cat.Behavior)
+        {
+            case CatBehavior.Lazy:      // melts into your hand: goes flat, stays there, slowly comes back
+                return new[] { new Pose(0f, -0.18f, 0.5f, 0.8f), new Pose(0f, 0f, 0.7f) };
+
+            case CatBehavior.Skittish:  // freezes small for a moment... then decides it likes it: a little hop
+                return new[] { new Pose(0f, -0.15f, 0.08f, 0.25f), new Pose(0.12f, 0.1f, 0.18f), new Pose(0f, 0f, 0.18f) };
+
+            case CatBehavior.Angry:     // goes stiff and tall, puts up with it, then relaxes
+                return new[] { new Pose(0f, 0.08f, 0.35f, 0.4f), new Pose(0f, 0f, 0.3f) };
+
+            default:                    // Playful: two happy bounces
+                return new[] { new Pose(0.12f, 0.12f, 0.14f), new Pose(0f, -0.08f, 0.12f),
+                               new Pose(0.08f, 0.08f, 0.12f), new Pose(0f, 0f, 0.14f) };
+        }
+    }
+
+    private IEnumerator PoseRoutine(Pose[] poses)
+    {
+        float fromHop = 0f, fromStretch = 0f;
+
+        foreach (Pose p in poses)
+        {
+            // Move from the last pose to this one
+            float t = 0f;
+            while (t < p.duration)
+            {
+                if (transform.parent != baseParent) { Restore(); running = null; yield break; }   // picked up mid-pet
+
+                t += Time.deltaTime;
+                float e = Juice.EaseOut(Mathf.Clamp01(t / p.duration));
+                ApplyPose(Mathf.Lerp(fromHop, p.hop, e), Mathf.Lerp(fromStretch, p.stretch, e));
+                yield return null;
+            }
+            ApplyPose(p.hop, p.stretch);
+            fromHop = p.hop;
+            fromStretch = p.stretch;
+
+            // Hold this pose (e.g. the lazy cat stays melted for a moment)
+            float held = 0f;
+            while (held < p.hold)
+            {
+                if (transform.parent != baseParent) { Restore(); running = null; yield break; }
+                held += Time.deltaTime;
+                yield return null;
+            }
+        }
+
+        Restore();
+        running = null;
+    }
+
+    private void ApplyPose(float hop, float stretch)
+    {
+        transform.localPosition = basePosition + new Vector3(0f, hop, 0f);
+        transform.localScale = new Vector3(
+            baseScale.x * (1f - stretch * 0.5f),
+            baseScale.y * (1f + stretch),
+            baseScale.z * (1f - stretch * 0.5f));
     }
 
     private Profile GetProfile()

@@ -42,7 +42,8 @@ public class CageManager : MonoBehaviour
             int count = 0;
             foreach (var pair in occupiedCages)
             {
-                if (pair.Value != null && !reservedCages.Contains(pair.Key)) count++;
+                // On-hold (rare) cats aren't on display for adoption until the player decides
+                if (pair.Value != null && !pair.Value.OnHold && !reservedCages.Contains(pair.Key)) count++;
             }
             return count;
         }
@@ -56,10 +57,23 @@ public class CageManager : MonoBehaviour
     // How many cats are in the shop (including one a Taker is carrying to the desk)
     public int CatCount => occupiedCages.Count;
 
+    // Every cat sitting in a cage right now (read-only: callers can look, not change the list)
+    public IEnumerable<BaseCat> CatsInCages => occupiedCages.Values;
+
     // True if at least one cat is in a cage and no Taker has claimed it yet
     public bool HasCatForAdoption()
     {
         return CatsForAdoption > 0;
+    }
+
+    // Which cage this cat is in (null if it isn't in one)
+    public Transform CageOf(BaseCat cat)
+    {
+        foreach (var pair in occupiedCages)
+        {
+            if (pair.Value == cat) return pair.Key;
+        }
+        return null;
     }
 
     public Transform GetAvailableCage()
@@ -106,7 +120,7 @@ public class CageManager : MonoBehaviour
             BaseCat cat = pair.Value;
 
             // Check that the cage has a cat AND is not reserved by another Taker
-            if (cat != null && !reservedCages.Contains(cage))
+            if (cat != null && !cat.OnHold && !reservedCages.Contains(cage))   // never take a cat that's on hold
             {
                 reservedCages.Add(cage); // Instantly reserve this cage for the caller
                 // Debug.Log($"[SOA {systemName}] Cage '{cage.name}' reserved for incoming Taker.");

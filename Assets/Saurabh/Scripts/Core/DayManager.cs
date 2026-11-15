@@ -1,4 +1,6 @@
+using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using TMPro;
 
 // The four parts of a day. DayManager is always in exactly one of them.
@@ -38,6 +40,10 @@ public class DayManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI resultsText;
     [SerializeField] private GameObject nextDayButton;
 
+    [Header("Day receipt")]
+    [SerializeField] private float lineDelay = 0.2f;    // seconds between receipt lines
+    [SerializeField] private float rentPause = 0.6f;    // the beat of suspense before the rent line
+
     // ==========================================
     // WHAT THIS SCRIPT REMEMBERS
     // ==========================================
@@ -58,6 +64,9 @@ public class DayManager : MonoBehaviour
 
     private int dayStartGP;
     private int dayStartReputation;
+
+    private bool skipReceipt;     // true once the player clicks or presses a key during the receipt
+    private int receiptStartFrame; // the key press that CLOSED the shop must not also skip the receipt
 
     // Simple stats for the summary (reset every day)
     private int catsSold;
@@ -94,6 +103,7 @@ public class DayManager : MonoBehaviour
         // Time.deltaTime is 0 while the game is paused, so every timer here stops by itself
         if (Phase == DayPhase.Open) UpdateOpenPhase();
         else if (Phase == DayPhase.LastCall) UpdateLastCallPhase();
+        else if (Phase == DayPhase.Summary && Time.frameCount > receiptStartFrame && PressedAnything()) skipReceipt = true;
     }
 
     // ==========================================
@@ -316,55 +326,167 @@ public class DayManager : MonoBehaviour
 
         ClearShopForNewDay();
 
-        // 2. Work out the day's results BEFORE rent is taken
-        int gpNow = CoreEconomySystem.Instance.GetGP(systemName);
-        int reputationNow = CoreEconomySystem.Instance.GetReputation(systemName);
-        int profit = gpNow - dayStartGP;
-        int reputationChange = reputationNow - dayStartReputation;
-
-        // Handy while tuning the rent: look for these lines in the Console
-        Debug.Log($"[{systemName}] Day {day} profit before rent: {profit} GP");
-
-        // 3. Rent (RentSystem decides what happens)
-        bool shopClosed = false;
-        string rentSection;
-
-        if (RentSystem.Instance != null)
-        {
-            shopClosed = RentSystem.Instance.SettleRent(day, gpNow, out rentSection);
-        }
-        else
-        {
-            rentSection = "There is no rent system in this scene.";
-        }
-
-        // 4. Build the summary text
-        string title = shopClosed ? "The shelter has to close for now" : $"Day {day} complete";
-
-        string stats =
-            $"Profit today: {profit} GP\n" +
-            $"Reputation: {reputationNow} \n" +
-            $"Reputation Change : {reputationChange:+#;-#;0}\n" +
-            $"Cats sold: {catsSold}\n" +
-            $"Cats bought: {catsBought}\n" +
-            $"Declined by you: {dealsDeclined}\n" +
-            $"Missed (no GP or space): {dealsMissed}";
-
-        string closing = shopClosed
-            ? $"\n\nYou kept the shelter open for {day} days.\nTip: keep some GP aside for the rent."
-            : "";
-
-        resultsText.text = $"{title}\n\n{stats}\n\n{rentSection}{closing}";
-
-        // 5. Freeze the game and show the summary
+        // 2. Freeze the game and show the (empty) summary panel
         PauseMenu.PauseDisabled = true;
         PauseMenu pauseMenu = FindFirstObjectByType<PauseMenu>();
         if (pauseMenu != null) pauseMenu.FreezeGame();
 
-        if (nextDayButton != null) nextDayButton.SetActive(!shopClosed);
+        if (nextDayButton != null) nextDayButton.SetActive(false);   // shown when the receipt has finished
+        resultsText.text = "";
         endPanel.SetActive(true);
-
         UpdateTimerText();
+
+        // 3. Print the receipt line by line (rent is taken part-way through)
+        StartCoroutine(PrintReceipt());
+    }
+
+    // ==========================================
+    // THE DAY RECEIPT
+    // ==========================================
+
+    // Prints the day's money one line at a time, like a till receipt, then takes the rent.
+    // A coroutine can pause between lines ("yield") without freezing the whole game.
+    private IEnumerator PrintReceipt()
+    {
+        skipReceipt = false;
+        receiptStartFrame = Time.frameCount;
+        CoreEconomySystem eco = CoreEconomySystem.Instance;
+
+        // Today's numbers, BEFORE rent
+        int gpNow = eco.GetGP(systemName);
+        int profit = gpNow - dayStartGP;
+        int reputationNow = eco.GetReputation(systemName);
+        int reputationChange = reputationNow - dayStartReputation;
+
+        int earned = eco.TodayIn("ReceptionDesk");      // adoption fees + donations
+        int care   = eco.TodayOut("CareSubsystem");     // feeding and cleaning
+        int bought = eco.TodayOut("ReceptionDesk");     // cats bought from Givers
+        int decor  = eco.TodayOut("DecorSlot");
+        // Anything else (e.g. GP added with the developer console) = what's left over
+        int other  = profit - (earned - care - bought - decor);
+
+        Debug.Log($"[{systemName}] Day {day} profit before rent: {profit} GP");   // handy while tuning the rent
+
+        // The receipt, one line at a time
+        string text = $"<size=120%><b>Day {day} receipt</b></size>\n";
+        yield return Show(text);
+
+        text += "\n" + Row("GP at the start of the day", dayStartGP.ToString());   yield return Show(text);
+
+        text += "\n" + Row("Adoptions & donations", Signed(earned), Green);   yield return Show(text);
+        if (care > 0)   { text += "\n" + Row("Cat care", Signed(-care));      yield return Show(text); }
+        if (bought > 0) { text += "\n" + Row("Cats bought", Signed(-bought)); yield return Show(text); }
+        if (decor > 0)  { text += "\n" + Row("Decor", Signed(-decor));        yield return Show(text); }
+        if (other != 0) { text += "\n" + Row("Other", Signed(other));         yield return Show(text); }
+
+        text += "\n" + Rule;
+        text += "\n" + Row("<b>Profit today</b>", $"<b>{Signed(profit)}</b>", profit >= 0 ? Green : Red);
+        yield return Show(text);
+
+        // --- RENT: a short pause, then it lands ---
+        yield return Wait(rentPause);
+
+        bool shopClosed = false;
+        string rentNote = "";
+
+        if (RentSystem.Instance == null)
+        {
+            text += "\n" + Row("Rent", "none in this scene");
+        }
+        else if (!RentSystem.Instance.IsRentDay(day))
+        {
+            RentSystem.Instance.SettleRent(day, gpNow, out _);   // "out _" = we don't need the message
+            text += "\n" + Row("Rent", "free today", Green);
+        }
+        else
+        {
+            int due = RentSystem.Instance.RentDue(day);          // read BEFORE settling (settling changes the late fee)
+            bool canPay = gpNow >= due;
+            shopClosed = RentSystem.Instance.SettleRent(day, gpNow, out _);   // GP is taken HERE
+
+            if (canPay)
+            {
+                text += "\n" + Row("<b>RENT</b>", $"<b>{Signed(-due)}</b>", Red);
+                AudioManager.Play(Sfx.CoinsOut);
+            }
+            else
+            {
+                text += "\n" + Row($"<b>RENT</b> <color={Red}><size=80%>NOT PAID</size></color>", $"<b>{Signed(-due)}</b>", Red);
+                AudioManager.Play(Sfx.PoliteNo);
+                // Short and about what happens NEXT (the receipt above already shows what went wrong)
+                if (!shopClosed)
+                {
+                    int tomorrow = RentSystem.Instance.RentDue(day + 1);   // now includes the late fee
+                    int left = RentSystem.Instance.MissesLeft;
+                    string warning = left <= 1 ? "Miss again and the shelter closes."
+                                               : $"{left} more misses and the shelter closes.";
+                    rentNote = $"\n\n<color={Red}><b>Landlord notice:</b> {tomorrow} GP tomorrow (late fee added).\n{warning}</color>";
+                }
+            }
+        }
+        resultsText.text = text;
+        Juice.Punch(resultsText.transform, 0.06f);   // the "thump" of the bill landing
+
+        // --- What's left ---
+        int gpLeft = eco.GetGP(systemName);
+        text += "\n" + Rule;
+        text += "\n" + Row("<b>GP left</b>", $"<b>{gpLeft}</b>");
+        text += rentNote;
+        yield return Show(text);
+
+        // --- The rest of the day, small ---
+        text += $"\n\n<size=85%>Reputation {reputationNow} ({reputationChange:+#;-#;0})\n" +
+                $"Sold {catsSold}   Bought {catsBought}   Declined {dealsDeclined}   Missed {dealsMissed}</size>";
+
+        if (shopClosed)
+            text = $"<size=120%><b>The shelter has to close for now</b></size>\n\n" + text +
+                   $"\n\nYou kept the shelter open for {day} days.\nTip: keep some GP aside for the rent.";
+
+        resultsText.text = text;
+        if (nextDayButton != null) nextDayButton.SetActive(!shopClosed);
+    }
+
+    // Puts the text on screen, plays a soft tick, and waits one line's time
+    private IEnumerator Show(string text)
+    {
+        resultsText.text = text;
+        if (!skipReceipt) AudioManager.Play(Sfx.ButtonClick, 1.3f, 0.4f);   // higher and quieter than a normal click
+        yield return Wait(lineDelay);
+    }
+
+    // Waits in REAL seconds (the game is frozen, so normal waits would never end).
+    // Stops waiting straight away once the player has skipped.
+    private IEnumerator Wait(float seconds)
+    {
+        float end = Time.unscaledTime + seconds;
+        while (Time.unscaledTime < end && !skipReceipt) yield return null;
+    }
+
+    // Any key or mouse click (this frame) — used to skip the receipt animation
+    private static bool PressedAnything()
+    {
+        bool key = Keyboard.current != null && Keyboard.current.anyKey.wasPressedThisFrame;
+        bool click = Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
+        return key || click;
+    }
+
+    // ---- Receipt formatting ----
+    private const string Green = "#3FA28C";
+    private const string Red = "#E8836A";
+    private const string Rule = "<color=#9C978B>-----------------------------------------------------</color>";
+
+    // One receipt row: the label on the left, the amount lined up at 70% of the width.
+    // <pos=70%> is a TextMeshPro tag: "jump to 70% across before writing the rest".
+    private static string Row(string label, string value, string color = null)
+    {
+        string amount = color == null ? value : $"<color={color}>{value}</color>";
+        return $"{label}<pos=70%>{amount}";
+    }
+
+    // 30 → "+30", -8 → "-8", 0 → "0"
+    private static string Signed(int value)
+    {
+        return value.ToString("+#;-#;0");
     }
 
     // ==========================================

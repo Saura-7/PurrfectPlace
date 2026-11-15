@@ -89,6 +89,7 @@ public class ReceptionDesk : MonoBehaviour
     private void ProcessTransaction()
     {
         currentInteractingCustomer = CustomerQueueManager.Instance.GetCurrentCustomerAtDesk();
+        if (currentInteractingCustomer != null && currentInteractingCustomer.IsSayingGoodbye) return;   // already adopted, just leaving
         bool panelWasOpen = dealUIPanel.activeSelf;   // clicking again shouldn't replay the animation
 
         if (currentInteractingCustomer != null && currentInteractingCustomer.heldCat != null)
@@ -152,6 +153,8 @@ public class ReceptionDesk : MonoBehaviour
             // Read the cat's care BEFORE the Taker leaves with it
             BaseCat adoptedCat = currentInteractingCustomer.heldCat;
             int care = adoptedCat != null ? adoptedCat.feedingLevel + adoptedCat.cleanlinessLevel : 0;
+            CatBehavior personality = adoptedCat != null ? adoptedCat.Behavior : CatBehavior.Playful;
+            string who = adoptedCat != null ? adoptedCat.DisplayName : "The cat";   // a former resident uses its name
             repGain = AdoptionReputation(care);
 
             // A trusted shelter gets a donation on top of the adoption fee
@@ -166,13 +169,15 @@ public class ReceptionDesk : MonoBehaviour
             currentInteractingCustomer.CompleteTakerTransactionAndLeave();
             CageManager.Instance.FreeCage(currentInteractingCustomer.HomeCage); // the cat is adopted, so the cage is free now
 
-            MessageUI.Notify(donation > 0
-                ? $"Adopted! +{currentDealPrice} GP and a +{donation} GP donation"
-                : $"Adopted! +{currentDealPrice} GP", ToastKind.Good);
+            // No "Adopted! +75 GP" toast: the deal screen showed the number and the GP counter rolls it.
+            // Saying it a third time made each signal matter less (design flaw 9). Only the heart toast stays.
 
+            // One heart toast in the cat's own voice; the best-cared cats get a little praise in front
             CareTier tier = CareRules.TierOf(care);
-            if (tier == CareTier.Purrfect) MessageUI.Notify("A purrfect adoption!", ToastKind.Heart);
-            else if (tier == CareTier.WellCared) MessageUI.Notify("A happy adoption!", ToastKind.Heart);
+            string praise = tier == CareTier.Purrfect ? "A purrfect adoption! "
+                          : tier == CareTier.WellCared ? "A happy adoption! "
+                          : "";
+            MessageUI.Notify(praise + GoodbyeLine(personality, who), ToastKind.Heart);
         }
         else if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Giver)
         {
@@ -217,6 +222,19 @@ public class ReceptionDesk : MonoBehaviour
         dealUIPanel.SetActive(false);
         CustomerQueueManager.Instance.AdvanceQueue();
         currentInteractingCustomer = null;
+    }
+
+    // How each personality leaves the shop
+    // who = the cat's name, or "The lazy one" etc. for unnamed cats
+    private static string GoodbyeLine(CatBehavior personality, string who)
+    {
+        switch (personality)
+        {
+            case CatBehavior.Lazy:     return $"{who} barely woke up to leave.";
+            case CatBehavior.Skittish: return $"{who} peeked back once, then left happy.";
+            case CatBehavior.Angry:    return $"{who} pretended not to care. It cared.";
+            default:                   return $"{who} bounced off with its new family!";
+        }
     }
 
     // How much reputation an adoption earns, from how well the cat was cared for

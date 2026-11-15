@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -19,6 +20,32 @@ public class TutorialHighlight : MonoBehaviour
     [Header("Fade when the player is close")]
     [SerializeField] private float fadeStartDistance = 4f;  // farther than this: full glow
     [SerializeField] private float fadeEndDistance = 1.5f;  // closer than this: glow is gone
+
+    // Every highlight in the scene, so the guide arrow can find "what to point at" for a step.
+    // Each one adds itself when enabled and removes itself when disabled.
+    public static readonly List<TutorialHighlight> All = new List<TutorialHighlight>();
+
+    private void OnEnable()  { All.Add(this); }
+    private void OnDisable() { All.Remove(this); }
+
+    /// <summary>Is this object the target for that step? (e.g. a cage for Feed and Clean)</summary>
+    public bool Covers(TutorialStep step) => System.Array.IndexOf(steps, step) >= 0;
+
+    /// <summary>The point just above the top of this object, for the guide arrow to point at.</summary>
+    public Vector3 GuidePoint
+    {
+        get
+        {
+            // The collider is the object's clickable shape, so its top is the top of the object
+            Collider col = GetComponentInChildren<Collider>();
+            if (col != null && col.enabled)
+            {
+                Bounds b = col.bounds;
+                return new Vector3(b.center.x, b.max.y, b.center.z);
+            }
+            return transform.position + Vector3.up;   // no collider: a little above the pivot
+        }
+    }
 
     // HDRP Unlit materials store their colour under this name
     private const string ColorProperty = "_UnlitColor";

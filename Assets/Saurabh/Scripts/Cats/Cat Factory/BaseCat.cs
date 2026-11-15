@@ -58,12 +58,70 @@ public class BaseCat : MonoBehaviour
         return new Bounds(transform.position, Vector3.zero);
     }
 
+    // RARE CATS (see CatFactory.MakeRare)
+    public bool IsRare { get; set; }     // a special cat: worth more, looks different
+    public bool OnHold { get; set; }     // rare cats arrive on hold: Takers skip them until YOU decide
+    public bool IsResident { get; set; } // kept by the player: lives on a resident spot, needs no care
+    public string CatName { get; set; } = "";   // only residents get named (empty = no name)
+
+    // "Biscuit" for a named cat, otherwise e.g. "The lazy one"
+    public string DisplayName
+    {
+        get
+        {
+            if (!string.IsNullOrEmpty(CatName)) return CatName;
+            switch (currentBehavior)
+            {
+                case CatBehavior.Lazy:     return "The lazy one";
+                case CatBehavior.Skittish: return "The shy one";
+                case CatBehavior.Angry:    return "The grumpy one";
+                default:                   return "The playful one";
+            }
+        }
+    }
+
+    /// <summary>Gives the cat a different coat (used for rare cats).</summary>
+    public void SetCoat(Material coat)
+    {
+        if (coat == null) return;
+        ApplyCoat(coat);
+    }
+
     // True while the cat sits on the reception desk during a deal (set by CustomerAI)
     public bool OnDesk { get; set; }
 
     // "Belongs to a customer right now": in their hands OR on the desk in a deal.
     // Care and reactions check this, so you can't feed a cat that's being sold or bought.
     public bool IsHeldByCustomer => OnDesk || GetComponentInParent<CustomerAI>() != null;
+
+    // How this cat's meows and purrs sound. All cats share one clip; pitch and volume give each personality its voice.
+    public float VoicePitch
+    {
+        get
+        {
+            switch (currentBehavior)
+            {
+                case CatBehavior.Lazy:     return 0.85f;   // low and slow
+                case CatBehavior.Skittish: return 1.3f;    // high and quick
+                case CatBehavior.Angry:    return 0.95f;   // a little low, said firmly (louder)
+                default:                   return 1.1f;    // playful: bright
+            }
+        }
+    }
+
+    public float VoiceVolume
+    {
+        get
+        {
+            switch (currentBehavior)
+            {
+                case CatBehavior.Lazy:     return 0.75f;   // can barely be bothered
+                case CatBehavior.Skittish: return 0.8f;    // shy
+                case CatBehavior.Angry:    return 1.15f;   // loud about it
+                default:                   return 1f;
+            }
+        }
+    }
 
     // ==========================================
     // MOVING THE CAT (hand, desk, cage)
@@ -173,15 +231,24 @@ public class BaseCat : MonoBehaviour
         cleanlinessLevel = 0;
 
         // 2. Apply Visuals & Audio
-        if (material != null)
-        {
-            foreach (Renderer part in bodyRenderers)
-            {
-                if (part != null) part.sharedMaterial = material;
-            }
-        }
+        if (material != null) ApplyCoat(material);
         if (catAudio != null && voiceClip != null) catAudio.clip = voiceClip;
         if (catAnimator != null) catAnimator.SetInteger("BehaviorType", (int)currentBehavior);
+    }
+
+    // Puts the coat material on every part in bodyRenderers.
+    // A mesh can have SEVERAL material slots (the eyeballs have one per eye).
+    // "sharedMaterial = coat" only fills the FIRST slot, so we fill every slot instead.
+    private void ApplyCoat(Material coat)
+    {
+        foreach (Renderer part in bodyRenderers)
+        {
+            if (part == null) continue;
+
+            Material[] slots = new Material[part.sharedMaterials.Length];   // one entry per slot
+            for (int i = 0; i < slots.Length; i++) slots[i] = coat;
+            part.sharedMaterials = slots;   // must assign the whole array back; editing it in place does nothing
+        }
     }
 
     [ContextMenu("Fill Body Renderers")]

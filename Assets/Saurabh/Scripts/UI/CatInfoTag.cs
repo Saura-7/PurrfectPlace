@@ -56,12 +56,40 @@ public class CatInfoTag : MonoBehaviour
         int care = cat.TotalCare;
         int nextTierAt = CareRules.NextTierAt(care);
 
-        string text = $"<size=75%>{cat.Pattern} | {cat.Body} | {cat.Behavior}</size>\n";
+        string text = "";
+        if (cat.IsResident)
+        {
+            // A resident isn't for sale, so it skips care tiers and worth: just who it is and what it does for you
+            text += $"<b>{cat.CatName}</b> <size=75%><color=#E9A23B>RARE</color> · Resident</size>\n";
+            text += $"<size=75%>{cat.Pattern} | {cat.Body} | {cat.Behavior}</size>\n";
+            text += "<size=70%><i>Makes the shop cozy: a few more adopters visit</i></size>";
+            return text;
+        }
+        if (cat.IsRare)
+        {
+            text += "<color=#E9A23B><b>RARE</b></color>";
+            if (cat.OnHold) text += "<size=75%> · On hold: keep it, or put it up for adoption</size>";
+            text += "\n";
+        }
+        text += $"<size=75%>{cat.Pattern} | {cat.Body} | {cat.Behavior}</size>\n";
+        text += $"<size=70%><i>{PersonalityLine(cat.Behavior)}</i></size>\n";
         text += $"<b>{CareRules.ColoredName(CareRules.TierOf(care))}</b>";
         if (nextTierAt > 0)
             text += $"<size=75%>  next: {CareRules.Name(CareRules.TierOf(nextTierAt))} at {nextTierAt} total</size>";
-        text += $"\nWorth {cat.CalculateFinalPrice()} GP <size=75%>(+{CareRules.ValuePerPoint} per care)</size>";
+        text += $"\nWorth {cat.CalculateFinalPrice()} GP <size=75%>(+{CareRules.ValuePerPointFor(cat)} per care)</size>";
         return text;
+    }
+
+    // One short line that turns a trait name into a little character
+    private static string PersonalityLine(CatBehavior behavior)
+    {
+        switch (behavior)
+        {
+            case CatBehavior.Lazy:     return "Would nap all day if you let it";
+            case CatBehavior.Angry:    return "Grumpy, but secretly sweet";
+            case CatBehavior.Skittish: return "Startles at every little sound";
+            default:                   return "Chases anything that moves";
+        }
     }
 
     public void Hide()

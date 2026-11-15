@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -254,13 +255,37 @@ public class CustomerAI : MonoBehaviour
         heldCat.MoveTo(parent, standOnSurface);   // MoveTo also keeps the cat its normal size (see BaseCat)
     }
 
+    // True for the second or two while the adopted cat says goodbye on the desk
+    public bool IsSayingGoodbye { get; private set; }
+
+    [Header("Adoption goodbye")]
+    [SerializeField] private float maxGoodbyeTime = 2f;   // never wait longer than this
+
     public BaseCat CompleteTakerTransactionAndLeave()
     {
-        TakeCatBack();   // the adopter picks the cat up from the desk and leaves with it
         BaseCat soldCat = heldCat;
         // Debug.Log($"[SOA {systemName}] Taker transaction complete. Leaving with cat '{soldCat?.name}'.");
-        ChangeState(CustomerState.Leaving);
+        StartCoroutine(GoodbyeThenLeave());
         return soldCat;
+    }
+
+    // The cat does its goodbye on the desk, THEN the adopter picks it up and leaves
+    private IEnumerator GoodbyeThenLeave()
+    {
+        IsSayingGoodbye = true;
+        if (talkCollider != null) talkCollider.enabled = false;   // nothing to click during the goodbye
+
+        if (heldCat != null && heldCat.OnDesk && heldCat.TryGetComponent(out CatReaction reaction))
+        {
+            float time = reaction.PlayGoodbye();
+            AudioManager.Play(Sfx.PurrClean, heldCat.VoicePitch, heldCat.VoiceVolume);
+            Juice.Punch(transform, 0.08f);   // the adopter does a happy little bounce
+            yield return new WaitForSeconds(Mathf.Min(time, maxGoodbyeTime));
+        }
+
+        IsSayingGoodbye = false;
+        TakeCatBack();   // the adopter picks the cat up from the desk and leaves with it
+        ChangeState(CustomerState.Leaving);
     }
 
     public BaseCat RejectTakerTransactionAndLeave()
@@ -300,6 +325,17 @@ public class CustomerAI : MonoBehaviour
 
     public void DismissForNewDay()
     {
+        // The day ended in the middle of an adoption goodbye: the cat is already sold,
+        // so it leaves with the adopter (never back to a cage)
+        if (IsSayingGoodbye)
+        {
+            StopAllCoroutines();
+            IsSayingGoodbye = false;
+            TakeCatBack();
+            Destroy(gameObject);
+            return;
+        }
+
         // A cat left on the desk goes back into the customer's hands first,
         // so it isn't left behind when this customer is removed
         TakeCatBack();

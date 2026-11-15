@@ -81,10 +81,16 @@ public class CustomerSpawner : MonoBehaviour
         return true;
     }
 
+    [Tooltip("The empty-shop stray bonus only applies up to this day (a safety net for new players)")]
+    [SerializeField] private int emptyShopBonusUntilDay = 3;
+
     // Weighted random pick: a row with weight 4 is picked twice as often as a row with weight 2
     private PoolEntry PickFromPool()
     {
-        bool shopEmpty = CageManager.Instance.CatCount == 0;
+        // The empty-shop stray bonus is a safety net for NEW players only (days 1 to 3).
+        // Later, a skilled player could empty the cages on purpose to farm free strays.
+        int day = DayManager.Instance != null ? DayManager.Instance.Day : 1;
+        bool shopEmpty = CageManager.Instance.CatCount == 0 && day <= emptyShopBonusUntilDay;
         int catsShown = CageManager.Instance.CatsForAdoption;
 
         // Add up the weights of everyone who is allowed to come right now
@@ -109,13 +115,20 @@ public class CustomerSpawner : MonoBehaviour
         return lastValid;   // only reached because of tiny rounding errors
     }
 
+    [Tooltip("Extra adopter weight per resident cat. A cat on display gives 1.5, so keeping a cat is always worth less than selling it")]
+    [SerializeField] private float adopterWeightPerResident = 0.5f;
+
     // This entry's chance right now (0 = cannot come)
     // Example: a Taker with weight 0 and 2 per cat shown has weight 6 when 3 cats are waiting
     private float WeightOf(PoolEntry entry, bool shopEmpty, int catsShown)
     {
         if (entry.needsCatToAdopt && catsShown == 0) return 0f;
+        // Residents make the shop a little more charming to adopters (only affects rows that come for cats)
+        float residentBonus = entry.weightPerCatShown > 0f ? adopterWeightPerResident * ResidentCats.Count : 0f;
+
         return entry.weight
              + entry.weightPerCatShown * catsShown
+             + residentBonus
              + (shopEmpty ? entry.emptyShopBonus : 0f);
     }
 

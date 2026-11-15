@@ -12,6 +12,12 @@ public class CareSubsystem : MonoBehaviour
     private InputSystem_Actions inputActions;
     private InputAction LeftShoulder;
     private InputAction RightShoulder;
+    private InputAction petAction;
+    private InputAction optionsAction;
+
+    [Header("Petting")]
+    [SerializeField] private float petCooldown = 0.6f;   // seconds between pets, so mashing R doesn't spam hearts
+    private float nextPetTime;
     // private InputAction interact1Action;
 
     void OnEnable()
@@ -19,8 +25,20 @@ public class CareSubsystem : MonoBehaviour
         inputActions = new InputSystem_Actions();
         RightShoulder = inputActions.Player.FeedCat;
         LeftShoulder = inputActions.Player.CleanCat;
+        petAction = inputActions.Player.PetCat;
+        optionsAction = inputActions.Player.CatOptions;
         // interact1Action = inputActions.Player.Interact1;
         inputActions.Enable();
+    }
+
+    // Every "new InputSystem_Actions()" must be turned off and thrown away when we're done,
+    // or Unity warns "InputSystem_Actions...Disable() has not been called" (a small leak) when Play stops.
+    void OnDisable()
+    {
+        if (inputActions == null) return;
+        inputActions.Disable();
+        inputActions.Dispose();
+        inputActions = null;
     }
 
  private void Update()
@@ -45,6 +63,50 @@ public class CareSubsystem : MonoBehaviour
     {
         TryCareForCat(isFeeding: true); 
     }
+    else if (petAction.WasPressedThisFrame())
+    {
+        TryPetCat();
+    }
+    else if (optionsAction.WasPressedThisFrame())
+    {
+        TryOpenCatOptions();
+    }
+}
+
+// F on a rare cat (on hold or a resident): open the keep / adopt panel
+private void TryOpenCatOptions()
+{
+    if (Camera.main == null) return;
+
+    Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
+    if (!Physics.Raycast(ray, out RaycastHit hit, maxInteractionDistance)) return;
+
+    BaseCat cat = hit.collider.GetComponent<BaseCat>();
+    if (cat == null || cat.IsHeldByCustomer || !cat.IsRare) return;
+    if (!cat.OnHold && !cat.IsResident) return;   // already up for adoption: nothing to decide
+
+    RareCatPanel.Open(cat);
+}
+
+// Petting is free and changes no numbers: it's there so cats feel like characters, not stock
+private void TryPetCat()
+{
+    if (Camera.main == null || Time.time < nextPetTime) return;
+
+    Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
+    if (!Physics.Raycast(ray, out RaycastHit hit, maxInteractionDistance)) return;
+
+    BaseCat cat = hit.collider.GetComponent<BaseCat>();
+    if (cat == null || cat.IsHeldByCustomer) return;
+    if (!cat.TryGetComponent(out CatReaction reaction)) return;
+
+    nextPetTime = Time.time + petCooldown;
+
+    string said = reaction.PlayPet();          // the cat reacts in its own way and tells us what it "said"
+    cat.PlayInteractAnimation();               // its own voice clip
+    AudioManager.Play(Sfx.PurrClean, cat.VoicePitch, cat.VoiceVolume);
+    // Only a refusal gets words: "Hiss!" is news (it didn't work). A happy pet is shown by the cat itself.
+    if (said == "Hiss!") FloatingNumbers.Show(cat.CenterPosition, FloatingNumbers.Spend(said));
 }
 
 private void TryCareForCat(bool isFeeding)
@@ -57,9 +119,11 @@ private void TryCareForCat(bool isFeeding)
     {
         BaseCat clickedCat = hit.collider.GetComponent<BaseCat>();
 
-        if (clickedCat == null)
+        if (clickedCat == null) return;
+
+        if (clickedCat.IsResident)
         {
-            Debug.LogWarning("Raycast hit an object, but it is not a Cat.");
+            MessageUI.Notify($"{clickedCat.CatName} is family: no care needed, just pets.");
             return;
         }
 
@@ -101,7 +165,7 @@ private void TryCareForCat(bool isFeeding)
 
         clickedCat.PlayInteractAnimation();
         if (clickedCat.TryGetComponent(out CatReaction reaction)) reaction.Play(isFeeding);
-        AudioManager.Play(isFeeding ? Sfx.MeowFeed : Sfx.PurrClean);
+        AudioManager.Play(isFeeding ? Sfx.MeowFeed : Sfx.PurrClean, clickedCat.VoicePitch, clickedCat.VoiceVolume);
         TutorialNote.Complete(isFeeding ? TutorialStep.Feed : TutorialStep.Clean);
     }
     else
