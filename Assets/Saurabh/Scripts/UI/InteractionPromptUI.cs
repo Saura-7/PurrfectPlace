@@ -84,8 +84,8 @@ public class InteractionPromptUI : MonoBehaviour
             // A resident needs no care: just pet it, or open its options
             if (cat.IsResident) return $"{cat.CatName}     Pet [{pet}]     Options [{options}]";
 
-            // A rare cat on hold: the normal care line, plus a reminder that you need to decide
-            string decide = cat.IsRare && cat.OnHold ? $"\nKeep or put up for adoption [{options}]" : "";
+            // A rare cat on hold: one more short key on the SAME line (the tag explains why)
+            string decide = cat.IsRare && cat.OnHold ? $"     Options [{options}]" : "";
 
             return $"Feed [{feed}] {cat.feedingLevel}/{BaseCat.MaxLevel}{CostText(cat, true)}     " +
                    $"Clean [{clean}] {cat.cleanlinessLevel}/{BaseCat.MaxLevel}{CostText(cat, false)}     " +

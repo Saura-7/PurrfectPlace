@@ -84,10 +84,7 @@ public class BaseCat : MonoBehaviour
     public void SetCoat(Material coat)
     {
         if (coat == null) return;
-        foreach (Renderer part in bodyRenderers)
-        {
-            if (part != null) part.sharedMaterial = coat;
-        }
+        ApplyCoat(coat);
     }
 
     // True while the cat sits on the reception desk during a deal (set by CustomerAI)
@@ -234,15 +231,24 @@ public class BaseCat : MonoBehaviour
         cleanlinessLevel = 0;
 
         // 2. Apply Visuals & Audio
-        if (material != null)
-        {
-            foreach (Renderer part in bodyRenderers)
-            {
-                if (part != null) part.sharedMaterial = material;
-            }
-        }
+        if (material != null) ApplyCoat(material);
         if (catAudio != null && voiceClip != null) catAudio.clip = voiceClip;
         if (catAnimator != null) catAnimator.SetInteger("BehaviorType", (int)currentBehavior);
+    }
+
+    // Puts the coat material on every part in bodyRenderers.
+    // A mesh can have SEVERAL material slots (the eyeballs have one per eye).
+    // "sharedMaterial = coat" only fills the FIRST slot, so we fill every slot instead.
+    private void ApplyCoat(Material coat)
+    {
+        foreach (Renderer part in bodyRenderers)
+        {
+            if (part == null) continue;
+
+            Material[] slots = new Material[part.sharedMaterials.Length];   // one entry per slot
+            for (int i = 0; i < slots.Length; i++) slots[i] = coat;
+            part.sharedMaterials = slots;   // must assign the whole array back; editing it in place does nothing
+        }
     }
 
     [ContextMenu("Fill Body Renderers")]

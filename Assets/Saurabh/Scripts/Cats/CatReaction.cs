@@ -54,11 +54,11 @@ public class CatReaction : MonoBehaviour
     // True while a hop, shake or pet reaction is moving the cat (CatIdle waits for it to finish)
     public bool IsPlaying => running != null;
 
-    /// <summary>A small hop with no particles, for idle life (half the personality's normal hop).</summary>
+    /// <summary>A small hop with no particles, for idle life (a third of the personality's normal hop).</summary>
     public void PlayIdleHop()
     {
         Profile p = GetProfile();
-        Begin(new Profile { hopHeight = p.hopHeight * 0.5f, duration = p.duration, squash = p.squash * 0.5f }, null);
+        Begin(new Profile { hopHeight = p.hopHeight * 0.35f, duration = p.duration, squash = p.squash * 0.35f }, null);
     }
 
     /// <summary>A quick startled shake, for a skittish cat hearing the door.</summary>
@@ -71,8 +71,8 @@ public class CatReaction : MonoBehaviour
     [SerializeField, Range(0f, 1f)] private float angryRefuseChance = 0.4f;   // grumpy cats don't always want it
 
     /// <summary>
-    /// Pet the cat. Returns what the cat "says", shown as a small pop-up.
-    /// Each personality reacts its own way: that's the point of petting.
+    /// Pet the cat. Returns what the cat "says" (only "Hiss!" is shown on screen; the rest
+    /// is told by the body and the eyes). Each personality reacts its own way: that's the point of petting.
     /// </summary>
     public string PlayPet()
     {
@@ -86,6 +86,7 @@ public class CatReaction : MonoBehaviour
         }
 
         BeginPoses(PetPoses(), feedEffect);   // each personality's own pet animation, with the pink hearts
+        CloseEyesHappily(1.2f);               // the happy squint: says "purr" without any text
 
         switch (cat.Behavior)
         {
@@ -94,6 +95,12 @@ public class CatReaction : MonoBehaviour
             case CatBehavior.Skittish: return "Eep! ...purr";
             default:                   return "Purr!";
         }
+    }
+
+    // Asks CatFace (if the cat has one) for a content, eyes-closed squint
+    private void CloseEyesHappily(float seconds)
+    {
+        if (TryGetComponent(out CatFace face)) face.Content(seconds);
     }
 
     // Called by CareSubsystem when care is refused (not enough GP, or the stat is already full):
@@ -126,6 +133,7 @@ public class CatReaction : MonoBehaviour
         Pose[] poses = PetPoses();
         if (!Prepare(feedEffect, force: true)) return 0f;   // force: the cat is "with a customer", but this is its goodbye
         running = StartCoroutine(PoseRoutine(poses));
+        CloseEyesHappily(1.5f);
 
         float total = 0f;
         foreach (Pose p in poses) total += p.duration + p.hold;

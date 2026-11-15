@@ -105,9 +105,8 @@ private void TryPetCat()
     string said = reaction.PlayPet();          // the cat reacts in its own way and tells us what it "said"
     cat.PlayInteractAnimation();               // its own voice clip
     AudioManager.Play(Sfx.PurrClean, cat.VoicePitch, cat.VoiceVolume);
-    if (said == "") return;
-    bool refused = said == "Hiss!";
-    FloatingNumbers.Show(cat.CenterPosition, refused ? FloatingNumbers.Spend(said) : FloatingNumbers.Gain(said));
+    // Only a refusal gets words: "Hiss!" is news (it didn't work). A happy pet is shown by the cat itself.
+    if (said == "Hiss!") FloatingNumbers.Show(cat.CenterPosition, FloatingNumbers.Spend(said));
 }
 
 private void TryCareForCat(bool isFeeding)
