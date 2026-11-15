@@ -119,11 +119,7 @@ private void TryCareForCat(bool isFeeding)
     {
         BaseCat clickedCat = hit.collider.GetComponent<BaseCat>();
 
-        if (clickedCat == null)
-        {
-            Debug.LogWarning("Raycast hit an object, but it is not a Cat.");
-            return;
-        }
+        if (clickedCat == null) return;
 
         if (clickedCat.IsResident)
         {

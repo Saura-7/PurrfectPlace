@@ -54,7 +54,7 @@ public class CoreEconomySystem : MonoBehaviour
     public void ModifyGP(int amount, string subsystemName)
     {
         currentGP += amount;
-        Tally(amount >= 0 ? $"GP in  · {subsystemName}" : $"GP out · {subsystemName}", Mathf.Abs(amount));   // for the "ledger" command
+        Tally(GpLine(amount >= 0, subsystemName), Mathf.Abs(amount));   // for the "ledger" command and the day receipt
         
         string actionType = amount >= 0 ? "ADD" : "SUBTRACT";
         SOALogger.LogAudit(subsystemName, actionType, amount, "GP", currentGP);
@@ -95,6 +95,24 @@ public class CoreEconomySystem : MonoBehaviour
         string text = "Today so far:";
         foreach (string line in lines) text += $"\n  {line}: {ledger[line]}";
         return text;
+    }
+
+
+    // The ledger line for GP moving in or out of one system, e.g. "GP out · CareSubsystem".
+    // ModifyGP writes with it and the day receipt reads with it, so the two always match.
+    private static string GpLine(bool gpIn, string subsystemName)
+    {
+        return gpIn ? $"GP in  · {subsystemName}" : $"GP out · {subsystemName}";
+    }
+
+    // How much GP one system brought IN today / took OUT today (0 if none)
+    public int TodayIn(string subsystemName)  => LedgerValue(GpLine(true, subsystemName));
+    public int TodayOut(string subsystemName) => LedgerValue(GpLine(false, subsystemName));
+
+    private int LedgerValue(string line)
+    {
+        ledger.TryGetValue(line, out int value);   // value stays 0 if the line isn't there
+        return value;
     }
 
     // --- REPUTATION ---
