@@ -27,6 +27,29 @@ public class ReceptionDesk : MonoBehaviour
     // [SerializeField] private int missedDealRep = 1;          // reputation LOST when the shop cannot complete a deal
     [SerializeField] private int noDealRep = 3;              // reputation LOST for every "no", chosen or forced
 
+    // One desk in the shop, so other scripts (like CustomerPatience) can reach it
+    public static ReceptionDesk Instance { get; private set; }
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
+    // True while this customer's deal is up on the monitor (the player is serving them)
+    public bool IsServing(CustomerAI customer)
+    {
+        return customer != null && customer == currentInteractingCustomer && dealUIPanel.activeSelf;
+    }
+
+    // Called by CustomerPatience when the customer at the desk gives up and leaves.
+    // It works exactly like a missed deal: the cat goes home (or back to its cage), −3 reputation.
+    public void CustomerWalkedOut(CustomerAI customer)
+    {
+        if (customer != CustomerQueueManager.Instance.GetCurrentCustomerAtDesk()) return;
+        currentInteractingCustomer = customer;
+        HandleReject(true, walkedOut: true);
+    }
+
     private void OnEnable()
     {
         inputActions = new InputSystem_Actions();
@@ -250,10 +273,12 @@ public class ReceptionDesk : MonoBehaviour
     }
 
     // The shared rejection logic. forcedByGame is true when the game rejects the deal for the player.
-    private void HandleReject(bool forcedByGame)
+    // walkedOut is true when the customer ran out of patience (always also forcedByGame).
+    // "bool walkedOut = false" is an optional parameter: the old calls without it still work.
+    private void HandleReject(bool forcedByGame, bool walkedOut = false)
     {
         if (currentInteractingCustomer == null) return;
-        CoreEconomySystem.Tally(forcedByGame ? "Refused · couldn't" : "Refused · chose to");
+        CoreEconomySystem.Tally(walkedOut ? "Refused · walked out" : forcedByGame ? "Refused · couldn't" : "Refused · chose to");
 
         if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Taker)
         {
@@ -275,6 +300,7 @@ public class ReceptionDesk : MonoBehaviour
         if (forcedByGame)
         {
             DayManager.RecordMissed();      // counted as "missed" in the day summary
+            string why = walkedOut ? "A customer got tired of waiting" : "Deal missed";
             MessageUI.Notify($"Deal missed: -{noDealRep} reputation", ToastKind.Bad);
         }
         else
