@@ -42,7 +42,8 @@ public class CageManager : MonoBehaviour
             int count = 0;
             foreach (var pair in occupiedCages)
             {
-                if (pair.Value != null && !reservedCages.Contains(pair.Key)) count++;
+                // On-hold (rare) cats aren't on display for adoption until the player decides
+                if (pair.Value != null && !pair.Value.OnHold && !reservedCages.Contains(pair.Key)) count++;
             }
             return count;
         }
@@ -109,7 +110,7 @@ public class CageManager : MonoBehaviour
             BaseCat cat = pair.Value;
 
             // Check that the cage has a cat AND is not reserved by another Taker
-            if (cat != null && !reservedCages.Contains(cage))
+            if (cat != null && !cat.OnHold && !reservedCages.Contains(cage))   // never take a cat that's on hold
             {
                 reservedCages.Add(cage); // Instantly reserve this cage for the caller
                 // Debug.Log($"[SOA {systemName}] Cage '{cage.name}' reserved for incoming Taker.");

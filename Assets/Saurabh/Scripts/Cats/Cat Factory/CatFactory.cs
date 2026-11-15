@@ -12,6 +12,14 @@ public class CatFactory : MonoBehaviour
     // 0=Solid(Red), 1=Spotted(Blue), 2=Calico(Green), 3=Tuxedo(Black)
     public Material[] patternMaterials; 
 
+    [Header("Rare cats")]
+    [SerializeField, Range(0f, 1f)] private float rareChance = 0.04f;   // 0.04 = about 1 in 25 cats from Givers and strays
+    [SerializeField] private int guaranteedRareByDay = 2;   // if none has appeared yet, the first cat from this day on is rare
+    [SerializeField] private Material rareCoat;             // optional special coat (leave empty to keep the normal pattern)
+    [SerializeField] private GameObject rareSparklePrefab;  // a looping sparkle particle effect that follows the cat
+
+    private bool rareSeen;   // has a rare cat appeared yet this session?
+
     private void Awake()
     {
         if (Instance != null && Instance != this) Destroy(gameObject);
@@ -29,6 +37,44 @@ public class CatFactory : MonoBehaviour
     {
         GameObject newCatObj = Instantiate(catPrefab, spawnPosition, Quaternion.identity);
         return SetupCat(newCatObj, behavior, body, pattern);
+    }
+
+    // ==========================================
+    // RARE CATS
+    // ==========================================
+
+    // Should the next cat from a Giver or stray finder be rare?
+    private bool RollRare()
+    {
+        int day = DayManager.Instance != null ? DayManager.Instance.Day : 1;
+
+        // Every player should meet one: if none has shown up by day 2, this one is rare
+        if (!rareSeen && day >= guaranteedRareByDay) return true;
+
+        return Random.value < rareChance;
+    }
+
+    /// <summary>
+    /// Turns a cat into a rare cat: worth more, a special look, sparkles, and On hold
+    /// (so a customer can't take it before the player decides what to do with it).
+    /// </summary>
+    public void MakeRare(BaseCat cat)
+    {
+        if (cat == null || cat.IsRare) return;
+
+        rareSeen = true;
+        cat.IsRare = true;
+        cat.OnHold = true;
+        cat.SetCoat(rareCoat);
+
+        if (rareSparklePrefab != null)
+        {
+            // A child of the cat, so the sparkles follow it into the cage, the desk and hands
+            GameObject sparkle = Instantiate(rareSparklePrefab, cat.transform);
+            sparkle.transform.position = cat.CenterPosition;
+        }
+
+        cat.name += " [RARE]";
     }
 
     // --- Helper Methods ---
@@ -70,6 +116,8 @@ public class CatFactory : MonoBehaviour
         // IMPORTANT: set the stats AFTER SetupCat, because InitializeCat resets them to 0
         newCat.feedingLevel = Random.Range(0, 3);      // 0, 1 or 2 (the max value is excluded)
         newCat.cleanlinessLevel = Random.Range(0, 3);  // 0, 1 or 2
+
+        if (RollRare()) MakeRare(newCat);
 
         return newCat;
     }

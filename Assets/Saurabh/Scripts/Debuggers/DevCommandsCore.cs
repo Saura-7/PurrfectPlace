@@ -90,7 +90,7 @@ public class DevCommandsCore : MonoBehaviour
 
     private void AddCatCommands()
     {
-        DevConsole.Add("spawncat", "spawncat [feed] [clean] [traits] · e.g. spawncat 4 4 skittish chonky calico", args =>
+        DevConsole.Add("spawncat", "spawncat [feed] [clean] [traits] [rare] · e.g. spawncat 4 4 skittish chonky calico rare", args =>
         {
             // Numbers are care levels (first = feed, second = clean). Words are traits, in any order.
             // Anything you leave out is random.
@@ -98,10 +98,12 @@ public class DevCommandsCore : MonoBehaviour
             CatBehavior? behavior = null;
             CatBody? body = null;
             CatPattern? pattern = null;
+            bool rare = false;
 
             foreach (string word in args)
             {
-                if (int.TryParse(word, out int number))
+                if (word.Equals("rare", StringComparison.OrdinalIgnoreCase)) rare = true;
+                else if (int.TryParse(word, out int number))
                 {
                     if (numbersSeen == 0) feed = number;
                     else if (numbersSeen == 1) clean = number;
@@ -120,12 +122,13 @@ public class DevCommandsCore : MonoBehaviour
 
             // Same steps as StarterCats: make the cat, set care AFTER it's made, then put it in the cage
             BaseCat cat = CatFactory.Instance.GenerateRandomCat(cage.position, behavior, body, pattern);
+            if (rare) CatFactory.Instance.MakeRare(cat);
             cat.feedingLevel = Mathf.Clamp(feed, 0, BaseCat.MaxLevel);
             cat.cleanlinessLevel = Mathf.Clamp(clean, 0, BaseCat.MaxLevel);
             CageManager.Instance.OccupyCage(cage, cat);
 
             string tier = CareRules.Name(CareRules.TierOf(cat.TotalCare));
-            return $"Spawned a {tier} {cat.Pattern} {cat.Body} {cat.Behavior} cat ({cat.feedingLevel}/{cat.cleanlinessLevel}) in {cage.name}";
+            return $"Spawned a {(cat.IsRare ? "RARE " : "")}{tier} {cat.Pattern} {cat.Body} {cat.Behavior} cat ({cat.feedingLevel}/{cat.cleanlinessLevel}) in {cage.name}";
         });
 
         DevConsole.Add("maxcare", "maxcare · every cat to 6/6 (Purrfect)", args => SetAllCare(BaseCat.MaxLevel));

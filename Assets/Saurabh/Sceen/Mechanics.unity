@@ -1358,6 +1358,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CareRules
   baseValue: 30
   valuePerPoint: 15
+  rareValueMultiplier: 2
   firstLevelCost: 5
   costStepPerLevel: 3
   averageFrom: 4
@@ -14924,6 +14925,7 @@ MonoBehaviour:
     emptyShopBonus: 4
     weightPerCatShown: 0
     needsCatToAdopt: 0
+  emptyShopBonusUntilDay: 3
 --- !u!224 &2918862268760559834
 RectTransform:
   m_ObjectHideFlags: 0

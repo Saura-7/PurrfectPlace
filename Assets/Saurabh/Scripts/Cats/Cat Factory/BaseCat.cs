@@ -58,6 +58,20 @@ public class BaseCat : MonoBehaviour
         return new Bounds(transform.position, Vector3.zero);
     }
 
+    // RARE CATS (see CatFactory.MakeRare)
+    public bool IsRare { get; set; }     // a special cat: worth more, looks different
+    public bool OnHold { get; set; }     // rare cats arrive on hold: Takers skip them until YOU decide
+
+    /// <summary>Gives the cat a different coat (used for rare cats).</summary>
+    public void SetCoat(Material coat)
+    {
+        if (coat == null) return;
+        foreach (Renderer part in bodyRenderers)
+        {
+            if (part != null) part.sharedMaterial = coat;
+        }
+    }
+
     // True while the cat sits on the reception desk during a deal (set by CustomerAI)
     public bool OnDesk { get; set; }
 

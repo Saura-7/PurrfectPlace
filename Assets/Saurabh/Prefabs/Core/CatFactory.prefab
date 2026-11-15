@@ -50,3 +50,7 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 91b1760ec81c5104e82cb386b4a67de3, type: 2}
   - {fileID: 2100000, guid: 44251923304b86b4fbb136119fa6a867, type: 2}
   - {fileID: 2100000, guid: 43aba74a48ebfcb43889514d4fb97344, type: 2}
+  rareChance: 0.04
+  guaranteedRareByDay: 2
+  rareCoat: {fileID: 2100000, guid: 332c58d7b8563244f9b4049e50f565a5, type: 2}
+  rareSparklePrefab: {fileID: 7035382954692211420, guid: 374d929b7235b5e4f8ceaab20418ad85, type: 3}

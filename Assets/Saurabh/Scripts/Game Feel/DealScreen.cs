@@ -141,7 +141,8 @@ public class DealScreen : MonoBehaviour
 
     private void SetCat(BaseCat cat)
     {
-        traitsText.text = $"{cat.Pattern} · {cat.Body} · {cat.Behavior}";
+        string rare = cat.IsRare ? "<color=#E9A23B><b>RARE</b></color> · " : "";
+        traitsText.text = $"{rare}{cat.Pattern} · {cat.Body} · {cat.Behavior}";
         careText.text = $"<b>{CareRules.ColoredName(CareRules.TierOf(cat.TotalCare))}</b>   " +
                         $"Feed {cat.feedingLevel}/{BaseCat.MaxLevel} · Clean {cat.cleanlinessLevel}/{BaseCat.MaxLevel}";
     }

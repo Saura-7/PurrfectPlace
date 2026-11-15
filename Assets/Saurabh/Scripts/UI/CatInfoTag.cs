@@ -56,12 +56,15 @@ public class CatInfoTag : MonoBehaviour
         int care = cat.TotalCare;
         int nextTierAt = CareRules.NextTierAt(care);
 
-        string text = $"<size=75%>{cat.Pattern} | {cat.Body} | {cat.Behavior}</size>\n";
+        string text = "";
+        if (cat.IsRare)
+            text += $"<color=#E9A23B><b>RARE</b></color>{(cat.OnHold ? "<size=75%> · On hold</size>" : "")}\n";
+        text += $"<size=75%>{cat.Pattern} | {cat.Body} | {cat.Behavior}</size>\n";
         text += $"<size=70%><i>{PersonalityLine(cat.Behavior)}</i></size>\n";
         text += $"<b>{CareRules.ColoredName(CareRules.TierOf(care))}</b>";
         if (nextTierAt > 0)
             text += $"<size=75%>  next: {CareRules.Name(CareRules.TierOf(nextTierAt))} at {nextTierAt} total</size>";
-        text += $"\nWorth {cat.CalculateFinalPrice()} GP <size=75%>(+{CareRules.ValuePerPoint} per care)</size>";
+        text += $"\nWorth {cat.CalculateFinalPrice()} GP <size=75%>(+{CareRules.ValuePerPointFor(cat)} per care)</size>";
         return text;
     }
 
