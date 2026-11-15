@@ -168,9 +168,8 @@ public class ReceptionDesk : MonoBehaviour
             currentInteractingCustomer.CompleteTakerTransactionAndLeave();
             CageManager.Instance.FreeCage(currentInteractingCustomer.HomeCage); // the cat is adopted, so the cage is free now
 
-            MessageUI.Notify(donation > 0
-                ? $"Adopted! +{currentDealPrice} GP and a +{donation} GP donation"
-                : $"Adopted! +{currentDealPrice} GP", ToastKind.Good);
+            // No "Adopted! +75 GP" toast: the deal screen showed the number and the GP counter rolls it.
+            // Saying it a third time made each signal matter less (design flaw 9). Only the heart toast stays.
 
             // One heart toast in the cat's own voice; the best-cared cats get a little praise in front
             CareTier tier = CareRules.TierOf(care);

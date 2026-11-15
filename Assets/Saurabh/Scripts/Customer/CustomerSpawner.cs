@@ -81,10 +81,16 @@ public class CustomerSpawner : MonoBehaviour
         return true;
     }
 
+    [Tooltip("The empty-shop stray bonus only applies up to this day (a safety net for new players)")]
+    [SerializeField] private int emptyShopBonusUntilDay = 3;
+
     // Weighted random pick: a row with weight 4 is picked twice as often as a row with weight 2
     private PoolEntry PickFromPool()
     {
-        bool shopEmpty = CageManager.Instance.CatCount == 0;
+        // The empty-shop stray bonus is a safety net for NEW players only (days 1 to 3).
+        // Later, a skilled player could empty the cages on purpose to farm free strays.
+        int day = DayManager.Instance != null ? DayManager.Instance.Day : 1;
+        bool shopEmpty = CageManager.Instance.CatCount == 0 && day <= emptyShopBonusUntilDay;
         int catsShown = CageManager.Instance.CatsForAdoption;
 
         // Add up the weights of everyone who is allowed to come right now
