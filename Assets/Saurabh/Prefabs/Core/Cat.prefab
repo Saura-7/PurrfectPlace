@@ -839,6 +839,7 @@ GameObject:
   - component: {fileID: 5110306921422118953}
   - component: {fileID: 3499384012469813425}
   - component: {fileID: 4939120111513167665}
+  - component: {fileID: -7682841706968441404}
   m_Layer: 0
   m_Name: Cat
   m_TagString: Untagged
@@ -973,6 +974,9 @@ MonoBehaviour:
   lazyGap: {x: 10, y: 20}
   skittishGap: {x: 7, y: 14}
   angryGap: {x: 8, y: 16}
+  lazyNapChance: 0.6
+  otherNapChance: 0.15
+  napLength: {x: 20, y: 40}
 --- !u!114 &4939120111513167665
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -992,8 +996,27 @@ MonoBehaviour:
   maxHeadYaw: 45
   maxHeadPitch: 20
   headSpeed: 5
+  napHeadDroop: 15
   tailAxis: {x: 0, y: 1, z: 0}
   blinkTime: 0.12
+--- !u!114 &-7682841706968441404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3812270900494404771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a5a1568be22d034cb7fee8b4640e4aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CatNap
+  settle: 0.1
+  spread: 0.03
+  easeTime: 1.2
+  breathDepth: 0.015
+  breathsPerSecond: 0.3
+  zEvery: 3
 --- !u!1 &5092628558729002485
 GameObject:
   m_ObjectHideFlags: 0

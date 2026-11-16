@@ -57,6 +57,43 @@ public class ReputationLevels : MonoBehaviour
         }
     }
 
+    // For the HUD's reputation bar: where the current level starts, where the next one starts
+    // (-1 at the top level), and what the next level gives
+    public static int LevelStartsAt
+    {
+        get
+        {
+            if (instance == null) return 0;
+            if (Level == 2) return instance.belovedAt;
+            if (Level == 1) return instance.trustedAt;
+            return 0;
+        }
+    }
+
+    public static int NextLevelAt
+    {
+        get
+        {
+            if (instance == null) return -1;
+            if (Level == 0) return instance.trustedAt;
+            if (Level == 1) return instance.belovedAt;
+            return -1;   // already at the top
+        }
+    }
+
+    public static string NextName => Level == 0 ? "Trusted" : Level == 1 ? "Beloved" : "";
+
+    public static int NextDonation
+    {
+        get
+        {
+            if (instance == null) return 0;
+            if (Level == 0) return instance.trustedDonation;
+            if (Level == 1) return instance.belovedDonation;
+            return 0;
+        }
+    }
+
     // ==========================================
     // INSIDE THE LEVELS
     // ==========================================

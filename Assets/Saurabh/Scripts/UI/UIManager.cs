@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro; // Required for TextMeshPro
+using UnityEngine.UI;
 
 /// <summary>
 /// Keeps the money corner of the HUD up to date: GP, reputation, and the "+30" change.
@@ -19,6 +20,11 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Color gainColor = new Color32(0x3F, 0xA2, 0x8C, 0xFF);   // green
     [SerializeField] private Color lossColor = new Color32(0xE8, 0x5D, 0x4A, 0xFF);   // red
 
+    [Header("Reputation bar")]
+    [SerializeField] private Image repBarFill;              // Sliced image stretched across the bar: its right anchor = progress
+    [SerializeField] private TextMeshProUGUI repNextText;   // "Next: Trusted at 150 · +5 GP per adoption"
+    [SerializeField] private float repBarSpeed = 6f;        // how quickly the bar glides to its new length
+
     private readonly string systemName = "UIManager";
 
     // The counter
@@ -26,6 +32,11 @@ public class UIManager : MonoBehaviour
     private int targetGP;          // the real GP
     private float rollFrom;        // the number shown when the current roll began
     private float rollProgress = 1f;   // 0 = roll just started, 1 = finished
+
+    // The reputation bar
+    private float repBarTarget;            // 0 to 1: progress through the current level
+    private float repBarShown;             // what the bar shows right now (glides toward the target)
+    private int lastRep = int.MinValue;    // int.MinValue = "not shown yet"
 
     // The "+30" label
     private int changeTotal;       // adds up changes that come quickly one after another
@@ -60,6 +71,7 @@ public class UIManager : MonoBehaviour
         int currentReputation = CoreEconomySystem.Instance.GetReputation(systemName);
 
         reputationText.text = $"Rep {currentReputation} · {ReputationLevels.Name}";
+        UpdateReputationBar(currentReputation);
 
         if (!started)
         {
@@ -93,6 +105,14 @@ public class UIManager : MonoBehaviour
             gpText.text = $"{ShownGP()} GP";
         }
 
+        // The reputation bar glides to its new length (real time, so it moves on the frozen receipt too)
+        if (repBarFill != null)
+        {
+            repBarShown = Mathf.Lerp(repBarShown, repBarTarget, 1f - Mathf.Exp(-repBarSpeed * dt));
+            Vector2 max = repBarFill.rectTransform.anchorMax;
+            repBarFill.rectTransform.anchorMax = new Vector2(repBarShown, max.y);
+        }
+
         if (gpChangeText != null && changeTimer > 0f)
         {
             changeTimer -= dt;
@@ -100,6 +120,32 @@ public class UIManager : MonoBehaviour
             gpChangeText.alpha = Mathf.Clamp01(changeTimer / 0.3f);
             if (changeTimer <= 0f) changeTotal = 0;   // next change starts a new total
         }
+    }
+
+    // Works out how far through the current level the player is, and what the next level gives.
+    // This is the answer to "why should I care about reputation?", shown from the very first day.
+    private void UpdateReputationBar(int reputation)
+    {
+        int from = ReputationLevels.LevelStartsAt;
+        int to = ReputationLevels.NextLevelAt;
+
+        if (to < 0)
+        {
+            // Top level: a full bar and what it's giving you
+            repBarTarget = 1f;
+            if (repNextText != null) repNextText.text = $"Top level · +{ReputationLevels.Donation} GP per adoption";
+        }
+        else
+        {
+            // e.g. 60 rep between 0 and 150 = 0.4 of the way
+            repBarTarget = Mathf.Clamp01((reputation - from) / (float)(to - from));
+            if (repNextText != null)
+                repNextText.text = $"Next: {ReputationLevels.NextName} at {to} · +{ReputationLevels.NextDonation} GP per adoption";
+        }
+
+        if (lastRep == int.MinValue) repBarShown = repBarTarget;            // first time: no animation
+        else if (reputation != lastRep) Juice.Punch(reputationText.transform, 0.1f);   // a bump when it changes
+        lastRep = reputation;
     }
 
     // The number on screen right now, part-way between rollFrom and targetGP.
