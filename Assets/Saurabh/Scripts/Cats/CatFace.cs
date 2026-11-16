@@ -123,7 +123,8 @@ public class CatFace : MonoBehaviour
     {
         if (headPivot == null) return;
 
-        else if (glanceTimer > 0f) glanceTimer -= dt;
+        // Pick up the next glance from the to-do list when the last one ends
+        if (glanceTimer > 0f) glanceTimer -= dt;
         if (glanceTimer <= 0f && glances.Count > 0)
         {
             currentGlance = glances.Dequeue();
