@@ -17,6 +17,7 @@ public class ResidentCats : MonoBehaviour
 
     [Tooltip("Empty objects where residents live (a cushion, a shelf). The number of spots = the most residents you can have")]
     [SerializeField] private List<Transform> spots = new List<Transform>();
+    [SerializeField] private TipData residentTip;   // shown the first time a cat becomes a resident
 
     // Which spot each resident sits on
     private readonly Dictionary<Transform, BaseCat> residents = new Dictionary<Transform, BaseCat>();
@@ -52,6 +53,7 @@ public class ResidentCats : MonoBehaviour
         Juice.Squash(cat.transform);
         MessageUI.Notify($"{catName} lives here now!", ToastKind.Heart);
         AudioManager.Play(Sfx.ResidentJoins);
+        TipCard.Show(residentTip);   // only does anything the very first time
         return true;
     }
 

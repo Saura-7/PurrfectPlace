@@ -31,6 +31,7 @@ public class CustomerPatience : MonoBehaviour
     [SerializeField] private Color fullColor = new Color32(0x3F, 0xA2, 0x8C, 0xFF);   // teal: happy to wait
     [SerializeField] private Color calmColor = new Color32(0xE9, 0xA2, 0x3B, 0xFF);   // amber
     [SerializeField] private Color angryColor = new Color32(0xE8, 0x83, 0x6A, 0xFF);  // coral
+    [SerializeField] private TipData patienceTip;   // shown the first time any patience bar appears
 
     private CustomerAI customer;
     private float patience = 1f;   // 1 = full, 0 = they leave
@@ -114,6 +115,10 @@ public class CustomerPatience : MonoBehaviour
     {
         if (barRoot == null || barRoot.activeSelf == show) return;
         barRoot.SetActive(show);
-        if (show) Juice.PopIn(barRoot.transform);   // a small pop so the eye notices it
+        if (show)
+        {
+            Juice.PopIn(barRoot.transform);   // a small pop so the eye notices it
+            TipCard.Show(patienceTip);       // only does anything the very first time
+        }
     }
 }

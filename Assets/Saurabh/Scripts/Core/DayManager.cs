@@ -46,6 +46,7 @@ public class DayManager : MonoBehaviour
     [Header("Day receipt")]
     [SerializeField] private float lineDelay = 0.2f;    // seconds between receipt lines
     [SerializeField] private float rentPause = 0.6f;    // the beat of suspense before the rent line
+    [SerializeField] private TipData rentTip;           // shown the first morning that rent is due
 
     // ==========================================
     // WHAT THIS SCRIPT REMEMBERS
@@ -204,6 +205,9 @@ public class DayManager : MonoBehaviour
 
         RefreshRentText();
         UpdateTimerText();
+
+        // The first morning rent is due gets a tip card (it waits until the fade-in is done)
+        if (RentSystem.Instance != null && RentSystem.Instance.IsRentDay(day)) TipCard.Show(rentTip);
 
         if (UsesSign())
         {

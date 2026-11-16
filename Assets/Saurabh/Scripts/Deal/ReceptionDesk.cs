@@ -26,7 +26,7 @@ public class ReceptionDesk : MonoBehaviour
     [SerializeField] private int giverRescueRep = 3;         // reputation for taking in a Giver's cat
     // [SerializeField] private int missedDealRep = 1;          // reputation LOST when the shop cannot complete a deal
     [SerializeField] private int noDealRep = 3;              // reputation LOST for every "no", chosen or forced
-
+    [SerializeField] private TipData rareCatTip;             // shown the first time a rare cat lands on the desk
     // One desk in the shop, so other scripts (like CustomerPatience) can reach it
     public static ReceptionDesk Instance { get; private set; }
 
@@ -165,7 +165,11 @@ public class ReceptionDesk : MonoBehaviour
             {
                 Juice.PopIn(dealUIPanel.transform, 0.25f);                    // the deal screen pops open
                 Juice.Squash(currentInteractingCustomer.heldCat.transform);   // the cat lands softly on the desk
-                if (cat.IsRare) AudioManager.Play(Sfx.RareCat);               // something special just arrived
+                if (cat.IsRare)
+                {
+                    AudioManager.Play(Sfx.RareCat);                           // something special just arrived
+                    TipCard.Show(rareCatTip);                                // explained once, the first time
+                }
             }
         }
         else
