@@ -40,6 +40,9 @@ public class DayManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI resultsText;
     [SerializeField] private GameObject nextDayButton;
 
+    [Header("Between days")]
+    [SerializeField] private float fadeTime = 0.6f;    // seconds to fade to cream at closing (and back, ×1.5)
+
     [Header("Day receipt")]
     [SerializeField] private float lineDelay = 0.2f;    // seconds between receipt lines
     [SerializeField] private float rentPause = 0.6f;    // the beat of suspense before the rent line
@@ -324,20 +327,29 @@ public class DayManager : MonoBehaviour
         CustomerSpawner spawner = FindFirstObjectByType<CustomerSpawner>();
         if (spawner != null) spawner.StopSpawning();
 
-        ClearShopForNewDay();
-
-        // 2. Freeze the game and show the (empty) summary panel
+        // 2. Freeze the game straight away (no walking during the fade)
         PauseMenu.PauseDisabled = true;
         PauseMenu pauseMenu = FindFirstObjectByType<PauseMenu>();
         if (pauseMenu != null) pauseMenu.FreezeGame();
 
         if (nextDayButton != null) nextDayButton.SetActive(false);   // shown when the receipt has finished
         resultsText.text = "";
-        endPanel.SetActive(true);
         UpdateTimerText();
 
-        // 3. Print the receipt line by line (rent is taken part-way through)
-        StartCoroutine(PrintReceipt());
+        // 3. Fade out, tidy the shop while it's hidden, then print the receipt
+        StartCoroutine(EndOfDaySequence());
+    }
+
+    // The end of a day, in order. A coroutine, because each step waits for the one before.
+    private IEnumerator EndOfDaySequence()
+    {
+        yield return ScreenFader.FadeTo(1f, fadeTime);   // the shop fades to cream
+
+        ClearShopForNewDay();                             // customers leave while nobody can see
+        endPanel.SetActive(true);
+        Juice.PopIn(endPanel.transform, 0.25f);           // the receipt pops up on the cream
+
+        yield return PrintReceipt();                      // line by line, rent part-way through
     }
 
     // ==========================================
@@ -520,7 +532,8 @@ public class DayManager : MonoBehaviour
         PauseMenu pauseMenu = FindFirstObjectByType<PauseMenu>();
         if (pauseMenu != null) pauseMenu.UnfreezeGame();
 
-        BeginDay();
+        BeginDay();                                // the new morning is set up under the cream...
+        ScreenFader.Fade(0f, fadeTime * 1.5f);     // ...then fades in, a little slower, like waking up
     }
 
     // ==========================================
