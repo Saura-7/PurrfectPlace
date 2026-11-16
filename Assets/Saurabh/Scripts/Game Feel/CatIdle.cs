@@ -25,9 +25,15 @@ public class CatIdle : MonoBehaviour
     [SerializeField] private Vector2 skittishGap = new Vector2(14f, 28f);
     [SerializeField] private Vector2 angryGap    = new Vector2(16f, 32f);
 
+    [Header("Naps")]
+    [SerializeField] private float lazyNapChance = 0.6f;     // a lazy cat's habit is a nap 60% of the time
+    [SerializeField] private float otherNapChance = 0.15f;   // playful and grumpy cats nap now and then
+    [SerializeField] private Vector2 napLength = new Vector2(20f, 40f);   // seconds asleep
+
     private BaseCat cat;
     private CatReaction reaction;
     private CatFace face;
+    private CatNap nap;
     private float nextIdleTime;
     private Coroutine turning;   // the body turn currently playing, or null
 
@@ -36,6 +42,7 @@ public class CatIdle : MonoBehaviour
         cat = GetComponent<BaseCat>();
         reaction = GetComponent<CatReaction>();
         face = GetComponent<CatFace>();
+        nap = GetComponent<CatNap>();
     }
 
     private void OnEnable()
@@ -68,7 +75,8 @@ public class CatIdle : MonoBehaviour
                && !cat.IsHeldByCustomer                        // not in someone's arms or on the desk
                && (reaction == null || !reaction.IsPlaying)    // not mid-hop from feeding or petting
                && (face == null || !face.IsGlancing)           // head not already busy
-               && turning == null;                             // not already turning
+               && turning == null                              // not already turning
+               && (nap == null || !nap.IsNapping);             // not asleep
     }
 
     private void ScheduleNext()
@@ -96,6 +104,13 @@ public class CatIdle : MonoBehaviour
     {
         bool coin = Random.value < 0.5f;   // a coin flip, so each cat has two habits, not one
 
+        // Sometimes the habit is a proper nap instead (skittish cats never: they stay on guard)
+        if (nap != null && Random.value < NapChance(cat.Behavior))
+        {
+            nap.StartNap(Random.Range(napLength.x, napLength.y));
+            return;
+        }
+
         switch (cat.Behavior)
         {
             case CatBehavior.Playful:
@@ -119,6 +134,16 @@ public class CatIdle : MonoBehaviour
                 if (coin) Turn(120f, 0.6f, 2f, 0.8f);                       // turns its back, then turns round again
                 else if (face != null) face.QueueGlance(-40f, 0f, 2f);      // a long, grumpy look away
                 break;
+        }
+    }
+
+    private float NapChance(CatBehavior behavior)
+    {
+        switch (behavior)
+        {
+            case CatBehavior.Lazy:     return lazyNapChance;
+            case CatBehavior.Skittish: return 0f;
+            default:                   return otherNapChance;
         }
     }
 

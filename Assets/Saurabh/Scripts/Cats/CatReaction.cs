@@ -155,6 +155,10 @@ public class CatReaction : MonoBehaviour
             Restore();
         }
 
+        // A napping cat wakes up first and stands normally again, so we remember its REAL size,
+        // not its squashed sleeping size (otherwise it would stay flat after the hop).
+        if (TryGetComponent(out CatNap nap)) nap.WakeUp();
+
         // Remember where the cat really is, how big it really is, and who holds it.
         basePosition = transform.localPosition;
         baseScale = transform.localScale;

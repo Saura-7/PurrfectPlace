@@ -197,7 +197,7 @@ public class BaseCat : MonoBehaviour
     // The box around everything the cat draws (body, head, tail), in world space.
     // Renderer bounds update the moment the cat moves, unlike collider bounds,
     // which only update on the next physics step.
-    private Bounds VisualBounds()
+    public Bounds VisualBounds()   // public: CatNap uses it to keep the feet on the floor
     {
         Bounds total = new Bounds(transform.position, Vector3.zero);
         bool first = true;

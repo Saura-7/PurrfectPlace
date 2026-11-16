@@ -36,6 +36,7 @@ public class CatFace : MonoBehaviour
     [SerializeField] private float maxHeadYaw = 45f;      // the furthest it turns its head left/right (degrees)
     [SerializeField] private float maxHeadPitch = 20f;    // the furthest it looks up/down (degrees)
     [SerializeField] private float headSpeed = 5f;        // how quickly the head follows (higher = snappier)
+    [SerializeField] private float napHeadDroop = 15f;    // degrees the head nods down while asleep
 
     [Header("Tail")]
     [SerializeField] private Vector3 tailAxis = Vector3.up;  // the hinge the tail swings around (try (0,0,1) if it looks wrong)
@@ -44,6 +45,7 @@ public class CatFace : MonoBehaviour
     [SerializeField] private float blinkTime = 0.12f;     // seconds for one close-and-open
 
     private BaseCat cat;
+    private CatNap nap;
 
     // The pivots' starting rotation and size, so every change is "on top of" the model's own pose
     private Quaternion headBase, tailBase;
@@ -68,10 +70,12 @@ public class CatFace : MonoBehaviour
 
     // TAIL: a random starting point in the sway, so cats side by side don't wag in sync
     private float tailPhase;
+    private float tailCalm = 1f;   // 1 = normal sway, 0.2 = barely moving (asleep). Eased, so it never snaps.
 
     private void Awake()
     {
         cat = GetComponent<BaseCat>();
+        nap = GetComponent<CatNap>();   // optional: without it the cat just never naps
 
         if (headPivot == null) headPivot = FindDeep(transform, "HeadPivot");
         if (lidPivot == null)  lidPivot  = FindDeep(transform, "EyelidPivot");
@@ -99,7 +103,7 @@ public class CatFace : MonoBehaviour
 
         UpdateHead(dt);
         UpdateEyes(dt);
-        UpdateTail();
+        UpdateTail(dt);
     }
 
     // ==========================================
@@ -119,8 +123,7 @@ public class CatFace : MonoBehaviour
     {
         if (headPivot == null) return;
 
-        // Pick up the next glance from the to-do list when the last one ends
-        if (glanceTimer > 0f) glanceTimer -= dt;
+        else if (glanceTimer > 0f) glanceTimer -= dt;
         if (glanceTimer <= 0f && glances.Count > 0)
         {
             currentGlance = glances.Dequeue();
@@ -134,6 +137,10 @@ public class CatFace : MonoBehaviour
             // In a customer's arms or on the desk: look straight ahead, and forget any glances
             glances.Clear();
             glanceTimer = 0f;
+        }
+        else if (Asleep)
+        {
+            goalPitch = napHeadDroop;   // positive X tips the head down: a sleepy nod
         }
         else if (glanceTimer > 0f)
         {
@@ -199,6 +206,9 @@ public class CatFace : MonoBehaviour
     // The eyes are only ever fully OPEN or fully SHUT. A half-closed lid looked like a flat disc
     // on this model (it's a squashed copy of the eyeball, not a real eyelid), so we don't use it.
 
+    // Asleep in a proper nap (see CatNap). Eyes shut, head down, tail almost still.
+    private bool Asleep => nap != null && nap.IsAsleep;
+
     /// <summary>Close the eyes for a while (a lazy cat dozing off).</summary>
     public void Doze(float seconds) { holdClosedTimer = seconds; }
 
@@ -211,7 +221,11 @@ public class CatFace : MonoBehaviour
 
         float goal = 1f;   // open
 
-        if (holdClosedTimer > 0f)
+        if (Asleep)
+        {
+            goal = 0f;   // napping: shut for as long as the nap lasts
+        }
+        else if (holdClosedTimer > 0f)
         {
             holdClosedTimer -= dt;
             goal = 0f;
@@ -229,7 +243,7 @@ public class CatFace : MonoBehaviour
         }
 
         // Blinks are fast (speed 40), dozing off is slow (speed 4)
-        float speed = holdClosedTimer > 0f ? 4f : 40f;
+        float speed = holdClosedTimer > 0f || Asleep ? 4f : 40f;
         eyeOpen = Mathf.Lerp(eyeOpen, goal, 1f - Mathf.Exp(-speed * dt));
 
         // The lid grows DOWN from the top of the eyes (that's why EyelidPivot sits at the top).
@@ -262,7 +276,7 @@ public class CatFace : MonoBehaviour
     // TAIL
     // ==========================================
 
-    private void UpdateTail()
+    private void UpdateTail(float dt)
     {
         if (tailPivot == null) return;
 
@@ -281,7 +295,11 @@ public class CatFace : MonoBehaviour
         float t = (Time.time + tailPhase) * speed * Mathf.PI * 2f;
         float wave = Mathf.Sin(t) * 0.8f + Mathf.Sin(t * 2.3f) * 0.2f;
 
-        tailPivot.localRotation = tailBase * Quaternion.AngleAxis(wave * amount, tailAxis);
+        // Asleep: ease the swing down to 20%. Only the SIZE changes, never the speed,
+        // because changing the speed would make the tail jump to a different point in the wave.
+        tailCalm = Mathf.MoveTowards(tailCalm, Asleep ? 0.2f : 1f, dt);
+
+        tailPivot.localRotation = tailBase * Quaternion.AngleAxis(wave * amount * tailCalm, tailAxis);
     }
 
     // ==========================================
