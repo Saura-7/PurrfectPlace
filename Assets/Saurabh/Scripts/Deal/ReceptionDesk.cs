@@ -157,6 +157,7 @@ public class ReceptionDesk : MonoBehaviour
             {
                 Juice.PopIn(dealUIPanel.transform, 0.25f);                    // the deal screen pops open
                 Juice.Squash(currentInteractingCustomer.heldCat.transform);   // the cat lands softly on the desk
+                if (cat.IsRare) AudioManager.Play(Sfx.RareCat);               // something special just arrived
             }
         }
         else
@@ -301,14 +302,14 @@ public class ReceptionDesk : MonoBehaviour
         {
             DayManager.RecordMissed();      // counted as "missed" in the day summary
             string why = walkedOut ? "A customer got tired of waiting" : "Deal missed";
-            MessageUI.Notify($"Deal missed: -{noDealRep} reputation", ToastKind.Bad);
+            MessageUI.Notify($"{why}: -{noDealRep} reputation", ToastKind.Bad);
         }
         else
         {
             DayManager.RecordDeclined();    // counted as "declined" in the day summary
             MessageUI.Notify($"Deal declined: -{noDealRep} reputation", ToastKind.Bad);
         }
-
+    
         AudioManager.Play(Sfx.PoliteNo);
         TutorialNote.Complete(TutorialStep.Serve);
 

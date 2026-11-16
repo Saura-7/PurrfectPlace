@@ -51,6 +51,7 @@ public class ResidentCats : MonoBehaviour
 
         Juice.Squash(cat.transform);
         MessageUI.Notify($"{catName} lives here now!", ToastKind.Heart);
+        AudioManager.Play(Sfx.ResidentJoins);
         return true;
     }
 

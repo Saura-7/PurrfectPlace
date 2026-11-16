@@ -22884,42 +22884,65 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 20187b48d427cd7478586fb5df72404a, type: 3}
     volume: 0.4
     randomPitch: 0
+    keepFullVolume: 0
   - sound: 1
     clip: {fileID: 8300000, guid: 7a001a09488a9aa48baf01000d4a0e34, type: 3}
     volume: 0.2
     randomPitch: 1
+    keepFullVolume: 0
   - sound: 2
-    clip: {fileID: 8300000, guid: 6c0d4d93634019045bcfefd28261d602, type: 3}
+    clip: {fileID: 8300000, guid: 03e8f8eb06c25d849a4060a413711a56, type: 3}
     volume: 2
     randomPitch: 1
+    keepFullVolume: 0
   - sound: 3
     clip: {fileID: 8300000, guid: 62ebbfc39e91b7941b469171801ad6c1, type: 3}
     volume: 0.3
     randomPitch: 0
+    keepFullVolume: 0
   - sound: 4
     clip: {fileID: 8300000, guid: eaaedca5dac93e14dbadc76bf1af6109, type: 3}
     volume: 0.3
     randomPitch: 0
+    keepFullVolume: 0
   - sound: 5
-    clip: {fileID: 8300000, guid: 2bff620c8ea79da49a0391f96f3aa575, type: 3}
+    clip: {fileID: 8300000, guid: 3469eb1fa225a0646979fac1107f1c22, type: 3}
     volume: 0.3
     randomPitch: 0
+    keepFullVolume: 0
   - sound: 6
     clip: {fileID: 8300000, guid: 24cca70230d796d4d88ce00a66d12e1b, type: 3}
     volume: 0.3
     randomPitch: 0
+    keepFullVolume: 0
   - sound: 7
     clip: {fileID: 8300000, guid: fd1165a06dc031c4990256abe6bb8632, type: 3}
     volume: 0.5
     randomPitch: 0
+    keepFullVolume: 0
   - sound: 8
     clip: {fileID: 8300000, guid: fd1165a06dc031c4990256abe6bb8632, type: 3}
-    volume: 0
+    volume: 0.5
     randomPitch: 0
+    keepFullVolume: 0
   - sound: 9
     clip: {fileID: 8300000, guid: 12f1643fbcacd48429df162ad8598ae8, type: 3}
     volume: 0.2
     randomPitch: 0
+    keepFullVolume: 0
+  - sound: 11
+    clip: {fileID: 8300000, guid: f9c2220ab60c6504a8c19e70cddced4b, type: 3}
+    volume: 0.2
+    randomPitch: 0
+    keepFullVolume: 0
+  - sound: 10
+    clip: {fileID: 8300000, guid: f9c2220ab60c6504a8c19e70cddced4b, type: 3}
+    volume: 0.2
+    randomPitch: 0
+    keepFullVolume: 0
+  repeatWindow: 0.3
+  repeatFalloff: 0.7
+  repeatFloor: 0.35
 --- !u!114 &7761697235928427736
 MonoBehaviour:
   m_ObjectHideFlags: 0

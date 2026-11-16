@@ -13,7 +13,10 @@ public enum Sfx
     ButtonClick,    // any world-space button
     ShopOpen,       // the sign is turned to Open
     ShopClosing,    // last call starts
-    DaySummary      // the summary screen appears
+    DaySummary,     // the summary screen appears
+    // New sounds go at the END only: the Inspector stores each row's sound as a number (its position here)
+    RareCat,        // a rare cat is put on the desk
+    ResidentJoins   // a rare cat becomes a resident
 }
 
 /// <summary>
