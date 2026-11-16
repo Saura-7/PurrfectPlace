@@ -84,7 +84,15 @@ public class ReceptionDesk : MonoBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit hit, maxInteractionDistance))
         {
-            // 1. A world-space button (Accept / Reject, Buy, the sign)
+            // 0. The shop PC: sit down at it (its Buy buttons are then clicked with the mouse)
+            ShopComputer computer = hit.collider.GetComponentInParent<ShopComputer>();
+            if (computer != null)
+            {
+                computer.SitDown();
+                return;
+            }
+
+            // 1. A world-space button (Accept / Reject, the sign)
             WorldSpaceUIButton uiButton = hit.collider.GetComponent<WorldSpaceUIButton>();
             if (uiButton != null)
             {

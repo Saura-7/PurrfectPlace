@@ -99,12 +99,11 @@ public class InteractionPromptUI : MonoBehaviour
             return sign.GetPrompt(InputPrompts.Get(PromptAction.Click));
         }
 
-        // Looking at the decor monitor
-        DecorMonitor decorMonitor = hit.collider.GetComponentInParent<DecorMonitor>();
-        if (decorMonitor != null && hit.distance <= deskDistance)
+        // Looking at the shop PC: sit down at it
+        ShopComputer computer = hit.collider.GetComponentInParent<ShopComputer>();
+        if (computer != null && hit.distance <= deskDistance)
         {
-            TutorialNote.Complete(TutorialStep.Computer);
-            return decorMonitor.GetPrompt(hit.collider, InputPrompts.Get(PromptAction.Click));
+            return $"Use computer [{InputPrompts.Get(PromptAction.Click)}]";
         }
 
         // 2. Looking at an Accept / Reject button
