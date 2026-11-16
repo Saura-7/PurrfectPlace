@@ -21,11 +21,17 @@ public class ControlsList : MonoBehaviour
             Line("Feed a cat", K(PromptAction.Feed)) +
             Line("Clean a cat", K(PromptAction.Clean)) +
             Line("Pet a cat", K(PromptAction.Pet)) +
-            Line("Rare cat options", K(PromptAction.CatOptions)) +
+            // Only once the player has met a rare cat: listing it earlier would spoil the surprise
+            (RareCatsSeen() ? Line("Rare cat options", K(PromptAction.CatOptions)) : "") +
             Line("Pause / leave PC", "Esc");
     }
 
-    // Action on the left, key lined up at 60% (the same <pos> trick as the day receipt)
+    private static bool RareCatsSeen()
+    {
+        return CatFactory.Instance != null && CatFactory.Instance.RareSeen;
+    }
+
+    // Action on the left, key lined up at 66% (the same <pos> trick as the day receipt)
     private static string Line(string action, string key)
     {
         return $"{action}<pos=66%><b>{key}</b>\n";

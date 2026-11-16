@@ -243,17 +243,30 @@ public class ReceptionDesk : MonoBehaviour
             }
         }
 
-        if (repGain > 0)
-        {
-            CoreEconomySystem.Instance.ModifyReputation(repGain, systemName);
-            MessageUI.Notify($"+{repGain} reputation", ToastKind.Heart);
-        }
+        // No "+8 reputation" toast: the deal screen already showed it, and the HUD counts it
+        if (repGain > 0) CoreEconomySystem.Instance.ModifyReputation(repGain, systemName);
 
         TutorialNote.Complete(TutorialStep.Serve);
 
         dealUIPanel.SetActive(false);
-        CustomerQueueManager.Instance.AdvanceQueue();
+
+        // An adopter says goodbye at the desk first: the next customer waits until that's over,
+        // so they don't walk into the cat's goodbye. Everyone else moves the line on at once.
+        if (currentInteractingCustomer.IsSayingGoodbye)
+            StartCoroutine(AdvanceAfterGoodbye(currentInteractingCustomer));
+        else
+            CustomerQueueManager.Instance.AdvanceQueue();
+
         currentInteractingCustomer = null;
+    }
+
+    // Waits until the adopter has finished saying goodbye, then lets the next customer step up
+    private System.Collections.IEnumerator AdvanceAfterGoodbye(CustomerAI adopter)
+    {
+        while (adopter != null && adopter.IsSayingGoodbye) yield return null;   // check again every frame
+
+        // Only if they're still first in line (the day may have ended and cleared the queue meanwhile)
+        if (CustomerQueueManager.Instance.Front == adopter) CustomerQueueManager.Instance.AdvanceQueue();
     }
 
     // How each personality leaves the shop

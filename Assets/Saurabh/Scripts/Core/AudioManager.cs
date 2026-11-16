@@ -56,6 +56,14 @@ public class AudioManager : MonoBehaviour
     private const string SfxKey = "SfxVolume";
 
     private AudioSource musicSource;
+    private AudioLowPassFilter musicFilter;   // muffles the music (cuts the high sounds) while paused
+
+    [Header("Muffled music while paused")]
+    [SerializeField] private float muffledCutoff = 900f;   // Hz: lower = more muffled ("through a wall")
+    [SerializeField] private float muffleSpeed = 8f;       // how quickly it muffles and clears
+    private const float ClearCutoff = 22000f;              // Hz: everything a person can hear passes = no muffle
+    private static bool muffled;
+    
     private AudioSource[] voices;       // a small pool of speakers for effects
     private int nextVoice;
 
@@ -68,8 +76,13 @@ public class AudioManager : MonoBehaviour
         MusicSetting = PlayerPrefs.GetFloat(MusicKey, 1f);   // the saved value, or full volume on first launch
         SfxSetting = PlayerPrefs.GetFloat(SfxKey, 1f);
 
-        // The music speaker
-        musicSource = gameObject.AddComponent<AudioSource>();
+        // The music speaker lives on its OWN child object. A low-pass filter affects every AudioSource
+        // on the same object, so this keeps the muffle on the music only (button clicks stay crisp).
+        GameObject musicObject = new GameObject("Music");
+        musicObject.transform.SetParent(transform, false);
+        musicSource = musicObject.AddComponent<AudioSource>();
+        musicFilter = musicObject.AddComponent<AudioLowPassFilter>();
+        musicFilter.cutoffFrequency = ClearCutoff;
         musicSource.loop = true;
         musicSource.playOnAwake = false;
         musicSource.spatialBlend = 0f;      // 0 = 2D sound: same volume wherever the player stands
@@ -121,6 +134,19 @@ public class AudioManager : MonoBehaviour
     {
         SfxSetting = Mathf.Clamp01(value);
         PlayerPrefs.SetFloat(SfxKey, SfxSetting);
+    }
+
+    /// <summary>Muffle the music (the pause menu calls this). It glides there over a moment.</summary>
+    public static void SetMuffled(bool on) => muffled = on;
+
+    private void Update()
+    {
+        if (musicFilter == null) return;
+
+        float target = muffled ? muffledCutoff : ClearCutoff;
+        // Unscaled: the game is frozen while paused, but the muffle still has to move.
+        float blend = 1f - Mathf.Exp(-muffleSpeed * Time.unscaledDeltaTime);
+        musicFilter.cutoffFrequency = Mathf.Lerp(musicFilter.cutoffFrequency, target, blend);
     }
 
     public static event System.Action<Sfx> OnSoundPlayed;

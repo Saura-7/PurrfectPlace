@@ -38,6 +38,9 @@ public class CustomerQueueManager : MonoBehaviour
         return true;
     }
 
+    // Whoever is first in line, whatever they're doing (even saying goodbye)
+    public CustomerAI Front => line.Count > 0 ? line[0] : null;
+
     public CustomerAI GetCurrentCustomerAtDesk()
     {
         if (line.Count > 0)

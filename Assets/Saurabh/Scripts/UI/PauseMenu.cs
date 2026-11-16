@@ -81,6 +81,7 @@ public class PauseMenu : MonoBehaviour
 
         FreezeGame();
         pausePanel.SetActive(true);
+        AudioManager.SetMuffled(true);   // the music sounds far away while paused
     }
 
     public void Resume()
@@ -89,12 +90,14 @@ public class PauseMenu : MonoBehaviour
 
         pausePanel.SetActive(false);
         UnfreezeGame();
+        AudioManager.SetMuffled(false);  // the music returns to normal
     }
 
     public void Restart()
     {
         // IMPORTANT: unfreeze time first, or the reloaded scene starts frozen
         Time.timeScale = 1f;
+        AudioManager.SetMuffled(false);   // a static setting survives the reload, so clear it
         IsPaused = false;
         PauseDisabled = false;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
