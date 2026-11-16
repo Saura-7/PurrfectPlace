@@ -17,14 +17,29 @@ public class DecorMonitor : MonoBehaviour
         public DecorSlot slot;
         public TextMeshProUGUI nameText;
         public TextMeshProUGUI priceText;
+        public TextMeshProUGUI descText;     // optional: the one-line "what it does" on the card
         public TextMeshProUGUI buttonLabel;
         public Image buttonImage;
         public WorldSpaceUIButton buyButton;
     }
 
+    // One tab at the top of the screen, and the page of cards it shows
+    [Serializable]
+    public class Tab
+    {
+        public WorldSpaceUIButton button;   // the tab itself (clicked with the mouse on the shop PC)
+        public Image buttonImage;           // coloured to show which tab is open
+        public GameObject page;             // the cards for this tab; the other pages are switched off
+    }
+
     [Header("Screen")]
     [SerializeField] private TextMeshProUGUI gpText;
     [SerializeField] private List<Row> rows = new List<Row>();
+
+    [Header("Tabs")]
+    [SerializeField] private List<Tab> tabs = new List<Tab>();
+    [SerializeField] private Color activeTabColor = new Color32(0x2C, 0x8C, 0x88, 0xFF);  // teal
+    [SerializeField] private Color idleTabColor = new Color32(0xE6, 0xE1, 0xD6, 0xFF);    // light grey
 
     [Header("Button colours")]
     [SerializeField] private Color buyColor = new Color(1f, 0.6f, 0.4f);        // coral FF9966
@@ -39,7 +54,14 @@ public class DecorMonitor : MonoBehaviour
             row.buyButton.onClick.AddListener(() => OnBuyPressed(thisRow));
         }
 
-        // Redraw whenever GP changes (rent, a sale, a purchase), so "Need X more" stays correct
+        for (int i = 0; i < tabs.Count; i++)
+        {
+            int index = i;   // copy, so each tab button remembers its OWN number (same reason as thisRow above)
+            tabs[i].button.onClick.AddListener(() => ShowTab(index));
+        }
+        ShowTab(0);
+
+        // Redraw whenever GP changes
         if (CoreEconomySystem.Instance != null)
             CoreEconomySystem.Instance.OnEconomyUpdated += Refresh;
 
@@ -76,6 +98,7 @@ public class DecorMonitor : MonoBehaviour
             // Name and price come from the slot, so there is only one place to change them
             row.nameText.text = slot.ItemName;
             row.priceText.text = $"{slot.Price} GP";
+            if (row.descText != null) row.descText.text = slot.Description;
 
             if (slot.IsBought)
             {
@@ -97,6 +120,18 @@ public class DecorMonitor : MonoBehaviour
                 row.buttonLabel.text = "BUY";
                 row.buttonImage.color = buyColor;
             }
+        }
+    }
+
+    // Show one tab's page and hide the others. A hidden page's buttons are switched off with it,
+    // so their colliders can't be clicked by accident.
+    private void ShowTab(int index)
+    {
+        for (int i = 0; i < tabs.Count; i++)
+        {
+            bool open = i == index;
+            if (tabs[i].page != null) tabs[i].page.SetActive(open);
+            if (tabs[i].buttonImage != null) tabs[i].buttonImage.color = open ? activeTabColor : idleTabColor;
         }
     }
 
