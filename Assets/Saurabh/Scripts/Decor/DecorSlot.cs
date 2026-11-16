@@ -10,6 +10,7 @@ public class DecorSlot : MonoBehaviour
     [Header("Item")]
     [SerializeField] private string itemName = "Cat Scratcher";
     [SerializeField] private int price = 100;
+    [SerializeField] private string description = "Makes the shop cozier";   // one short line on the shop PC card
 
     [Header("Optional")]
     [SerializeField] private DecorSlot requires;   // must be bought first (e.g. the 5th cage needs the 4th)
@@ -22,6 +23,7 @@ public class DecorSlot : MonoBehaviour
     // Read-only values the monitor uses to draw its rows
     public string ItemName => itemName;
     public int Price => price;
+    public string Description => description;
     public bool IsBought { get; private set; }
     public bool IsAvailable => requires == null || requires.IsBought;   // can it be bought yet?
     public string RequiresName => requires != null ? requires.ItemName : "";

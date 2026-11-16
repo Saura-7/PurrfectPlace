@@ -19,6 +19,7 @@ public class CatFactory : MonoBehaviour
     [SerializeField] private GameObject rareSparklePrefab;  // a looping sparkle particle effect that follows the cat
 
     private bool rareSeen;   // has a rare cat appeared yet this session?
+    public bool RareSeen => rareSeen;   // read-only, so the pause menu can hide the rare controls until then
 
     private void Awake()
     {

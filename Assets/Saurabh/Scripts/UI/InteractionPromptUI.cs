@@ -81,13 +81,11 @@ public class InteractionPromptUI : MonoBehaviour
             string pet = InputPrompts.Get(PromptAction.Pet);
             string options = InputPrompts.Get(PromptAction.CatOptions);
 
-            // A resident needs no care: just pet it, or open its options
-            if (cat.IsResident) return $"{cat.CatName}     Pet [{pet}]     Options [{options}]";
+                        // A rare cat on hold, or a resident: one more short key on the SAME line (the tag explains why)
+            string decide = cat.IsRare && (cat.OnHold || cat.IsResident) ? $"     Options [{options}]" : "";
+            string name = cat.IsResident ? $"{cat.CatName}     " : "";   // residents are greeted by name
 
-            // A rare cat on hold: one more short key on the SAME line (the tag explains why)
-            string decide = cat.IsRare && cat.OnHold ? $"     Options [{options}]" : "";
-
-            return $"Feed [{feed}] {cat.feedingLevel}/{BaseCat.MaxLevel}{CostText(cat, true)}     " +
+            return name + $"Feed [{feed}] {cat.feedingLevel}/{BaseCat.MaxLevel}{CostText(cat, true)}     " +
                    $"Clean [{clean}] {cat.cleanlinessLevel}/{BaseCat.MaxLevel}{CostText(cat, false)}     " +
                    $"Pet [{pet}]" + decide;
         }
@@ -99,12 +97,11 @@ public class InteractionPromptUI : MonoBehaviour
             return sign.GetPrompt(InputPrompts.Get(PromptAction.Click));
         }
 
-        // Looking at the decor monitor
-        DecorMonitor decorMonitor = hit.collider.GetComponentInParent<DecorMonitor>();
-        if (decorMonitor != null && hit.distance <= deskDistance)
+        // Looking at the shop PC: sit down at it
+        ShopComputer computer = hit.collider.GetComponentInParent<ShopComputer>();
+        if (computer != null && hit.distance <= deskDistance)
         {
-            TutorialNote.Complete(TutorialStep.Computer);
-            return decorMonitor.GetPrompt(hit.collider, InputPrompts.Get(PromptAction.Click));
+            return $"Use computer [{InputPrompts.Get(PromptAction.Click)}]";
         }
 
         // 2. Looking at an Accept / Reject button

@@ -53,8 +53,8 @@ public class GuideArrow : MonoBehaviour
         Camera cam = Camera.main;
         bool show = false;
 
-        // Paused or on the day summary (time frozen): no arrow
-        if (cam != null && Time.timeScale > 0f && TryGetTarget(out Vector3 target))
+        // Paused, on the day summary (time frozen) or seated at the shop PC: no arrow
+        if (cam != null && Time.timeScale > 0f && !ShopComputer.IsOpen && TryGetTarget(out Vector3 target))
         {
             show = PlaceArrow(cam, target);
         }

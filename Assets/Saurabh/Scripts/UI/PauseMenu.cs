@@ -62,6 +62,7 @@ public class PauseMenu : MonoBehaviour
         if (PauseDisabled) return;
         if (DevConsole.BlocksPause) return;   // Esc closes the console instead of pausing
         if (RareCatPanel.BlocksPause) return; // Esc closes the rare cat panel instead of pausing
+        if (ShopComputer.BlocksPause) return; // Esc stands up from the shop PC instead of pausing
 
         if (inputActions.Player.Pause.WasPressedThisFrame())
         {
@@ -80,6 +81,7 @@ public class PauseMenu : MonoBehaviour
 
         FreezeGame();
         pausePanel.SetActive(true);
+        AudioManager.SetMuffled(true);   // the music sounds far away while paused
     }
 
     public void Resume()
@@ -88,12 +90,14 @@ public class PauseMenu : MonoBehaviour
 
         pausePanel.SetActive(false);
         UnfreezeGame();
+        AudioManager.SetMuffled(false);  // the music returns to normal
     }
 
     public void Restart()
     {
         // IMPORTANT: unfreeze time first, or the reloaded scene starts frozen
         Time.timeScale = 1f;
+        AudioManager.SetMuffled(false);   // a static setting survives the reload, so clear it
         IsPaused = false;
         PauseDisabled = false;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);

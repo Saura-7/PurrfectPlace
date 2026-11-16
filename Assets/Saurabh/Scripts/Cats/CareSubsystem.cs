@@ -121,12 +121,6 @@ private void TryCareForCat(bool isFeeding)
 
         if (clickedCat == null) return;
 
-        if (clickedCat.IsResident)
-        {
-            MessageUI.Notify($"{clickedCat.CatName} is family: no care needed, just pets.");
-            return;
-        }
-
         if (clickedCat.IsHeldByCustomer)
         {
             MessageUI.Notify("This cat is with a customer.");

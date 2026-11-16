@@ -59,13 +59,12 @@ public class CatInfoTag : MonoBehaviour
         string text = "";
         if (cat.IsResident)
         {
-            // A resident isn't for sale, so it skips care tiers and worth: just who it is and what it does for you
+            // A resident: its name, and what it does for you. Care and worth follow below like any cat,
+            // because it can still be cared for and put up for adoption later.
             text += $"<b>{cat.CatName}</b> <size=75%><color=#E9A23B>RARE</color> · Resident</size>\n";
-            text += $"<size=75%>{cat.Pattern} | {cat.Body} | {cat.Behavior}</size>\n";
-            text += "<size=70%><i>Makes the shop cozy: a few more adopters visit</i></size>";
-            return text;
+            text += "<size=70%><i>Makes the shop cozy: a few more adopters visit</i></size>\n";
         }
-        if (cat.IsRare)
+        else if (cat.IsRare)
         {
             text += "<color=#E9A23B><b>RARE</b></color>";
             if (cat.OnHold) text += "<size=75%> · On hold: keep it, or put it up for adoption</size>";

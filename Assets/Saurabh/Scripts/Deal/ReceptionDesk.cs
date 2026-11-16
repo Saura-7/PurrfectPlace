@@ -27,6 +27,29 @@ public class ReceptionDesk : MonoBehaviour
     // [SerializeField] private int missedDealRep = 1;          // reputation LOST when the shop cannot complete a deal
     [SerializeField] private int noDealRep = 3;              // reputation LOST for every "no", chosen or forced
 
+    // One desk in the shop, so other scripts (like CustomerPatience) can reach it
+    public static ReceptionDesk Instance { get; private set; }
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
+    // True while this customer's deal is up on the monitor (the player is serving them)
+    public bool IsServing(CustomerAI customer)
+    {
+        return customer != null && customer == currentInteractingCustomer && dealUIPanel.activeSelf;
+    }
+
+    // Called by CustomerPatience when the customer at the desk gives up and leaves.
+    // It works exactly like a missed deal: the cat goes home (or back to its cage), −3 reputation.
+    public void CustomerWalkedOut(CustomerAI customer)
+    {
+        if (customer != CustomerQueueManager.Instance.GetCurrentCustomerAtDesk()) return;
+        currentInteractingCustomer = customer;
+        HandleReject(true, walkedOut: true);
+    }
+
     private void OnEnable()
     {
         inputActions = new InputSystem_Actions();
@@ -61,7 +84,15 @@ public class ReceptionDesk : MonoBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit hit, maxInteractionDistance))
         {
-            // 1. A world-space button (Accept / Reject, Buy, the sign)
+            // 0. The shop PC: sit down at it (its Buy buttons are then clicked with the mouse)
+            ShopComputer computer = hit.collider.GetComponentInParent<ShopComputer>();
+            if (computer != null)
+            {
+                computer.SitDown();
+                return;
+            }
+
+            // 1. A world-space button (Accept / Reject, the sign)
             WorldSpaceUIButton uiButton = hit.collider.GetComponent<WorldSpaceUIButton>();
             if (uiButton != null)
             {
@@ -134,6 +165,7 @@ public class ReceptionDesk : MonoBehaviour
             {
                 Juice.PopIn(dealUIPanel.transform, 0.25f);                    // the deal screen pops open
                 Juice.Squash(currentInteractingCustomer.heldCat.transform);   // the cat lands softly on the desk
+                if (cat.IsRare) AudioManager.Play(Sfx.RareCat);               // something special just arrived
             }
         }
         else
@@ -211,17 +243,30 @@ public class ReceptionDesk : MonoBehaviour
             }
         }
 
-        if (repGain > 0)
-        {
-            CoreEconomySystem.Instance.ModifyReputation(repGain, systemName);
-            MessageUI.Notify($"+{repGain} reputation", ToastKind.Heart);
-        }
+        // No "+8 reputation" toast: the deal screen already showed it, and the HUD counts it
+        if (repGain > 0) CoreEconomySystem.Instance.ModifyReputation(repGain, systemName);
 
         TutorialNote.Complete(TutorialStep.Serve);
 
         dealUIPanel.SetActive(false);
-        CustomerQueueManager.Instance.AdvanceQueue();
+
+        // An adopter says goodbye at the desk first: the next customer waits until that's over,
+        // so they don't walk into the cat's goodbye. Everyone else moves the line on at once.
+        if (currentInteractingCustomer.IsSayingGoodbye)
+            StartCoroutine(AdvanceAfterGoodbye(currentInteractingCustomer));
+        else
+            CustomerQueueManager.Instance.AdvanceQueue();
+
         currentInteractingCustomer = null;
+    }
+
+    // Waits until the adopter has finished saying goodbye, then lets the next customer step up
+    private System.Collections.IEnumerator AdvanceAfterGoodbye(CustomerAI adopter)
+    {
+        while (adopter != null && adopter.IsSayingGoodbye) yield return null;   // check again every frame
+
+        // Only if they're still first in line (the day may have ended and cleared the queue meanwhile)
+        if (CustomerQueueManager.Instance.Front == adopter) CustomerQueueManager.Instance.AdvanceQueue();
     }
 
     // How each personality leaves the shop
@@ -250,10 +295,12 @@ public class ReceptionDesk : MonoBehaviour
     }
 
     // The shared rejection logic. forcedByGame is true when the game rejects the deal for the player.
-    private void HandleReject(bool forcedByGame)
+    // walkedOut is true when the customer ran out of patience (always also forcedByGame).
+    // "bool walkedOut = false" is an optional parameter: the old calls without it still work.
+    private void HandleReject(bool forcedByGame, bool walkedOut = false)
     {
         if (currentInteractingCustomer == null) return;
-        CoreEconomySystem.Tally(forcedByGame ? "Refused · couldn't" : "Refused · chose to");
+        CoreEconomySystem.Tally(walkedOut ? "Refused · walked out" : forcedByGame ? "Refused · couldn't" : "Refused · chose to");
 
         if (currentInteractingCustomer.myType == CustomerAI.CustomerType.Taker)
         {
@@ -275,14 +322,15 @@ public class ReceptionDesk : MonoBehaviour
         if (forcedByGame)
         {
             DayManager.RecordMissed();      // counted as "missed" in the day summary
-            MessageUI.Notify($"Deal missed: -{noDealRep} reputation", ToastKind.Bad);
+            string why = walkedOut ? "A customer got tired of waiting" : "Deal missed";
+            MessageUI.Notify($"{why}: -{noDealRep} reputation", ToastKind.Bad);
         }
         else
         {
             DayManager.RecordDeclined();    // counted as "declined" in the day summary
             MessageUI.Notify($"Deal declined: -{noDealRep} reputation", ToastKind.Bad);
         }
-
+    
         AudioManager.Play(Sfx.PoliteNo);
         TutorialNote.Complete(TutorialStep.Serve);
 

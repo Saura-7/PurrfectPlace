@@ -209,7 +209,7 @@ public class TutorialNote : MonoBehaviour
         {
             case TutorialStep.Feed:     label = $"Feed a cat [{feed}]"; break;
             case TutorialStep.Clean:    label = $"Clean a cat [{clean}]"; break;
-            case TutorialStep.Computer: label = "Look at the shop computer"; break;
+            case TutorialStep.Computer: label = "Use the shop computer"; break;
             case TutorialStep.OpenShop: label = $"Open the shop at the sign [{click}]"; break;
             case TutorialStep.Serve:    label = $"Talk to the customer at the desk [{use}]"; break;
             default:                    label = $"Close the shop at the sign [{click}]"; break;
