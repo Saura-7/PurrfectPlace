@@ -50,7 +50,7 @@ public class CustomerPatience : MonoBehaviour
 
         // Waiting = at the front of the desk on a patience day. Counting = waiting AND not being served yet.
         bool waiting = IsWaitingAtDesk();
-        bool counting = waiting && !ReceptionDesk.Instance.IsServing(customer);
+        bool counting = waiting && !ReceptionDesk.Instance.IsAttending(customer);   // walking away un-freezes it
 
         if (counting)
         {

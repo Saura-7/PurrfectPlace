@@ -396,7 +396,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6fe59da012b54bb4a89efb5f3c32a61f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CustomerPatience
-  patienceSeconds: 60
+  patienceSeconds: 45
   startDay: 3
   showBarBelow: 1
   warnBelow: 0.25
