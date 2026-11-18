@@ -52,6 +52,9 @@ public class CatFactory : MonoBehaviour
         // Every player should meet one: if none has shown up by day 2, this one is rare
         if (!rareSeen && day >= guaranteedRareByDay) return true;
 
+        // Day 1 is for learning the basics: no surprise rare cats during the tutorial
+        if (day < guaranteedRareByDay) return false;
+
         return Random.value < rareChance;
     }
 

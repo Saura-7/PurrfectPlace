@@ -41,6 +41,20 @@ public class ReceptionDesk : MonoBehaviour
         return customer != null && customer == currentInteractingCustomer && dealUIPanel.activeSelf;
     }
 
+    [SerializeField] private float attendRange = 4f;   // metres from the desk that still count as "serving"
+
+    // Serving AND still standing at the desk. Opening a deal and walking away
+    // no longer freezes the customer's patience (that was a loophole).
+    public bool IsAttending(CustomerAI customer)
+    {
+        if (!IsServing(customer)) return false;
+
+        Camera cam = Camera.main;
+        if (cam == null || deskCatSpot == null) return true;   // can't measure: be kind to the player
+
+        return Vector3.Distance(cam.transform.position, deskCatSpot.position) <= attendRange;
+    }
+
     // Called by CustomerPatience when the customer at the desk gives up and leaves.
     // It works exactly like a missed deal: the cat goes home (or back to its cage), −3 reputation.
     public void CustomerWalkedOut(CustomerAI customer)
