@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 848338956358250236}
   serializedVersion: 2
   m_LocalRotation: {x: 0.3535543, y: 0.35355404, z: 0.6123717, w: 0.6123723}
-  m_LocalPosition: {x: -0.7219796, y: 0.600001, z: 1.4149818}
+  m_LocalPosition: {x: -1.1570431, y: 0.60000134, z: 1.625679}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -67,7 +67,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 73c176f402d2c2f4d929aa5da7585d17, type: 2}
+  - {fileID: 2100000, guid: ab4522c34a7bb6e43b82b758b2351054, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -163,6 +163,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DecorSlot
   itemName: Cat Scratcher
   price: 100
+  description: Makes the shop cozier
+  requires: {fileID: 0}
+  addsCage: {fileID: 0}
   itemVisual: {fileID: 6897527177460300874}
   forSaleMarker: {fileID: 4071581399127668291}
 --- !u!208 &1890794709198593962
@@ -209,7 +212,7 @@ Transform:
   m_GameObject: {fileID: 2228894648567458883}
   serializedVersion: 2
   m_LocalRotation: {x: -0.18301246, y: -0.18301232, z: 0.6830125, w: 0.68301314}
-  m_LocalPosition: {x: 2.98157, y: 0.59999764, z: 0.3357668}
+  m_LocalPosition: {x: 3.6897023, y: 0.5999969, z: 0.48067427}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -248,7 +251,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 73c176f402d2c2f4d929aa5da7585d17, type: 2}
+  - {fileID: 2100000, guid: 13c977e3fc69ec74391d5b269e873cf4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -344,6 +347,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DecorSlot
   itemName: Giant Cat Bed
   price: 250
+  description: Makes the shop cozier
+  requires: {fileID: 0}
+  addsCage: {fileID: 0}
   itemVisual: {fileID: 6089313277752797087}
   forSaleMarker: {fileID: 8531053855571007220}
 --- !u!208 &6204963003807526134
@@ -429,7 +435,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 73c176f402d2c2f4d929aa5da7585d17, type: 2}
+  - {fileID: 2100000, guid: f34b4bb5181a10a4da6298cd9049472b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -541,7 +547,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 73c176f402d2c2f4d929aa5da7585d17, type: 2}
+  - {fileID: 2100000, guid: 52e3c212846e6764c891e28493d384fc, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -610,7 +616,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3430686401417027418}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -1, z: -0, w: 0.00000058114523}
+  m_LocalRotation: {x: 0, y: -1, z: 0, w: 0}
   m_LocalPosition: {x: -7.390255, y: 0.5, z: -7.6031494}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -795,8 +801,8 @@ Transform:
   m_GameObject: {fileID: 4829370280368902323}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.3438427, y: 1.0377493, z: 1.0175161}
-  m_LocalScale: {x: 4.9312735, y: 1.5189998, z: 3.3809998}
+  m_LocalPosition: {x: 1.4538434, y: 0.7877493, z: 1.1275159}
+  m_LocalScale: {x: 5.671458, y: 1.5189998, z: 3.6011028}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4579253873863820262}
@@ -1058,7 +1064,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 73c176f402d2c2f4d929aa5da7585d17, type: 2}
+  - {fileID: 2100000, guid: f34b4bb5181a10a4da6298cd9049472b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1205,7 +1211,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 73c176f402d2c2f4d929aa5da7585d17, type: 2}
+  - {fileID: 2100000, guid: ab4522c34a7bb6e43b82b758b2351054, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1317,7 +1323,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 73c176f402d2c2f4d929aa5da7585d17, type: 2}
+  - {fileID: 2100000, guid: f713f08e39e2b9040a766df1aa37d541, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1429,7 +1435,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 73c176f402d2c2f4d929aa5da7585d17, type: 2}
+  - {fileID: 2100000, guid: 52e3c212846e6764c891e28493d384fc, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1541,7 +1547,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 73c176f402d2c2f4d929aa5da7585d17, type: 2}
+  - {fileID: 2100000, guid: 7ee31cb7f91c0ba44b0829683ebe4501, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1704,6 +1710,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DecorSlot
   itemName: Cat Play Balls
   price: 150
+  description: Makes the shop cozier
+  requires: {fileID: 0}
+  addsCage: {fileID: 0}
   itemVisual: {fileID: 4297292052659569034}
   forSaleMarker: {fileID: 5618609332347745184}
 --- !u!208 &922488981837086188
@@ -1749,7 +1758,7 @@ Transform:
   m_GameObject: {fileID: 8051689274815134237}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 1, z: -0, w: 0.00000050663937}
-  m_LocalPosition: {x: -1.4600762, y: 0, z: 0.6951765}
+  m_LocalPosition: {x: -1.7400764, y: 0, z: 0.6951762}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1771,6 +1780,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DecorSlot
   itemName: Cat Tunnels
   price: 400
+  description: Makes the shop cozier
+  requires: {fileID: 0}
+  addsCage: {fileID: 0}
   itemVisual: {fileID: 7410403247639941209}
   forSaleMarker: {fileID: 4829370280368902323}
 --- !u!208 &983496102345102623
@@ -1968,7 +1980,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 73c176f402d2c2f4d929aa5da7585d17, type: 2}
+  - {fileID: 2100000, guid: ab4522c34a7bb6e43b82b758b2351054, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
