@@ -1,4 +1,0 @@
-repository "EscapeHouse/PurrfectPlace@13469084539694@cloud"
-  path "/"
-    br "/main"
-    co "/main"
