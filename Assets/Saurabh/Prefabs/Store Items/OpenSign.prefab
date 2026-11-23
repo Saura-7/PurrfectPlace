@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 496384507979621790}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.14999962, y: 0, z: -0.05000019}
+  m_LocalPosition: {x: 0.20000076, y: 0, z: -0.05000019}
   m_LocalScale: {x: 0.3, y: 0.3, z: 0.1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -66,7 +66,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: cef4364429240df4c89e83017ffad555, type: 2}
+  - {fileID: 2100000, guid: 13c977e3fc69ec74391d5b269e873cf4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -156,7 +156,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 7023c1fd68819244eb7e0145102de418, type: 2}
+  - {fileID: 2100000, guid: f34b4bb5181a10a4da6298cd9049472b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -282,8 +282,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialHighlight
   steps: 0300000005000000
   highlightVisual: {fileID: 6613519120075177465}
-  pulseSpeed: 2
-  pulseAmount: 0.03
+  pulseSpeed: 4
+  pulseAmount: 0.05
+  fadeStartDistance: 4
+  fadeEndDistance: 1.5
 --- !u!1 &6613519120075177465
 GameObject:
   m_ObjectHideFlags: 0

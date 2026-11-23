@@ -31,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -1, z: 0, w: 0}
   m_LocalPosition: {x: 14.160004, y: 1.72, z: -0.9799998}
-  m_LocalScale: {x: 1.3836342, y: 2.4054, z: 6.945593}
+  m_LocalScale: {x: 1.3836342, y: 2.4054, z: 5.348107}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1812346821287848219}
@@ -128,15 +128,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   maxInteractionDistance: 10
+  deskCatSpot: {fileID: 0}
   dealUIPanel: {fileID: 0}
-  dealText: {fileID: 0}
-  wellCaredFrom: 8
-  averageFrom: 4
-  wellCaredAdoptionRep: 8
-  averageAdoptionRep: 3
-  neglectedAdoptionRep: 0
+  dealScreen: {fileID: 0}
   giverRescueRep: 3
-  missedDealRep: 1
+  noDealRep: 3
+  rareCatTip: {fileID: 11400000, guid: 25343a5604112314c802c9b56251b63e, type: 2}
+  attendRange: 4
 --- !u!114 &6768451859411651862
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -151,8 +149,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TutorialHighlight
   steps: 04000000
   highlightVisual: {fileID: 6736594685719949442}
-  pulseSpeed: 2
-  pulseAmount: 0.03
+  pulseSpeed: 4
+  pulseAmount: 0.05
   fadeStartDistance: 4
   fadeEndDistance: 1.5
 --- !u!1 &6736594685719949442
